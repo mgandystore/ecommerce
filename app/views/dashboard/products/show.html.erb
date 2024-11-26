@@ -1,0 +1,157 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+    <!-- Breadcrumb -->
+    <nav class="mb-4">
+      <ol class="flex items-center space-x-2 text-sm text-gray-500">
+        <li>
+          <%= link_to "Produits", dashboard_products_path, class: "hover:text-gray-700" %>
+        </li>
+        <li>
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          </svg>
+        </li>
+        <li class="font-medium text-gray-900">
+          <%= @product.name %>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Main Grid Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column - Main Product Info -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+        <!-- Product Name & Description -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Information Produit</h3>
+          </div>
+          <div class="p-4 sm:p-6">
+            <%= form_with model: @product,
+                          url: update_dashboard_product_path(@product),
+                          method: :patch,
+                          class: "space-y-6" do |f| %>
+
+              <div>
+                <%= f.label :name, "Nom du produit", class: "block text-sm font-medium text-gray-700" %>
+                <%= f.text_field :name,
+                                 class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+              </div>
+
+              <div>
+                <%= f.label :description, "Description", class: "block text-sm font-medium text-gray-700" %>
+                <div class="mt-1">
+                  <%= f.rich_text_area :description,
+                                       class: "trix-content",
+                                       placeholder: "Description du produit..." %>
+                </div>
+              </div>
+
+              <div class="flex justify-end w-full">
+                <%= render(Dashboard::ButtonComponent.new(
+                  text: "Enregistrer",
+                  html_options: {
+                    type: "submit",
+                    value: "Enregistrer",
+                    name: "test",
+                    class: "w-full md:w-auto",
+                  },
+                  variant: Dashboard::ButtonComponent.variant_primary)) %>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Product Variants -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Variantes</h3>
+            <%= link_to '#', # new_dashboard_product_variant_path(@product),
+                        class: "dash-btn-primary flex items-center gap-2" do %>
+              <%= inline_svg_tag 'icons/plus.svg', class: "h-4 w-4" %>
+              <span>Nouveau</span>
+            <% end %>
+          </div>
+          <ul role="list" class="divide-y divide-gray-200">
+            <% @product.product_variants.each do |variant| %>
+              <li class="p-4 sm:p-6">
+                <div class="flex items-center justify-between">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= variant.variants_slug %>
+                    </p>
+                    <p class="text-xs text-gray-500 mt-1">
+                      Stripe <%= link_to truncate_long_id(variant.stripe_product_price_id),
+                                  "#{Rails.configuration.stripe["url"]}/prices/#{variant.stripe_product_price_id}",
+                                  target: "_blank",
+                                  class: "dash-stripe-link text-xs" %>
+                    </p>
+                  </div>
+                  <div class="flex items-center gap-4">
+                    <p class="text-sm font-medium text-gray-900">
+                      Stock: <%= variant.stock %>
+                    </p>
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= number_to_currency((@product.base_price + variant.additional_price) / 100.0, unit: "€") %>
+                    </p>
+                    <%= link_to '#', # edit_dashboard_product_variant_path(@product, variant),
+                                class: "dash-btn-secondary" do %>
+                      <%= inline_svg_tag 'icons/edit.svg', class: "h-4 w-4" %>
+                    <% end %>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+
+      <!-- Right Column - Specifications & Features -->
+      <div class="space-y-6">
+        <!-- Specifications -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Spécifications</h3>
+            <%= link_to '#', #edit_specifications_dashboard_product_path(@product),
+                        class: "dash-btn-secondary flex items-center gap-2" do %>
+              <%= inline_svg_tag 'icons/edit.svg', class: "h-4 w-4" %>
+              <span>Modifier</span>
+            <% end %>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="space-y-3">
+              <% @product.specifications.each do |key, value| %>
+                <div class="flex justify-between">
+                  <dt class="text-sm text-gray-500"><%= key %></dt>
+                  <dd class="text-sm font-medium text-gray-900"><%= value %></dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+
+        <!-- FAQ -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">F.A.Q</h3>
+            <%= link_to '#', # edit_features_dashboard_product_path(@product),
+                        class: "dash-btn-secondary flex items-center gap-2" do %>
+              <%= inline_svg_tag 'icons/edit.svg', class: "h-4 w-4" %>
+              <span>Modifier</span>
+            <% end %>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="space-y-3">
+              <% @product.faq.each do |key, value| %>
+                <div class="flex justify-between">
+                  <dt class="text-sm text-gray-500"><%= key %></dt>
+                  <dd class="text-sm font-medium text-gray-900"><%= value %></dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

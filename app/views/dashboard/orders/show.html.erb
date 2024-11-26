@@ -1,0 +1,315 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+    <nav class="mb-4">
+      <ol class="flex items-center space-x-2 text-sm text-gray-500">
+        <li>
+          <%= link_to "Commandes", dashboard_orders_path, class: "hover:text-gray-700" %>
+        </li>
+        <li>
+          <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+          </svg>
+        </li>
+        <li class="font-medium text-gray-900">
+          Commande <%= @order.id %>
+        </li>
+      </ol>
+    </nav>
+
+    <!-- Header -->
+    <div class="flex justify-between items-baseline  pb-4">
+
+      <div>
+        <h1 class="text-xl leading-6 font-medium text-gray-900">
+          Commande <%= @order.id %>
+        </h1>
+        <p class="mt-1 text-sm text-gray-500">
+          Créée le <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %>
+        </p>
+      </div>
+      <div class="flex gap-2">
+        <%= form_with model: @order,
+                      url: update_dashboard_order_path(@order),
+                      method: :patch,
+                      class: "flex items-center gap-2" do |f| %>
+
+          <div class="w-48">
+            <%= f.select :status,
+                         statuses_for_select,
+                         {},
+                         class: "dash-btn-select" %>
+          </div>
+
+          <%= f.submit "Mettre à jour le statut",
+                       class: "dash-btn-primary" %>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Main content -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Left Column - Order Items -->
+      <div class="lg:col-span-2 flex flex-col gap-6">
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Articles</h3>
+          </div>
+          <ul role="list" class="divide-y divide-gray-200">
+            <% @order.order_items.each do |item| %>
+              <li class="p-4 sm:p-6">
+                <div class="flex items-start space-x-4">
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= item.product.name %>
+                    </p>
+                    <p class="text-sm text-gray-500">
+                      <%= item.product_variant.variants_slug %>
+                    </p>
+                    <p class="text-xs text-gray-400 mt-1">
+                      SKU: <%= item.product_variant.id %>
+                    </p>
+                  </div>
+                  <div class="flex-shrink-0 text-right">
+                    <p class="text-sm font-medium text-gray-900">
+                      <%= number_to_currency(item.total_amount / 100.0, unit: "€") %>
+                    </p>
+                    <p class="text-sm text-gray-500">
+                      Qté: <%= item.quantity %>
+                    </p>
+                  </div>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Notes d'informations</h3>
+          </div>
+          <div class="p-4 sm:p-6">
+            <%= form_with model: @order,
+                          url: update_dashboard_order_path(@order),
+                          method: :patch,
+                          class: "space-y-4" do |f| %>
+
+              <div class="trix-container">
+                <%= f.label :notes, class: "sr-only" %>
+                <%= f.rich_text_area :notes,
+                                     class: "trix-content",
+                                     placeholder: "Ajoutez vos notes ici..." %>
+              </div>
+
+              <div class="flex justify-end">
+                <%= f.submit "Enregistrer les notes",
+                             class: "dash-btn-primary" %>
+              </div>
+            <% end %>
+          </div>
+
+
+        </div>
+
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Historique des notes</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flow-root">
+              <ul role="list" class="-mb-8">
+                <% events = @order.order_notes %>
+                <% events.each_with_index do |event, index| %>
+                  <li>
+                    <div class="relative pb-8">
+                      <% if index < events.length - 1 %>
+                        <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                      <% end %>
+                      <div class="relative flex space-x-3">
+                        <div>
+                          <span class="h-8 w-8 rounded-full bg-gray-100 flex items-center justify-center ring-8 ring-white">
+                            <%= inline_svg_tag 'icons/sticky_note.svg', class: "h-5 w-5 text-gray-800" %>
+                          </span>
+                        </div>
+                        <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                          <div>
+                            <p class="text-sm text-gray-500"><%= event.content.html_safe %></p>
+                          </div>
+                          <div class="whitespace-nowrap text-right text-sm text-gray-500">
+                            <%= event.created_at.strftime("%d/%m/%Y à %H:%M") %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column - Customer & Payment Info -->
+      <div class="space-y-6">
+        <!-- Customer Info -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Client</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="space-y-3">
+              <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                <p class="text-sm font-medium text-gray-900">Nom complet</p>
+                <p class="text-sm font-medium text-gray-500">
+                  <%= @order.customer.full_name %>
+                </p>
+              </div>
+
+              <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                <p class="text-sm font-medium text-gray-900">Email</p>
+                <p class="text-sm font-medium text-gray-500">
+                  <%= @order.customer.email %>
+                </p>
+              </div>
+              <% if @order.customer.phone.present? %>
+                <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                  <p class="text-sm font-medium text-gray-900">N. Tel</p>
+                  <p class="text-sm font-medium text-gray-500">
+                    <%= @order.customer.phone %>
+                  </p>
+                </div>
+              <% end %>
+              <div class="pt-2">
+                <p class="text-xs text-gray-400">
+                  Stripe dashboard : <%= link_to @order.customer.stripe_customer_id,
+                              "#{Rails.configuration.stripe["url"]}/customers/#{@order.customer.stripe_customer_id}",
+                              target: "_blank",
+                              class: "dash-stripe-link" %>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <% if @order.shipping_address.present? %>
+          <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Adresse de livraison</h3>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <address class="text-sm not-italic">
+                <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                  <p class="text-sm font-medium text-gray-900">Addresse de livraison</p>
+                  <p class="text-sm font-medium text-gray-500">
+                    <%= @order.shipping_address.address_line1 %>
+                  </p>
+                </div>
+
+                <% if @order.shipping_address.address_line2.present? %>
+                  <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                    <p class="text-sm font-medium text-gray-900">Addresse de livraison (2)</p>
+                    <p class="text-sm font-medium text-gray-500">
+                      <%= @order.shipping_address.address_line1 %>
+                    </p>
+                  </div>
+                <% end %>
+
+                <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                  <p class="text-sm font-medium text-gray-900">Ville</p>
+                  <p class="text-sm font-medium text-gray-500">
+                    <%= @order.shipping_address.city %>
+                  </p>
+                </div>
+
+                <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                  <p class="text-sm font-medium text-gray-900">Code postal</p>
+                  <p class="text-sm font-medium text-gray-500">
+                    <%= @order.shipping_address.postal_code %>
+                  </p>
+                </div>
+
+                <div class="border-b border-gray-200 flex items-center justify-between py-2">
+                  <p class="text-sm font-medium text-gray-900">Code pays</p>
+                  <p class="text-sm font-medium text-gray-500">
+                    <%= @order.shipping_address.country %>
+                  </p>
+                </div>
+              </address>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Payment Info -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Sous-total</dt>
+                <dd class="font-medium text-gray-900">
+                  <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
+                </dd>
+              </div>
+
+              <div class="border-t border-gray-200 pt-3 flex justify-between">
+                <dt class="text-gray-900 font-medium">Total</dt>
+                <dd class="text-gray-900 font-medium">
+                  <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
+                </dd>
+              </div>
+
+              <div class="pt-2">
+                <p class="text-xs text-gray-400">
+                  Stripe dashboard : <%= link_to @order.stripe_payment_id,
+                              "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_id}",
+                              target: "_blank",
+                              class: "dash-stripe-link" %>
+                </p>
+              </div>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Timeline -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Historique</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <div class="flow-root">
+              <ul role="list" class="-mb-8">
+                <% events = order_events(@order) %>
+                <% events.each_with_index do |event, index| %>
+                  <li>
+                    <div class="relative pb-8">
+                      <% if index < events.length - 1 %>
+                        <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                      <% end %>
+                      <div class="relative flex space-x-3">
+                        <div>
+                          <span class="h-8 w-8 rounded-full bg-<%= statuses_color[event[:status]] %>-100 flex items-center justify-center ring-8 ring-white">
+                            <%= inline_svg_tag statuses_icon[event[:status]], class: "h-5 w-5 text-#{statuses_color[event[:status]]}-800" %>
+                          </span>
+                        </div>
+                        <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                          <div>
+                            <p class="text-sm text-gray-500"><%= event[:text] %></p>
+                          </div>
+                          <div class="whitespace-nowrap text-right text-sm text-gray-500">
+                            <%= event[:date].strftime("%d/%m/%Y à %H:%M") %>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,81 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+    .default-transition {
+        @apply transition-all duration-300;
+    }
+
+    .thumbnail {
+        @apply min-h-20 max-h-20 min-w-20 max-w-20 rounded-md cursor-pointer;
+    }
+
+    @screen sm {
+        .thumbnail {
+            @apply min-h-12 max-h-12 min-w-12 max-w-12;
+        }
+    }
+
+    .thumbnail.active {
+        @apply border-2 border-gray-400 cursor-default;
+    }
+
+    .color-variant-button-active {
+        @apply w-10 h-8 rounded-full flex justify-center items-center cursor-default ring-2 ring-offset-1 outline-none transition-all duration-300;
+    }
+
+    .color-variant-button {
+        @apply w-8 h-8 rounded-full flex justify-center items-center cursor-pointer transition-all duration-300;
+    }
+
+    .variant-button {
+        @apply px-4 py-3 rounded-full border border-black flex justify-center items-center gap-2.5 text-black text-xs font-normal
+        hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-900
+        focus:bg-emerald-900 focus:text-white focus:border-white transition-all duration-300;
+    }
+
+    .variant-button-active {
+        @apply cursor-default px-4 py-3 rounded-full bg-emerald-900 border border-white flex justify-center
+        items-center gap-2.5 text-white text-xs font-normal transition-all duration-300;
+    }
+
+    .glide-arrow {
+        @apply w-8 h-8 bg-emerald-900 rounded-full flex justify-center items-center hover:bg-emerald-950
+        absolute top-1/2 z-10 transform -translate-y-1/2 transition-all duration-300 cursor-pointer;
+    }
+
+
+    /* Dashboard variables */
+
+    .dash-stripe-link {
+        @apply underline decoration-dashed underline-offset-1 cursor-pointer text-gray-400 cursor-pointer;
+    }
+
+    .dash-link {
+        @apply text-indigo-600 hover:text-indigo-900 cursor-pointer;
+    }
+
+    .dash-btn-select {
+        @apply shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-sm border-gray-300 rounded-md;
+    }
+
+    .dash-btn-secondary {
+        @apply justify-center text-center inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm
+        font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2
+        focus:ring-indigo-500 cursor-pointer;
+    }
+
+    .dash-btn-primary {
+        @apply justify-center text-center inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm
+        font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2
+        focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer;
+    }
+
+    .dash-btn-danger {
+        @apply justify-center text-center inline-flex items-center px-4 py-2 border border-transparent shadow-sm text-sm
+        font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2
+        focus:ring-offset-2 focus:ring-red-500 cursor-pointer;
+    }
+
+}

@@ -1,0 +1,8 @@
+development: &default
+  secret: <%= Rails.application.credentials.dig(:stripe, :secret) %>
+  webhook_signing: <%= Rails.application.credentials.dig(:stripe, :webhook_signing) %>
+  url: https://dashboard.stripe.com/test
+
+production:
+  <<: *default
+  url: https://dashboard.stripe.com

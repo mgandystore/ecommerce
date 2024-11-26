@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title><%= content_for(:title) || "Hassmac" %></title>
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="mobile-web-app-capable" content="yes">
+  <%= csrf_meta_tags %>
+  <%= csp_meta_tag %>
+
+  <%= yield :head %>
+
+  <link rel="icon" href="/icon.png" type="image/png">
+  <link rel="icon" href="/icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/icon.png">
+
+  <%# Includes all stylesheet files in app/assets/stylesheets %>
+  <%= stylesheet_link_tag "tailwind", "inter-font", "data-turbo-track": "reload" %>
+  <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+  <%= javascript_include_tag "application", "data-turbo-track": "reload", type: "module" %>
+</head>
+
+<body>
+<%= render "dashboard/shared/flash" %>
+
+<div class="min-h-screen bg-gray-50" data-controller="dashboard-sidebar">
+  <!-- Mobile menu button -->
+  <div class="lg:hidden fixed top-0 left-0 z-50 w-full bg-white border-b border-gray-200">
+    <div class="px-4 py-3 flex items-center justify-between">
+      <div class="flex items-center">
+        <span class="ml-2 text-xl font-semibold">Hassmac</span>
+      </div>
+      <button data-action="click->dashboard-sidebar#toggle" class="text-gray-500 hover:text-gray-600">
+        <svg class="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <aside data-dashboard-sidebar-target="menu" class="fixed inset-y-0 left-0 z-40 w-64 transform -translate-x-full lg:translate-x-0 transition-transform duration-300 ease-in-out bg-white border-r border-gray-200">
+    <div class="h-full flex flex-col">
+      <!-- Desktop logo -->
+      <div class="hidden lg:flex items-center px-4 py-3">
+        <span class="ml-2 text-xl font-semibold">Hassmac Dashboard</span>
+      </div>
+
+      <!-- Navigation -->
+      <nav class="flex-1 px-2 py-4 space-y-1 max-lg:pt-16">
+        <% navbar_items.each do |item| %>
+          <%= link_to item[:path], class: "flex items-center px-4 py-2 text-gray-600 rounded-lg hover:bg-gray-100 #{current_page?(item[:path]) ? 'bg-gray-100' : ''}" do %>
+            <%= item[:icon].html_safe %>
+            <span class="ml-3"><%= item[:label] %></span>
+            <% if item[:count].present? %>
+                  <span class="ml-auto bg-blue-100 text-blue-600 py-0.5 px-2 rounded-full text-xs">
+                    <%= item[:count] %>
+                  </span>
+            <% end %>
+          <% end %>
+        <% end %>
+      </nav>
+    </div>
+  </aside>
+
+  <!-- Main content -->
+  <main class="lg:ml-64 pt-14 lg:pt-0">
+    <div class="p-4">
+      <%= yield %>
+    </div>
+  </main>
+</div>
+</body>
+
+</html>

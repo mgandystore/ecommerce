@@ -1,0 +1,3 @@
+class OrderNote < ApplicationRecord
+  belongs_to :order
+end

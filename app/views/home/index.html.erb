@@ -1,0 +1,217 @@
+<div data-controller="product"
+      data-product-product-value="<%= @product.to_json(include: :product_variants) %>"
+      data-action="
+      visibility:buy-btn-visibility->product#buyBtnVisibilityEvent
+      visibility:footer-visibility->product#footerVisibilityEvent
+      product-variant:variant-selected->product#variantSelectedEvent
+"
+>
+
+<div id="header" class="max-w-screen-2xl mx-auto my-8 max-sm:hidden">
+  <div class="mx-4">
+    <h1 class="italic text-base font-bold text-stone-950 cursor-pointer">La boutique du hassmac</h1>
+
+  </div>
+</div>
+
+<hr class="w-100 border-mgray">
+
+<div id="product_detail" class=" bg-gray-50 ">
+  <div class="max-w-screen-2xl  mx-auto py-24 px-6 max-sm:py-8">
+    <div class="grid grid-cols-5 gap-12 max-sm:grid-cols-1 max-sm:gap-4">
+      <div id="product_images" class="col-span-3  max-sm:col-span-1" data-controller="slider">
+        <div class="glide">
+          <div class="glide__track" data-glide-el="track">
+            <ul class="glide__slides w-full">
+              <li class="glide__slide "><img class="rounded-md"
+                                             src="https://picsum.photos/seed/a/900/1000"
+                                             alt="img"></li>
+              <li class="glide__slide "><img class="rounded-md"
+                                             src="https://picsum.photos/seed/b/900/1000"
+                                             alt="img"></li>
+              <li class="glide__slide "><img class="rounded-md"
+                                             src="https://picsum.photos/seed/c/900/1000"
+                                             alt="img"></li>
+            </ul>
+          </div>
+        </div>
+
+        <div id="thumbnails" class="flex flex-row gap-4 mt-4 overflow-x-auto">
+          <div class="rounded-md ">
+            <img class="thumbnail active" data-action="click->slider#goToSlide" data-slider-index-param="0"
+                 data-slider-target="thumbnail"
+                 src="https://picsum.photos/seed/a/900/1000"
+                 alt="img">
+          </div>
+          <div class="rounded-md">
+            <img class="thumbnail" data-action="click->slider#goToSlide" data-slider-index-param="1"
+                 data-slider-target="thumbnail"
+                 src="https://picsum.photos/seed/b/900/1000"
+                 alt="img">
+          </div>
+          <div class="rounded-md">
+            <img class="thumbnail" data-action="click->slider#goToSlide" data-slider-index-param="2"
+                 data-slider-target="thumbnail"
+                 src="https://picsum.photos/seed/c/900/1000"
+                 alt="img">
+          </div>
+
+        </div>
+      </div>
+
+      <div id="product" class="col-span-2 max-sm:col-span-1">
+        <div class="flex flex-col w-full">
+          <h2 class="text-4xl max-sm:text-3xl font-bold text-emerald-700"><%= @product.name %></h2>
+
+          <div id="price">
+            <div data-product-target="price" class="text-3xl max-sm:text-1xl font-bold text-stone-950">...</div>
+          </div>
+
+          <div class="flex flex-col justify-between mt-4">
+            <p class="text-gray-500 text-base max-sm:text-sm"><%= @product.description.html_safe %></p>
+          </div>
+
+
+          <div class="flex flex-col pt-6">
+            <div class="flex flex-col gap-4">
+              <div
+                data-controller="product-variant"
+                data-product-variant-variant-value="rouge"
+                data-product-variant-value-to-class-value="<%= color_to_tailwind.to_json %>"
+                data-product-variant-type-value="couleur"
+              >
+
+                <div class="flex flex-row gap-1">
+                  <div class="text-stone-950 text-base max-sm:text-sm font-bold pb-2">Couleur</div>
+                  <div data-product-variant-target="variantname"
+                       class="text-stone-950 text-base max-sm:text-sm"></div>
+                </div>
+                <div class="flex flex-row gap-4 pl-1">
+                  <% @product.variants_map[color_key].each do |value| %>
+                    <% color = color_to_tailwind[value.to_sym] %>
+                    <button
+                      data-action="click->product-variant#handleVariantValueChanged"
+                      data-product-variant-target="variant"
+                      data-product-variant-variant-param="<%= value %>"
+                      data-product-variant-type-param="couleur"
+                      type="button"
+                      class="bg-<%= color %>-300 hover:bg-<%= color %>-500 focus:bg-<%= color %>-500 focus:ring-<%= color %>-500">
+                    </button>
+                  <% end %>
+                </div>
+              </div>
+            </div>
+            <div
+
+              class="flex flex-row items-center mt-8">
+              <button
+                data-action="click->product#buy"
+                data-controller="visibility"
+                data-visibility-name-value="buy-btn"
+                class="
+                            cursor-pointer
+                hover:bg-amber-300
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
+                transition duration-200 ease-in-out
+                text-stone-950 text-base max-sm:text-sm font-base font-bold
+                py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
+                w-full
+                ">
+                Acheter
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <div>
+          <div class="mt-8">
+            <% @product.specifications.each_with_index do |(key, value), index| %>
+              <div class="grid grid-cols-2 py-4 <%= 'border-t border-gray-500 border-opacity-50' unless index == 0 %> justify-start max-sm:grid-cols-1">
+                <div class="text-stone-950 text-lg font-base max-sm:pb-4"><%= key %></div>
+                <div class="text-gray-500 text-base max-sm:text-sm font-base"><%= value %></div>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="fqa" class="max-w-screen-2xl  mx-auto py-24 px-6 max-sm:py-8">
+  <h2 class="text-emerald-700 text-2xl font-bold mb-8">F.A.Q</h2>
+
+  <div class="flex flex-col gap-6">
+    <div>
+      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        ?</h3>
+      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
+        Quisque
+        sagittis orci ut diam condimentum</p>
+    </div>
+    <div>
+      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        ?</h3>
+      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
+        Quisque
+        sagittis orci ut diam condimentum</p>
+    </div>
+    <div>
+      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
+        ?</h3>
+      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
+        Quisque
+        sagittis orci ut diam condimentum</p>
+    </div>
+  </div>
+
+</div>
+
+<footer data-controller="visibility"
+        data-visibility-name-value="footer"  id="footer" class="bg-emerald-700 w-100 py-8 px-6">
+  <div class="max-w-screen-2xl mx-auto  py-24 px-6 max-sm:py-8 w-full flex flex-row justify-between">
+    <div class="text-white text-sm font-base">© mgandy</div>
+    <div class="flex gap-2">
+      <a href="">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.001 2C17.524 2 22.001 6.477 22.001 12C22.001 17.523 17.524 22 12.001 22C10.2338 22.0029 8.49765 21.5352 6.97099 20.645L2.00499 22L3.35699 17.032C2.46608 15.5049 1.99804 13.768 2.00099 12C2.00099 6.477 6.47799 2 12.001 2ZM8.59299 7.3L8.39299 7.308C8.26351 7.31589 8.13697 7.3499 8.02099 7.408C7.91251 7.46943 7.81349 7.54622 7.72699 7.636C7.60699 7.749 7.53899 7.847 7.46599 7.942C7.09611 8.4229 6.89696 9.01331 6.89999 9.62C6.90199 10.11 7.02999 10.587 7.22999 11.033C7.63899 11.935 8.31199 12.89 9.19999 13.775C9.41399 13.988 9.62399 14.202 9.84999 14.401C10.9534 15.3725 12.2682 16.073 13.69 16.447L14.258 16.534C14.443 16.544 14.628 16.53 14.814 16.521C15.1052 16.506 15.3896 16.4271 15.647 16.29C15.7779 16.2225 15.9057 16.1491 16.03 16.07C16.03 16.07 16.073 16.042 16.155 15.98C16.29 15.88 16.373 15.809 16.485 15.692C16.568 15.606 16.64 15.505 16.695 15.39C16.773 15.227 16.851 14.916 16.883 14.657C16.907 14.459 16.9 14.351 16.897 14.284C16.893 14.177 16.804 14.066 16.707 14.019L16.125 13.758C16.125 13.758 15.255 13.379 14.723 13.137C14.6673 13.1127 14.6077 13.0988 14.547 13.096C14.4786 13.089 14.4094 13.0967 14.3442 13.1186C14.279 13.1405 14.2193 13.1761 14.169 13.223C14.164 13.221 14.097 13.278 13.374 14.154C13.3325 14.2098 13.2753 14.2519 13.2098 14.2751C13.1443 14.2982 13.0733 14.3013 13.006 14.284C12.9408 14.2665 12.877 14.2445 12.815 14.218C12.691 14.166 12.648 14.146 12.563 14.11C11.9891 13.8595 11.4577 13.5211 10.988 13.107C10.862 12.997 10.745 12.877 10.625 12.761C10.2316 12.3842 9.88871 11.958 9.60499 11.493L9.54599 11.398C9.50361 11.3342 9.46935 11.2653 9.44399 11.193C9.40599 11.046 9.50499 10.928 9.50499 10.928C9.50499 10.928 9.74799 10.662 9.86099 10.518C9.97099 10.378 10.064 10.242 10.124 10.145C10.242 9.955 10.279 9.76 10.217 9.609C9.93699 8.925 9.64699 8.244 9.34899 7.568C9.28999 7.434 9.11499 7.338 8.95599 7.319C8.90199 7.313 8.84799 7.307 8.79399 7.303C8.6597 7.29633 8.52513 7.29766 8.39099 7.307L8.59199 7.299L8.59299 7.3Z"
+                fill="white"/>
+        </svg>
+      </a>
+      <a href="">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12.001 2C6.47801 2 2.00101 6.477 2.00101 12C2.00101 16.991 5.65801 21.128 10.439 21.878V14.891H7.89901V12H10.439V9.797C10.439 7.291 11.931 5.907 14.216 5.907C15.31 5.907 16.454 6.102 16.454 6.102V8.562H15.194C13.951 8.562 13.564 9.333 13.564 10.124V12H16.337L15.894 14.89H13.564V21.878C18.344 21.129 22 16.992 22 12C22 6.477 17.524 2 12.001 2Z"
+                fill="white"/>
+        </svg>
+      </a>
+      <a href="">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M13.028 2.00099C13.7577 1.99819 14.4875 2.00552 15.217 2.02299L15.411 2.02999C15.635 2.03799 15.856 2.04799 16.123 2.05999C17.187 2.10999 17.913 2.27799 18.55 2.52499C19.21 2.77899 19.766 3.12299 20.322 3.67899C20.8304 4.17859 21.2238 4.78293 21.475 5.44999C21.722 6.08699 21.89 6.81399 21.94 7.87799C21.952 8.14399 21.962 8.36599 21.97 8.58999L21.976 8.78399C21.9938 9.51318 22.0014 10.2426 21.999 10.972L22 11.718V13.028C22.0025 13.7577 21.9948 14.4875 21.977 15.217L21.971 15.411C21.963 15.635 21.953 15.856 21.941 16.123C21.891 17.187 21.721 17.913 21.475 18.55C21.2246 19.2177 20.8311 19.8226 20.322 20.322C19.822 20.8303 19.2173 21.2237 18.55 21.475C17.913 21.722 17.187 21.89 16.123 21.94C15.856 21.952 15.635 21.962 15.411 21.97L15.217 21.976C14.4875 21.9938 13.7577 22.0014 13.028 21.999L12.282 22H10.973C10.2433 22.0025 9.51352 21.9948 8.784 21.977L8.59 21.971C8.35261 21.9624 8.11527 21.9524 7.878 21.941C6.814 21.891 6.088 21.721 5.45 21.475C4.78268 21.2243 4.17823 20.8308 3.679 20.322C3.17004 19.8223 2.77622 19.2175 2.525 18.55C2.278 17.913 2.11 17.187 2.06 16.123C2.04886 15.8857 2.03886 15.6484 2.03 15.411L2.025 15.217C2.00656 14.4875 1.99823 13.7577 2 13.028V10.972C1.99721 10.2426 2.00454 9.51318 2.022 8.78399L2.029 8.58999C2.037 8.36599 2.047 8.14399 2.059 7.87799C2.109 6.81299 2.277 6.08799 2.524 5.44999C2.77537 4.78261 3.16996 4.17843 3.68 3.67999C4.17889 3.17074 4.78296 2.77656 5.45 2.52499C6.088 2.27799 6.813 2.10999 7.878 2.05999L8.59 2.02999L8.784 2.02499C9.51318 2.00656 10.2426 1.99823 10.972 1.99999L13.028 2.00099ZM12 7.00099C11.3375 6.99162 10.6798 7.11401 10.065 7.36105C9.45019 7.6081 8.89064 7.97486 8.41884 8.44004C7.94704 8.90522 7.5724 9.45952 7.31668 10.0707C7.06097 10.682 6.92929 11.3379 6.92929 12.0005C6.92929 12.663 7.06097 13.319 7.31668 13.9302C7.5724 14.5414 7.94704 15.0958 8.41884 15.5609C8.89064 16.0261 9.45019 16.3929 10.065 16.6399C10.6798 16.887 11.3375 17.0094 12 17C13.3261 17 14.5978 16.4732 15.5355 15.5355C16.4732 14.5978 17 13.3261 17 12C17 10.6739 16.4732 9.40213 15.5355 8.46445C14.5978 7.52677 13.3261 7.00099 12 7.00099ZM12 9.00099C12.3985 8.99364 12.7945 9.06578 13.1648 9.21319C13.5351 9.3606 13.8723 9.58033 14.1568 9.85953C14.4412 10.1387 14.6672 10.4718 14.8214 10.8393C14.9757 11.2068 15.0552 11.6014 15.0553 12C15.0553 12.3986 14.976 12.7931 14.8218 13.1607C14.6677 13.5283 14.4418 13.8614 14.1575 14.1407C13.8731 14.42 13.536 14.6399 13.1657 14.7874C12.7955 14.9349 12.3995 15.0072 12.001 15C11.2053 15 10.4423 14.6839 9.87968 14.1213C9.31707 13.5587 9.001 12.7956 9.001 12C9.001 11.2043 9.31707 10.4413 9.87968 9.87867C10.4423 9.31606 11.2053 8.99999 12.001 8.99999L12 9.00099ZM17.25 5.50099C16.9274 5.5139 16.6223 5.65114 16.3986 5.88396C16.1749 6.11678 16.05 6.42712 16.05 6.74999C16.05 7.07285 16.1749 7.38319 16.3986 7.61601C16.6223 7.84884 16.9274 7.98607 17.25 7.99899C17.5815 7.99899 17.8995 7.86729 18.1339 7.63287C18.3683 7.39845 18.5 7.08051 18.5 6.74899C18.5 6.41747 18.3683 6.09952 18.1339 5.8651C17.8995 5.63068 17.5815 5.49899 17.25 5.49899V5.50099Z"
+                fill="white"/>
+        </svg>
+      </a>
+    </div>
+  </div>
+</footer>
+
+<div class="default-transition hidden max-sm:block fixed bottom-0 w-full" data-product-target="fixedBuyBtnContainer">
+  <div class="bg-white w-full py-4 px-6 drop-shadow-lg">
+    <button
+      data-action="click->product#buy"
+      class="
+                            cursor-pointer
+                hover:bg-amber-300
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
+                transition duration-200 ease-in-out
+                text-stone-950 text-base max-sm:text-sm font-base font-bold
+                py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
+                w-full
+                ">
+      Acheter
+    </button>
+  </div>
+
+</div>
+
+</div>
