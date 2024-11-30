@@ -561,3 +561,27 @@ trix-editor:focus {
   margin-left: 0.3em;
   padding-left: 0.6em;
 }
+
+
+/* Add these CSS rules to override the default Trix toolbar behavior */
+trix-editor-container {
+  min-width: 0; /* This is crucial for flex items */
+  width: 100%;
+}
+
+trix-toolbar {
+  width: 100%;
+  min-width: 0;
+}
+
+trix-toolbar .trix-button-row {
+  flex-wrap: wrap; /* Change from nowrap to wrap */
+  justify-content: flex-start; /* Change from space-between */
+  gap: 0.5rem; /* Add some gap between wrapped items */
+}
+
+/* Ensure the editor itself doesn't overflow */
+trix-editor {
+  width: 100%;
+  min-width: 0;
+}

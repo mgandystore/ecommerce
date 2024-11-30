@@ -28,6 +28,10 @@ Rails.application.routes.draw do
   get "dashboard/products", to: "dashboard/products#index", as: :dashboard_products
   get "dashboard/products/:id", to: "dashboard/products#show", as: :dashboard_product
   patch "dashboard/products/:id", to: "dashboard/products#update", as: :update_dashboard_product
+  get "dashboard/products/:id/specifications", to: "dashboard/products#edit_specifications", as: :edit_dashboard_product_specifications
+  patch "dashboard/products/:id/specifications", to: "dashboard/products#update_specifications", as: :update_dashboard_product_specifications
+  get "dashboard/products/:id/faq", to: "dashboard/products#edit_faq", as: :edit_dashboard_product_faq
+  patch "dashboard/products/:id/faq", to: "dashboard/products#update_faq", as: :update_dashboard_product_faq
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest

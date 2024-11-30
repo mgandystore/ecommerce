@@ -1,4 +1,3 @@
-# app/components/dashboard/button_component.rb
 # frozen_string_literal: true
 
 module Dashboard
@@ -8,10 +7,11 @@ module Dashboard
       secondary: "dash-btn-secondary",
       danger: "dash-btn-danger",
       minimal: "dash-link",
+      minimal_danger: "dash-link-danger",
     }.freeze
 
     def initialize(
-      text:,
+      text: nil,
       link: nil,
       icon_left: nil,
       icon_right: nil,
@@ -41,29 +41,34 @@ module Dashboard
     private
 
     def button_content
-      safe_join([
-                  icon_left_tag,
-                  content_tag(:span, @text),
-                  icon_right_tag
-                ].compact)
+      content_tag(:span, class: "flex items-center gap-2") do
+        safe_join([
+                    icon_left_tag,
+                    text_tag,
+                    icon_right_tag
+                  ].compact)
+      end
+    end
+
+    def text_tag
+      return unless @text
+      content_tag(:span, @text)
     end
 
     def icon_left_tag
       return unless @icon_left
-
       inline_svg_tag(@icon_left, class: "h-4 w-4")
     end
 
     def icon_right_tag
       return unless @icon_right
-
       inline_svg_tag(@icon_right, class: "h-4 w-4")
     end
 
     def base_classes
       [
         VARIANTS[@variant.to_sym],
-        @icon_left || @icon_right ? "flex items-center gap-2" : nil
+        "flex items-center"
       ].compact.join(" ")
     end
 
@@ -94,6 +99,10 @@ module Dashboard
 
     def self.variant_minimal
       "minimal"
+    end
+
+    def self.variant_minimal_danger
+      "minimal_danger"
     end
   end
 end

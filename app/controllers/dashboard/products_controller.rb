@@ -33,10 +33,54 @@ module Dashboard
       redirect_to dashboard_product_path(@product)
     end
 
+    def edit_specifications
+      @product = Product.find(params[:id])
+    end
+
+    def update_specifications
+      @product = Product.find(params[:id])
+
+      specifications = {}
+
+      if params[:specifications].present?
+        params[:specifications].each do |spec|
+          next if spec[:key].blank? && spec[:value].blank?
+          specifications[spec[:key]] = spec[:value]
+        end
+      end
+
+      @product.update(specifications: specifications)
+
+      flash[:success] = "Les spécifications ont été mises à jour avec succès"
+      redirect_to dashboard_product_path(@product)
+    end
+
+    def edit_faq
+      @product = Product.find(params[:id])
+    end
+
+    def update_faq
+      @product = Product.find(params[:id])
+
+      faq = {}
+
+      if params[:faq].present?
+        params[:faq].each do |item|
+          next if item[:key].blank? && item[:value].blank?
+          faq[item[:key]] = item[:value]
+        end
+      end
+
+      @product.update(faq: faq)
+
+      flash[:success] = "La FAQ a été mise à jour avec succès"
+      redirect_to dashboard_product_path(@product)
+    end
+
     private
 
     def product_params
-      params.require(:product).permit(:name, :description)
+      params.require(:product).permit(:name, :description, specifications: {}, faq: {})
     end
 
     def products_scope

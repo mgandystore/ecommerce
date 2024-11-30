@@ -17,5 +17,7 @@ application.register("product", ProductController)
 
 import DashboardSidebarController from "./dashboard_sidebar_controller"
 import DashboardFlashController from "./dashboard_flash_controller"
+import DashboardDynamicKVFormController from "./dashboard_dynamic_kv_form_controller"
 application.register("dashboard-sidebar", DashboardSidebarController)
 application.register("dashboard-flash", DashboardFlashController)
+application.register("dashboard-dynamic-kv-form", DashboardDynamicKVFormController)
