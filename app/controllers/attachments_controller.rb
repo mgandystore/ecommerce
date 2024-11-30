@@ -20,34 +20,27 @@ class AttachmentsController < ApplicationController
       variant = attachment.variant(transformation_options).processed
       variant_record = variant.send(:record)
       blob = variant_record.image.blob
-
-      if request.headers["Range"].present?
-        send_blob_byte_range_data(blob, request.headers["Range"])
-        return
-      end
-
-      http_cache_forever public: true do
-        response.headers["Accept-Ranges"] = "bytes"
-        response.headers["Content-Length"] = blob.byte_size.to_s
-        send_blob_stream(blob, disposition: params[:disposition])
-      end
+      send_blob(blob)
     else
-      # Original behavior for non-variant requests
-      if request.headers["Range"].present?
-        send_blob_byte_range_data(attachment.blob, request.headers["Range"])
-        return
-      end
-
-      http_cache_forever public: true do
-        response.headers["Accept-Ranges"] = "bytes"
-        response.headers["Content-Length"] = attachment.blob.byte_size.to_s
-
-        send_blob_stream(attachment.blob, disposition: params[:disposition])
-      end
+      send_blob(attachment.blob)
     end
   end
 
   private
+
+  def send_blob(blob)
+    if request.headers["Range"].present?
+      send_blob_byte_range_data(blob, request.headers["Range"])
+      return
+    end
+
+    http_cache_forever public: true do
+      response.headers["Accept-Ranges"] = "bytes"
+      response.headers["Content-Length"] = blob.byte_size.to_s
+
+      send_blob_stream(blob, disposition: params[:disposition])
+    end
+  end
 
   def parse_dimension(param_value)
     return nil if param_value.blank?
