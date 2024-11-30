@@ -29,8 +29,6 @@ module Dashboard
         @product.images.where(id: params[:product][:images_to_delete]).delete_all
       end
 
-
-
       if product_params[:images].present?
         @product.images.attach(product_params[:images])
       end
@@ -38,6 +36,40 @@ module Dashboard
       if @product.changed? || product_params[:images].present? || params[:product][:images_to_delete].present?
         @product.save
         flash[:success] = "Les informations du produit ont été mises à jour avec succès"
+      end
+
+      redirect_to dashboard_product_path(@product)
+    end
+
+    def edit_product_variants
+      product_variant_id = params[:product_variant_id]
+      @product = Product.find(params[:id])
+      @product_variant = @product.product_variants.find(product_variant_id)
+    end
+
+    def update_product_variant
+      @product = Product.find(params[:id])
+      @product_variant = @product.product_variants.find(params[:product_variant_id])
+
+      if product_variant_params[:images].present?
+        @product_variant.images.attach(product_variant_params[:images])
+      end
+
+      if product_variant_params[:images_to_delete].present?
+        @product_variant.images.where(id: params[:product_variant][:images_to_delete]).delete_all
+      end
+
+      if product_variant_params[:stock].present?
+        @product_variant.update(stock: product_variant_params[:stock])
+      end
+
+      if product_variant_params[:additional_price].present?
+        @product_variant.update(additional_price: product_variant_params[:additional_price])
+      end
+
+      if @product_variant.changed? || product_variant_params[:images].present? || params[:product_variant][:images_to_delete].present?
+        @product_variant.save
+        flash[:success] = "Les informations de la variante ont été mises à jour avec succès"
       end
 
       redirect_to dashboard_product_path(@product)
@@ -91,6 +123,10 @@ module Dashboard
 
     def product_params
       params.require(:product).permit(:name, :description, specifications: {}, faq: {}, images: [], images_to_delete: [])
+    end
+
+    def product_variant_params
+      params.require(:product_variant).permit(:stock, :additional_price, images: [], images_to_delete: [])
     end
 
     def products_scope

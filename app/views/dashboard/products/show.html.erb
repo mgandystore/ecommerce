@@ -38,7 +38,7 @@
               </div>
 
               <%= f.label :description, "Images", class: "block text-sm font-medium text-gray-700" %>
-              <div data-controller="dashboard-image-upload" class="">
+              <div data-controller="dashboard-image-upload" class="" data-dashboard-image-upload-model-value="product">
                 <div class="flex flex-wrap gap-4">
                   <!-- Add Image Button -->
                   <button type="button"
@@ -122,10 +122,10 @@
                     <p class="text-sm font-medium text-gray-900">
                       <%= number_to_currency((@product.base_price + variant.additional_price) / 100.0, unit: "€") %>
                     </p>
-                    <%= link_to '#', # edit_dashboard_product_variant_path(@product, variant),
-                                class: "dash-btn-secondary" do %>
-                      <%= inline_svg_tag 'icons/edit.svg', class: "h-4 w-4" %>
-                    <% end %>
+                    <%= render(Dashboard::ButtonComponent.new(
+                      icon_left: 'icons/edit.svg',
+                      link: edit_dashboard_product_variant_path(@product, variant),
+                      variant: Dashboard::ButtonComponent.variant_secondary)) %>
                   </div>
                 </div>
               </li>

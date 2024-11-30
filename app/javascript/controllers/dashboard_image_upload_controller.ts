@@ -2,10 +2,12 @@ import { Controller } from "@hotwired/stimulus"
 
 export default class extends Controller {
   static targets = ["preview", "input", "template"]
+  static values = { model: String }
 
   declare readonly previewTarget: HTMLDivElement
   declare readonly inputTarget: HTMLInputElement
   declare readonly templateTarget: HTMLTemplateElement
+  declare readonly modelValue: string
 
   connect() {
     console.log("ImageUploadController connected")
@@ -43,7 +45,7 @@ export default class extends Controller {
     if (imageId) {
       const input = document.createElement('input')
       input.type = 'hidden'
-      input.name = 'product[images_to_delete][]'
+      input.name = this.modelValue + '[images_to_delete][]'
       input.value = imageId
       this.element.appendChild(input)
     }

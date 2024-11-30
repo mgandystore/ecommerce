@@ -1,0 +1,19 @@
+<nav class="mb-4">
+  <ol class="flex items-center space-x-2 text-sm text-gray-500">
+    <% @items.each_with_index do |item, index| %>
+      <li>
+        <% if item[:current] %>
+          <span class="font-medium text-gray-900"><%= item[:label] %></span>
+        <% else %>
+          <%= link_to item[:label], item[:path], class: "hover:text-gray-700" %>
+        <% end %>
+      </li>
+
+      <% if index < @items.length - 1 %>
+        <li>
+          <%= inline_svg_tag "icons/chevron_right.svg", class: "h-4 w-4" %>
+        </li>
+      <% end %>
+    <% end %>
+  </ol>
+</nav>
