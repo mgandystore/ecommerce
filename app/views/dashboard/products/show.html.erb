@@ -37,6 +37,44 @@
                 </div>
               </div>
 
+              <%= f.label :description, "Images", class: "block text-sm font-medium text-gray-700" %>
+              <div data-controller="dashboard-image-upload" class="">
+                <div class="flex flex-wrap gap-4">
+                  <!-- Add Image Button -->
+                  <button type="button"
+                          data-action="click->dashboard-image-upload#addImage"
+                          class="w-24 h-24 flex flex-col items-center justify-center border-2 border-dashed border-gray-300 rounded hover:border-gray-400">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    </svg>
+                    <span class="mt-2 text-sm text-gray-500">Ajouter une image</span>
+                  </button>
+
+                  <!-- Image Preview Section -->
+                  <div data-dashboard-image-upload-target="preview" class="flex flex-wrap gap-4">
+                    <% @product.images.each do |image| %>
+                      <%= render 'dashboard/shared/image_preview', image: image, data: { image_id: image.id } %>
+                    <% end %>
+                  </div>
+                </div>
+
+                <!-- Hidden File Input -->
+                <%= f.file_field :images,
+                                 multiple: true,
+                                 direct_upload: true,
+                                 data: {
+                                   dashboard_image_upload_target: "input",
+                                   action: "change->dashboard-image-upload#handleFileSelect"
+                                 },
+                                 class: "hidden",
+                                 accept: "image/*" %>
+
+                <!-- Template -->
+                <template data-dashboard-image-upload-target="template">
+                  <%= render 'dashboard/shared/image_preview', image: nil %>
+                </template>
+              </div>
+
               <div class="flex justify-end w-full">
                 <%= render(Dashboard::ButtonComponent.new(
                   text: "Enregistrer",

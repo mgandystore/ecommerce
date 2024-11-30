@@ -25,7 +25,17 @@ module Dashboard
         @product.description = product_params[:description]
       end
 
-      if @product.changed?
+      if params[:product][:images_to_delete].present?
+        @product.images.where(id: params[:product][:images_to_delete]).delete_all
+      end
+
+
+
+      if product_params[:images].present?
+        @product.images.attach(product_params[:images])
+      end
+
+      if @product.changed? || product_params[:images].present? || params[:product][:images_to_delete].present?
         @product.save
         flash[:success] = "Les informations du produit ont été mises à jour avec succès"
       end
@@ -80,7 +90,7 @@ module Dashboard
     private
 
     def product_params
-      params.require(:product).permit(:name, :description, specifications: {}, faq: {})
+      params.require(:product).permit(:name, :description, specifications: {}, faq: {}, images: [], images_to_delete: [])
     end
 
     def products_scope
