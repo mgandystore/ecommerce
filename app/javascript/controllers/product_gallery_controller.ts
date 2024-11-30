@@ -2,11 +2,14 @@ import { Controller } from "@hotwired/stimulus"
 import { VariantSelectEvent } from './product_variant_controller'
 import { VariantSlugSelectedEvent } from './product_controller'
 
-
-type Images = Record<string, {
+type Image = {
   url: string
+  url_thumb: string
+  url_normal: string
   alt: string
-}[]>
+}
+
+type Images = Record<string, Image[]>
 
 export default class extends Controller {
   static targets = ["mainImage", "counter", "thumbnail", "modal", "modalImage", 'thumbnailsContainer', 'thumbnailsTemplate']
@@ -27,7 +30,7 @@ export default class extends Controller {
   declare thumbnailsTemplateTarget: HTMLTemplateElement
 
   declare readonly imagesValue: Images
-  declare imageUsedValue: { url: string, alt: string }[]
+  declare imageUsedValue: Image[]
   declare currentIndexValue: number
   declare isZoomedValue: boolean
   declare variantSelectedValue: string
@@ -48,11 +51,11 @@ export default class extends Controller {
     imagesValue: Images,
     currentVariant: string,
     currentIndex: number,
-  ): { newImageUsed: { url: string, alt: string }[]; newIndex: number } {
+  ): { newImageUsed: Image[]; newIndex: number } {
     console.log("variant select changed gallery", currentVariant);
 
     // Build new imageUsed array starting with product images
-    let newImageUsed: { url: string, alt: string }[] = [...imagesValue.product_images];
+    let newImageUsed: Image[] = [...imagesValue.product_images];
 
     // Count of base product images
     const productImagesCount = imagesValue.product_images.length;
@@ -113,7 +116,7 @@ export default class extends Controller {
 
       if (button && img) {
         button.dataset.productGalleryIndexParam = index.toString()
-        img.src = image.url
+        img.src = image.url_thumb
         img.alt = image.alt
         this.thumbnailsContainerTarget.appendChild(clone)
       }
@@ -131,7 +134,7 @@ export default class extends Controller {
     if (this.imageUsedValue) {
       const currentImage = this.imageUsedValue[this.currentIndexValue]
       if (currentImage) {
-        this.mainImageTarget.src = currentImage.url
+        this.mainImageTarget.src = currentImage.url_normal
         this.mainImageTarget.alt = currentImage.alt
         this.modalImageTarget.src = currentImage.url
         this.modalImageTarget.alt = currentImage.alt

@@ -71,5 +71,15 @@ Rails.application.configure do
   # config.generators.apply_rubocop_autocorrect_after_generate!
 
 
+  # Explicitly set the variant processor
+  config.active_storage.variant_processor = :mini_magick
+
+  # Enable variants tracking in database
+  config.active_storage.track_variants = true
+  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.analyzers = [ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick]
+
   config.assets.debug = true
+
+  routes.default_url_options[:host] = ENV.fetch('WEBSITE_URL', 'localhost:3000')
 end
