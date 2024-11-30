@@ -8,7 +8,6 @@ export default class extends Controller {
   declare readonly nameValue: string
 
   connect() {
-    console.log("connect visibility controller")
     useIntersection(this)
   }
 

@@ -19,44 +19,8 @@
 <div id="product_detail" class=" bg-gray-50 ">
   <div class="max-w-screen-2xl  mx-auto py-24 px-6 max-sm:py-8">
     <div class="grid grid-cols-5 gap-12 max-sm:grid-cols-1 max-sm:gap-4">
-      <div id="product_images" class="col-span-3  max-sm:col-span-1" data-controller="slider">
-        <div class="glide">
-          <div class="glide__track" data-glide-el="track">
-            <ul class="glide__slides w-full">
-              <li class="glide__slide "><img class="rounded-md"
-                                             src="https://picsum.photos/seed/a/900/1000"
-                                             alt="img"></li>
-              <li class="glide__slide "><img class="rounded-md"
-                                             src="https://picsum.photos/seed/b/900/1000"
-                                             alt="img"></li>
-              <li class="glide__slide "><img class="rounded-md"
-                                             src="https://picsum.photos/seed/c/900/1000"
-                                             alt="img"></li>
-            </ul>
-          </div>
-        </div>
-
-        <div id="thumbnails" class="flex flex-row gap-4 mt-4 overflow-x-auto">
-          <div class="rounded-md ">
-            <img class="thumbnail active" data-action="click->slider#goToSlide" data-slider-index-param="0"
-                 data-slider-target="thumbnail"
-                 src="https://picsum.photos/seed/a/900/1000"
-                 alt="img">
-          </div>
-          <div class="rounded-md">
-            <img class="thumbnail" data-action="click->slider#goToSlide" data-slider-index-param="1"
-                 data-slider-target="thumbnail"
-                 src="https://picsum.photos/seed/b/900/1000"
-                 alt="img">
-          </div>
-          <div class="rounded-md">
-            <img class="thumbnail" data-action="click->slider#goToSlide" data-slider-index-param="2"
-                 data-slider-target="thumbnail"
-                 src="https://picsum.photos/seed/c/900/1000"
-                 alt="img">
-          </div>
-
-        </div>
+      <div id="product_images" class="col-span-3  max-sm:col-span-1">
+        <%= render(ProductGalleryComponent.new(images: @images)) %>
       </div>
 
       <div id="product" class="col-span-2 max-sm:col-span-1">
@@ -101,13 +65,12 @@
                 </div>
               </div>
             </div>
-            <div
-
-              class="flex flex-row items-center mt-8">
+            <div class="flex flex-col items-center mt-8">
               <button
                 data-action="click->product#buy"
                 data-controller="visibility"
                 data-visibility-name-value="buy-btn"
+                data-product-target="buyButtons"
                 class="
                             cursor-pointer
                 hover:bg-amber-300
@@ -119,6 +82,9 @@
                 ">
                 Acheter
               </button>
+              <span class="text-red-500 text-xs mt-2 hidden" data-product-target="outOfStock">
+                Rupture de stock
+              </span>
             </div>
           </div>
 
@@ -126,10 +92,11 @@
 
         <div>
           <div class="mt-8">
+            <p class="text-stone-950 text-xl pb-2">Spécifications</p>
             <% @product.specifications.each_with_index do |(key, value), index| %>
               <div class="grid grid-cols-2 py-4 <%= 'border-t border-gray-500 border-opacity-50' unless index == 0 %> justify-start max-sm:grid-cols-1">
-                <div class="text-stone-950 text-lg font-base max-sm:pb-4"><%= key %></div>
-                <div class="text-gray-500 text-base max-sm:text-sm font-base"><%= value %></div>
+                <div class="text-stone-950 text-sm font-base max-sm:pb-4"><%= key %></div>
+                <div class="text-gray-500 text-sm font-base"><%= value.html_safe %></div>
               </div>
             <% end %>
           </div>
@@ -143,31 +110,36 @@
   <h2 class="text-emerald-700 text-2xl font-bold mb-8">F.A.Q</h2>
 
   <div class="flex flex-col gap-6">
-    <div>
-      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        ?</h3>
-      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
-        Quisque
-        sagittis orci ut diam condimentum</p>
-    </div>
-    <div>
-      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        ?</h3>
-      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
-        Quisque
-        sagittis orci ut diam condimentum</p>
-    </div>
-    <div>
-      <h3 class="text-stone-950 text-lg font-bold pb-2">Lorem ipsum dolor sit amet, consectetur adipiscing elit
-        ?</h3>
-      <p class="text-gray-500 text-base max-sm:text-sm font-base">Pellentesque commodo lacus at sodales sodales.
-        Quisque
-        sagittis orci ut diam condimentum</p>
-    </div>
+    <% @product.faq.each do |(key, value)| %>
+      <div>
+        <p class="text-stone-950 text-lg font-bold pb-2"><%= key %></p>
+        <div class="text-gray-500 text-base max-sm:text-sm font-base"><%= value.html_safe %></div>
+      </div>
+    <% end %>
   </div>
 
 </div>
 
+<div class="default-transition hidden max-sm:block fixed bottom-0 w-full"
+     data-product-target="fixedBuyBtnContainer">
+  <div class="bg-white w-full py-4 px-6 drop-shadow-lg">
+    <button
+      data-action="click->product#buy"
+      data-product-target="buyButtons"
+      class="
+                          cursor-pointer
+              hover:bg-amber-300
+              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
+              transition duration-200 ease-in-out
+              text-stone-950 text-base max-sm:text-sm font-base font-bold
+              py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
+              w-full
+              ">
+      Acheter
+    </button>
+  </div>
+
+</div>
 <footer data-controller="visibility"
         data-visibility-name-value="footer"  id="footer" class="bg-emerald-700 w-100 py-8 px-6">
   <div class="max-w-screen-2xl mx-auto  py-24 px-6 max-sm:py-8 w-full flex flex-row justify-between">
@@ -195,23 +167,6 @@
   </div>
 </footer>
 
-<div class="default-transition hidden max-sm:block fixed bottom-0 w-full" data-product-target="fixedBuyBtnContainer">
-  <div class="bg-white w-full py-4 px-6 drop-shadow-lg">
-    <button
-      data-action="click->product#buy"
-      class="
-                            cursor-pointer
-                hover:bg-amber-300
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
-                transition duration-200 ease-in-out
-                text-stone-950 text-base max-sm:text-sm font-base font-bold
-                py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
-                w-full
-                ">
-      Acheter
-    </button>
-  </div>
 
-</div>
 
 </div>

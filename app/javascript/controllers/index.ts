@@ -8,11 +8,12 @@ import SliderController from "./slider_controller"
 import ProductVariantController from "./product_variant_controller"
 import VisibilityController from "./visibility_controller"
 import ProductController from "./product_controller"
-
+import ProductGalleryController from "./product_gallery_controller"
 application.register("slider", SliderController)
 application.register("product-variant", ProductVariantController)
 application.register("visibility", VisibilityController)
 application.register("product", ProductController)
+application.register("product-gallery", ProductGalleryController)
 
 
 import DashboardSidebarController from "./dashboard_sidebar_controller"

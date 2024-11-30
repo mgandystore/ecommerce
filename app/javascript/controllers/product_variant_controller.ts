@@ -27,7 +27,6 @@ export default class extends Controller {
   declare hasVariantnameTarget: boolean
 
   connect() {
-    console.log('connect product variant controller', this.variantValue, this.typeValue, this.valueToClassValue)
   }
 
   variantValueChanged() {
@@ -53,7 +52,6 @@ export default class extends Controller {
   }
 
   unselectVariant(el: HTMLDivElement, variant: string) {
-    console.log('unselect variant', variant)
     switch (this.typeValue) {
       case VariantType.Color:
         const color = this.valueToClassValue[variant]
@@ -64,7 +62,6 @@ export default class extends Controller {
   }
 
   selectVariant(el: HTMLDivElement, variant: string) {
-    console.log('select variant', variant)
     switch (this.typeValue) {
       case VariantType.Color:
         let color = this.valueToClassValue[variant]

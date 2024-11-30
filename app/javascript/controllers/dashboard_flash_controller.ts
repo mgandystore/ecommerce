@@ -6,7 +6,6 @@ export default class extends Controller {
   declare readonly containerTarget: HTMLElement
 
   connect() {
-    console.log("FlashController connected")
     setTimeout(() => {
       this.fadeOut()
     }, 5000)

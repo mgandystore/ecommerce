@@ -11,9 +11,6 @@ export default class extends Controller {
 
   connect() {
 
-    console.log("GLIDE =", Glide)
-
-
     const g = new Glide('.glide', {
       type: 'carousel',
       perView: 1,

@@ -10,7 +10,6 @@ export default class extends Controller {
   declare readonly modelValue: string
 
   connect() {
-    console.log("ImageUploadController connected")
   }
 
   addImage() {
