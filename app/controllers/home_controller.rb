@@ -17,6 +17,10 @@ class HomeController < ApplicationController
     end
   end
 
+  def success
+
+  end
+
   def to_image(id, image)
     {
       url: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id),

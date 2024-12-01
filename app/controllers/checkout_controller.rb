@@ -18,7 +18,7 @@ class CheckoutController < ApplicationController
 
       begin
         session = Stripe::Checkout::Session.create(
-          success_url: "http://localhost:3000",
+          success_url: Rails.application.routes.url_helpers.success_url,
           cancel_url: "http://localhost:3000",
           payment_method_types: ["card"],
           shipping_address_collection: {
