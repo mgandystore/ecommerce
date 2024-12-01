@@ -21,6 +21,9 @@ module Dashboard
 
       if Order.statuses.include?(order_params[:status])
         @order.update(status: order_params[:status])
+        if @order.status == "shipped"
+          OrderMailer.order_shipped(@order.id).deliver_later
+        end
         flash[:success] = "L'état de la commande a été mis à jour avec succès"
       end
 

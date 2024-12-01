@@ -5,6 +5,8 @@ class Order
     def perform(checkout_session_id)
       session = Stripe::Checkout::Session.retrieve(checkout_session_id)
 
+      order = nil
+
       ActiveRecord::Base.transaction do
         address = Address.create!(
           address_line1: session.shipping_details.address.line1,
@@ -46,6 +48,10 @@ class Order
             .where(id: stripe_product.metadata.variant_id)
             .update_all("stock = stock - 1")
         end
+      end
+
+      if order != nil
+        OrderMailer.order_created(order.id).deliver_later
       end
     end
   end

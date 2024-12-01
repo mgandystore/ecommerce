@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Commande expédiée</title>
+  <style>
+      body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+      }
+      .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: white;
+      }
+      .header {
+          background-color: #4CAF50;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+      }
+      .content {
+          padding: 30px;
+          background-color: white;
+          border-radius: 0 0 8px 8px;
+      }
+      .status-box {
+          background-color: #e8f5e9;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+          border-left: 4px solid #4CAF50;
+          display: flex;
+          align-items: center;
+          gap: 10px;
+      }
+      .status-box img {
+          vertical-align: middle;
+      }
+      .tracking-box {
+          background-color: #f5f5f5;
+          border-radius: 8px;
+          padding: 20px;
+          margin: 20px 0;
+          text-align: center;
+      }
+      .footer {
+          text-align: center;
+          padding: 20px;
+          color: #666;
+          font-size: 14px;
+      }
+      .button {
+          background-color: #4CAF50;
+          color: white;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 4px;
+          display: inline-block;
+          margin: 20px 0;
+      }
+  </style>
+</head>
+<body>
+<div class="container">
+  <div class="header">
+    <h1>Votre commande est en route !</h1>
+  </div>
+
+  <div class="content">
+    <p>Bonjour <%= @client_name %>,</p>
+
+    <p>Bonne nouvelle ! Votre commande est en route.</p>
+    <p>Commande <strong>#<%= @order_number %></strong></p>
+    <p>Votre assmac de <%= @variant_human %> est en cours d'acheminement.</p>
+
+    <div class="status-box">
+      <img src="https://assmac-assets.s3.fr-par.scw.cloud/check.png" alt="status-box" width="16" height="16">
+      <span>Commande expédiée</span>
+    </div>
+
+    <div class="tracking-box">
+      <p>Numéro de suivi : <strong><%= @tracking_number %></strong></p>
+      <a href="<%= @tracking_url %>" class="button">Suivre mon colis</a>
+    </div>
+
+    <p>Votre colis est entre les mains de notre transporteur <%= @carrier_name %>. Vous pouvez suivre son acheminement en cliquant sur le bouton ci-dessus.</p>
+
+    <p>Rappel de votre commande :</p>
+    <ul>
+      <li>Assmac <%= @variant_human %></li>
+      <li>Livraison à : <%= @delivery_address %></li>
+    </ul>
+
+    <p>Si vous avez des questions concernant votre livraison, n'hésitez pas à nous contacter à l'adresse <a href="mailto:<%= @shop_email %>"><%= @shop_email %></a>.</p>
+
+    <p>Cordialement,<br>
+      L'équipe <%= @shop_name %></p>
+  </div>
+
+  <div class="footer">
+    <p><%= @shop_name %> - <%= @shop_address %></p>
+    <p>Cet email a été envoyé à <a href="mailto:<%= @client_email %>"><%= @client_email %></a></p>
+  </div>
+</div>
+</body>
+</html>

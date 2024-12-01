@@ -73,12 +73,19 @@ Rails.application.configure do
 
   config.active_storage.variant_processor = :mini_magick
   config.active_storage.track_variants = true
-  config.active_storage.analyzers = [ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick]
+  config.active_storage.analyzers = [ ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick ]
   config.active_storage.service_urls_expire_in = 30.minutes
 
   config.assets.debug = true
 
-  routes.default_url_options[:host] = ENV.fetch('WEBSITE_URL', 'localhost:3000')
+  routes.default_url_options[:host] = ENV.fetch("WEBSITE_URL", "localhost:3000")
+
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: "localhost",
+    port: 1025
+  }
+  config.action_mailer.default_url_options = { host: "localhost", port: 3000 }
 
   Stripe.log_level = Stripe::LEVEL_DEBUG
 end
