@@ -24,6 +24,7 @@ module Hassmac
     # config.time_zone = "Central Time (US & Canada)"
     # config.eager_load_paths << Rails.root.join("extras")
     config.stripe = config_for(:stripe)
+    config.auth = config_for(:auth)
 
     config.i18n.default_locale = :fr
 

@@ -1,0 +1,6 @@
+development: &default
+  username: <%= ENV.fetch('AUTH_USERNAME') %>
+  password: <%= ENV.fetch('AUTH_PASSWORD') %>
+
+production:
+  <<: *default
