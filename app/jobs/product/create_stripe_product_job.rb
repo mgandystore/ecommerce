@@ -20,14 +20,14 @@ class Product
     def create_stripe_product_with_prices
       @product.product_variants.each do |variant|
         stripe_product = Stripe::Product.create(
-          name: @product.name + variant.human_format,
-          description: @product.description,
+          name: @product.base_price + " " +  variant.additional_price,
+          description: ActionView::Base.full_sanitizer.sanitize(product.description),
           shippable: true,
           default_price_data: {
             unit_amount: @product.base_price + variant.additional_price,
             currency: "eur"
           },
-          metadata: { product_id: @product.id , variant_id: variant.id }
+          metadata: { product_id: @product.id, variant_id: variant.id }
         )
 
         puts "Creating price for #{stripe_product.inspect}"

@@ -20,7 +20,24 @@ export default class extends Controller {
     const input = event.target as HTMLInputElement
     if (!input.files?.length) return
 
-    Array.from(input.files).forEach(file => {
+    // Store the current files in a temporary array
+    const currentFiles = Array.from(input.files)
+
+    // Create a new FileList from existing previews
+    const existingFiles = new DataTransfer()
+
+    // If there are already files in the input, add them first
+    if (input.files) {
+      currentFiles.forEach(file => {
+        existingFiles.items.add(file)
+      })
+    }
+
+    // Update the input's files
+    input.files = existingFiles.files
+
+    // Create previews for new files
+    currentFiles.forEach(file => {
       const reader = new FileReader()
 
       reader.onload = (e) => {

@@ -5,7 +5,8 @@ import { VariantSlugSelectedEvent } from './product_controller'
 type Image = {
   url: string
   url_thumb: string
-  url_normal: string
+  url_medium: string
+  url_large: string
   alt: string
 }
 
@@ -134,7 +135,7 @@ export default class extends Controller {
     if (this.imageUsedValue) {
       const currentImage = this.imageUsedValue[this.currentIndexValue]
       if (currentImage) {
-        this.mainImageTarget.src = currentImage.url_normal
+        this.mainImageTarget.src = currentImage.url_large
         this.mainImageTarget.alt = currentImage.alt
         this.modalImageTarget.src = currentImage.url
         this.modalImageTarget.alt = currentImage.alt

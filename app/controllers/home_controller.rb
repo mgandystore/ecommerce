@@ -6,22 +6,23 @@ class HomeController < ApplicationController
                  .first
 
     @images = {
-      product_images: @product.images.map(&method(:to_image))
+      product_images: @product.images.map { |image| to_image(@product.id, image) }
     }
 
     @product.product_variants.each do |variant|
       variant.images.each do |image|
         @images[variant.variants_slug] ||= []
-        @images[variant.variants_slug] << to_image(image)
+        @images[variant.variants_slug] << to_image(variant.id, image)
       end
     end
   end
 
-  def to_image(image)
+  def to_image(id, image)
     {
-      url: Rails.application.routes.url_helpers.attachment_url(image.id, quality: 100),
-      url_thumb: Rails.application.routes.url_helpers.attachment_url(image.id, resize_to_limit_width: 100),
-      url_normal: Rails.application.routes.url_helpers.attachment_url(image.id, resize_to_limit_width: 1000),
+      url: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id),
+      url_medium: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :medium),
+      url_thumb: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :thumbnail),
+      url_large: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :large),
       alt: "none"
     }
   end

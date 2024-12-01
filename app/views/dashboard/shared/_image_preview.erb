@@ -1,6 +1,6 @@
 <div class="image-preview relative" <%= "data-image-id=#{data[:image_id]}" if local_assigns[:data].present? %>>
   <% if image %>
-    <%= image_tag url_for(image), class: "w-24 h-24 object-cover rounded" %>
+    <%= image_tag url_for(image.variant(:thumbnail)), class: "w-24 h-24 object-cover rounded" %>
   <% else %>
     <img src="" class="w-24 h-24 object-cover rounded" />
   <% end %>

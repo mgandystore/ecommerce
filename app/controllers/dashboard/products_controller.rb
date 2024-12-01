@@ -35,6 +35,7 @@ module Dashboard
 
       if @product.changed? || product_params[:images].present? || params[:product][:images_to_delete].present?
         @product.save
+        Product::UpdateStripeProductJob.perform_later({ product_id: @product.id })
         flash[:success] = "Les informations du produit ont été mises à jour avec succès"
       end
 
@@ -60,15 +61,16 @@ module Dashboard
       end
 
       if product_variant_params[:stock].present?
-        @product_variant.update(stock: product_variant_params[:stock])
+        @product_variant.stock = product_variant_params[:stock].to_i
       end
 
       if product_variant_params[:additional_price].present?
-        @product_variant.update(additional_price: product_variant_params[:additional_price])
+        @product_variant.additional_price = product_variant_params[:additional_price].to_i * 100
       end
 
       if @product_variant.changed? || product_variant_params[:images].present? || params[:product_variant][:images_to_delete].present?
         @product_variant.save
+        Product::UpdateStripeProductJob.perform_later({ product_id: @product.id, variant_id: @product_variant.id })
         flash[:success] = "Les informations de la variante ont été mises à jour avec succès"
       end
 

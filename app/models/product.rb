@@ -1,7 +1,14 @@
 class Product < ApplicationRecord
-  has_many_attached :images
-  has_many :product_variants
+  has_many_attached :images do |attachment|
+    attachment.variant :thumbnail, resize_to_limit: [200, nil]
+    attachment.variant :medium, resize_to_limit: [500, nil]
+    attachment.variant :large, resize_to_limit: [1000, nil]
+  end
+
+  after_commit :create_image_variants, on: [:create, :update]
   after_create_commit :create_stripe_products
+
+  has_many :product_variants
 
   def create_stripe_products
     CreateStripeProductJob.perform_later(self.id)
@@ -58,7 +65,12 @@ class Product < ApplicationRecord
         variants: variants,
         variants_slug: slug_parts.join("_"),
         additional_price: combo.sum { |v| (v[:additional_price] || 0).to_i },
-        )
+      )
     end
+  end
+
+  def create_image_variants
+    return unless images.attached?
+    ::CreateImageVariantsJob.perform_later({ record_type: Product.class, record_id: id })
   end
 end

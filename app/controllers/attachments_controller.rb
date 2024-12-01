@@ -11,7 +11,7 @@ class AttachmentsController < ApplicationController
   include ActiveStorage::Streaming
 
   def show
-    attachment = ActiveStorage::Attachment.includes(:blob).find_by(id: params[:id])
+    attachment = ActiveStorage::Attachment.includes(:blob).find_by(id: params[:id], record_id: params[:record_id])
     if !attachment.blob || !ALLOWED_ATTACHMENTS[attachment.record_type]&.include?(attachment.name)
       return head :not_found
     end
@@ -64,6 +64,11 @@ class AttachmentsController < ApplicationController
   def transformation_options
     options = {}
 
+    variant = params[:variant]
+    if variant.present?
+      return params[:variant].to_sym
+    end
+
     width = parse_dimension(params[:resize_to_limit_width])
     height = parse_dimension(params[:resize_to_limit_height])
 
@@ -80,6 +85,6 @@ class AttachmentsController < ApplicationController
   def transformation_params_present?
     params[:resize_to_limit_width].present? ||
       params[:resize_to_limit_height].present? ||
-      params[:quality].present?
+      params[:quality].present? || params[:variant].present?
   end
 end

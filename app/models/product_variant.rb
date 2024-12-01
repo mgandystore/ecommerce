@@ -1,5 +1,10 @@
 class ProductVariant < ApplicationRecord
-  has_many_attached :images
+  has_many_attached :images do |attachment|
+    attachment.variant :thumbnail, resize_to_limit: [200, nil]
+    attachment.variant :medium, resize_to_limit: [500, nil]
+    attachment.variant :large, resize_to_limit: [1000, nil]
+  end
+
   belongs_to :product
 
   # human format is Key Value / Key Value
