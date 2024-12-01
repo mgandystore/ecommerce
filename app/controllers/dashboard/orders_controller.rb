@@ -10,6 +10,10 @@ module Dashboard
       @order = Order
                  .includes(:customer, :order_notes,:shipping_address, order_items: [:product_variant, :product])
                  .find_by!(id: params[:id])
+
+      # create 3 statistic on orders
+      # total amount of order
+      # avg delay between status paid and shipped
     end
 
     def update

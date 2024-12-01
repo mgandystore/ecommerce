@@ -93,11 +93,6 @@
         <div class="bg-white rounded-lg border border-gray-200">
           <div class="px-4 py-5 sm:px-6 border-b border-gray-200 flex justify-between items-center">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Variantes</h3>
-            <%= link_to '#', # new_dashboard_product_variant_path(@product),
-                        class: "dash-btn-primary flex items-center gap-2" do %>
-              <%= inline_svg_tag 'icons/plus.svg', class: "h-4 w-4" %>
-              <span>Nouveau</span>
-            <% end %>
           </div>
           <ul role="list" class="divide-y divide-gray-200">
             <% @product.product_variants.each do |variant| %>
@@ -146,14 +141,20 @@
             <% end %>
           </div>
           <div class="px-4 py-5 sm:p-6">
-            <dl class="space-y-3">
-              <% @product.specifications.each do |key, value| %>
-                <div class="flex justify-between">
-                  <dt class="text-sm text-gray-500"><%= key %></dt>
-                  <dd class="text-sm font-medium text-gray-900"><%= value.html_safe %></dd>
-                </div>
-              <% end %>
-            </dl>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <tbody class="divide-y divide-gray-200">
+                <% @product.specifications.each do |key, value| %>
+                  <tr>
+                    <td class="px-4 py-2 text-sm text-gray-500"><%= key %></td>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-900">
+                      <%= truncate(strip_tags(value), length: 125, escape: false) %>
+                    </td>
+                  </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
 
@@ -168,14 +169,20 @@
             <% end %>
           </div>
           <div class="px-4 py-5 sm:p-6">
-            <dl class="space-y-3">
-              <% @product.faq.each do |key, value| %>
-                <div class="flex justify-between">
-                  <dt class="text-sm text-gray-500"><%= key %></dt>
-                  <dd class="text-sm font-medium text-gray-900"><%= value.html_safe %></dd>
-                </div>
-              <% end %>
-            </dl>
+            <div class="overflow-x-auto">
+              <table class="min-w-full divide-y divide-gray-200">
+                <tbody class="divide-y divide-gray-200">
+                <% @product.faq.each do |key, value| %>
+                  <tr>
+                    <td class="px-4 py-2 text-sm text-gray-500"><%= key %></td>
+                    <td class="px-4 py-2 text-sm font-medium text-gray-900">
+                      <%= truncate(strip_tags(value), length: 125, escape: false) %>
+                    </td>
+                  </tr>
+                <% end %>
+                </tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>

@@ -156,36 +156,31 @@
             <h3 class="text-lg leading-6 font-medium text-gray-900">Client</h3>
           </div>
           <div class="px-4 py-5 sm:p-6">
-            <div class="space-y-3">
-              <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                <p class="text-sm font-medium text-gray-900">Nom complet</p>
-                <p class="text-sm font-medium text-gray-500">
-                  <%= @order.customer.full_name %>
-                </p>
-              </div>
-
-              <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                <p class="text-sm font-medium text-gray-900">Email</p>
-                <p class="text-sm font-medium text-gray-500">
-                  <%= @order.customer.email %>
-                </p>
-              </div>
+            <table class="min-w-full">
+              <tbody class="divide-y divide-gray-200">
+              <tr>
+                <td class="py-2 text-sm font-medium text-gray-900">Nom complet</td>
+                <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.full_name %></td>
+              </tr>
+              <tr>
+                <td class="py-2 text-sm font-medium text-gray-900">Email</td>
+                <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.email %></td>
+              </tr>
               <% if @order.customer.phone.present? %>
-                <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                  <p class="text-sm font-medium text-gray-900">N. Tel</p>
-                  <p class="text-sm font-medium text-gray-500">
-                    <%= @order.customer.phone %>
-                  </p>
-                </div>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">N. Tel</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.phone %></td>
+                </tr>
               <% end %>
-              <div class="pt-2">
-                <p class="text-xs text-gray-400">
-                  Stripe dashboard : <%= link_to @order.customer.stripe_customer_id,
-                              "#{Rails.configuration.stripe["url"]}/customers/#{@order.customer.stripe_customer_id}",
-                              target: "_blank",
-                              class: "dash-stripe-link" %>
-                </p>
-              </div>
+              </tbody>
+            </table>
+            <div class="pt-2">
+              <p class="text-xs text-gray-400">
+                Stripe dashboard : <%= link_to @order.customer.stripe_customer_id,
+                                               "#{Rails.configuration.stripe["url"]}/customers/#{@order.customer.stripe_customer_id}",
+                                               target: "_blank",
+                                               class: "dash-stripe-link" %>
+              </p>
             </div>
           </div>
         </div>
@@ -197,44 +192,32 @@
               <h3 class="text-lg leading-6 font-medium text-gray-900">Adresse de livraison</h3>
             </div>
             <div class="px-4 py-5 sm:p-6">
-              <address class="text-sm not-italic">
-                <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                  <p class="text-sm font-medium text-gray-900">Addresse de livraison</p>
-                  <p class="text-sm font-medium text-gray-500">
-                    <%= @order.shipping_address.address_line1 %>
-                  </p>
-                </div>
-
+              <table class="min-w-full">
+                <tbody class="divide-y divide-gray-200">
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line1 %></td>
+                </tr>
                 <% if @order.shipping_address.address_line2.present? %>
-                  <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                    <p class="text-sm font-medium text-gray-900">Addresse de livraison (2)</p>
-                    <p class="text-sm font-medium text-gray-500">
-                      <%= @order.shipping_address.address_line1 %>
-                    </p>
-                  </div>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison (2)</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line2 %></td>
+                  </tr>
                 <% end %>
-
-                <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                  <p class="text-sm font-medium text-gray-900">Ville</p>
-                  <p class="text-sm font-medium text-gray-500">
-                    <%= @order.shipping_address.city %>
-                  </p>
-                </div>
-
-                <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                  <p class="text-sm font-medium text-gray-900">Code postal</p>
-                  <p class="text-sm font-medium text-gray-500">
-                    <%= @order.shipping_address.postal_code %>
-                  </p>
-                </div>
-
-                <div class="border-b border-gray-200 flex items-center justify-between py-2">
-                  <p class="text-sm font-medium text-gray-900">Code pays</p>
-                  <p class="text-sm font-medium text-gray-500">
-                    <%= @order.shipping_address.country %>
-                  </p>
-                </div>
-              </address>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Ville</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.city %></td>
+                </tr>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Code postal</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.postal_code %></td>
+                </tr>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Code pays</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.country %></td>
+                </tr>
+                </tbody>
+              </table>
             </div>
           </div>
         <% end %>
@@ -245,34 +228,34 @@
             <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
           </div>
           <div class="px-4 py-5 sm:p-6">
-            <dl class="space-y-3 text-sm">
-              <div class="flex justify-between">
-                <dt class="text-gray-500">Sous-total</dt>
-                <dd class="font-medium text-gray-900">
+            <table class="min-w-full">
+              <tbody class="divide-y divide-gray-200">
+              <tr>
+                <td class="py-2 text-sm text-gray-500">Sous-total</td>
+                <td class="py-2 text-sm font-medium text-gray-900 text-right">
                   <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                </dd>
-              </div>
-
-              <div class="border-t border-gray-200 pt-3 flex justify-between">
-                <dt class="text-gray-900 font-medium">Total</dt>
-                <dd class="text-gray-900 font-medium">
+                </td>
+              </tr>
+              <tr>
+                <td class="py-2 text-sm font-medium text-gray-900">Total</td>
+                <td class="py-2 text-sm font-medium text-gray-900 text-right">
                   <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                </dd>
-              </div>
-
-              <div class="pt-2">
-                <p class="text-xs text-gray-400">
-                  Stripe dashboard : <%= link_to @order.stripe_payment_id,
-                              "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_id}",
-                              target: "_blank",
-                              class: "dash-stripe-link" %>
-                </p>
-              </div>
-            </dl>
+                </td>
+              </tr>
+              </tbody>
+            </table>
+            <div class="pt-2">
+              <p class="text-xs text-gray-400">
+                Stripe dashboard : <%= link_to @order.stripe_payment_id,
+                                               "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_id}",
+                                               target: "_blank",
+                                               class: "dash-stripe-link" %>
+              </p>
+            </div>
           </div>
         </div>
 
-        <!-- Timeline -->
+        <!-- Timeline (keeping original structure as it's not a key-value layout) -->
         <div class="bg-white rounded-lg border border-gray-200">
           <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
             <h3 class="text-lg leading-6 font-medium text-gray-900">Historique</h3>
@@ -289,9 +272,9 @@
                       <% end %>
                       <div class="relative flex space-x-3">
                         <div>
-                          <span class="h-8 w-8 rounded-full bg-<%= statuses_color[event[:status]] %>-100 flex items-center justify-center ring-8 ring-white">
-                            <%= inline_svg_tag statuses_icon[event[:status]], class: "h-5 w-5 text-#{statuses_color[event[:status]]}-800" %>
-                          </span>
+                    <span class="h-8 w-8 rounded-full bg-<%= statuses_color[event[:status]] %>-100 flex items-center justify-center ring-8 ring-white">
+                      <%= inline_svg_tag statuses_icon[event[:status]], class: "h-5 w-5 text-#{statuses_color[event[:status]]}-800" %>
+                    </span>
                         </div>
                         <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
                           <div>

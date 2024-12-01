@@ -52,6 +52,7 @@ module Dashboard
       @product = Product.find(params[:id])
       @product_variant = @product.product_variants.find(params[:product_variant_id])
 
+      puts "product_variant_params: #{product_variant_params.inspect}"
       if product_variant_params[:images].present?
         @product_variant.images.attach(product_variant_params[:images])
       end

@@ -71,7 +71,7 @@
               </div>
             </td>
             <td class="px-6 py-4 text-sm text-gray-500 max-w-xs">
-              <%= truncate(product.description, length: 100) %>
+              <%= truncate(strip_tags(product.description), length: 125, escape: false) %>
             </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
               <%= product.product_variants.count %>
