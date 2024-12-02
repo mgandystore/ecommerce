@@ -1,5 +1,3 @@
-
-
 # This file is auto-generated from the current state of the database. Instead
 # of editing this file, please use the migrations feature of Active Record to
 # incrementally modify your database, and then regenerate this schema definition.
@@ -12,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_11_30_092845) do
+ActiveRecord::Schema[8.0].define(version: 2024_12_02_103723) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -141,6 +139,14 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_30_092845) do
     t.datetime "updated_at", null: false
   end
 
+  create_table "stock_notifications", id: :string, force: :cascade do |t|
+    t.string "email"
+    t.string "product_variant_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["product_variant_id"], name: "index_stock_notifications_on_product_variant_id"
+  end
+
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "order_items", "orders", on_update: :cascade, on_delete: :cascade
@@ -150,4 +156,5 @@ ActiveRecord::Schema[8.0].define(version: 2024_11_30_092845) do
   add_foreign_key "orders", "addresses", column: "shipping_address_id"
   add_foreign_key "orders", "customers"
   add_foreign_key "product_variants", "products", on_update: :cascade, on_delete: :cascade
+  add_foreign_key "stock_notifications", "product_variants", on_update: :cascade, on_delete: :cascade
 end

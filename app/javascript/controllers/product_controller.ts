@@ -7,8 +7,23 @@ export type VariantSlugSelectedEvent = CustomEvent<{
   variant_slug: string
 }>;
 
+const animatedSpinner = `
+<svg aria-hidden="true" role="status" class="inline mr-2 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"></path>
+          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="#1f2937"></path>
+        </svg>
+        `
+
 export default class extends Controller {
-  static targets = [ 'price', 'fixedBuyBtnContainer', 'buyButtons', 'outOfStock' ]
+  static targets = [
+    'price',
+    'fixedBuyBtnContainer',
+    'buyButtons',
+    'outOfStock',
+    'notifyForm',
+    'notifyEmail',
+    'notifyButton'
+  ]
   static values = {
     product: Object,
     price: Number,
@@ -24,6 +39,10 @@ export default class extends Controller {
   declare readonly fixedBuyBtnContainerTarget: HTMLButtonElement
   declare readonly buyButtonsTargets: HTMLButtonElement[]
   declare readonly outOfStockTarget: HTMLElement
+
+  declare readonly notifyFormTarget: HTMLFormElement
+  declare readonly notifyEmailTarget: HTMLInputElement
+  declare readonly notifyButtonTarget: HTMLButtonElement
 
   connect() {
   }
@@ -83,7 +102,7 @@ export default class extends Controller {
 
     if (someProductVariant) {
       this.currentProductVariantValue = someProductVariant
-      console.log("variant selected", this.currentProductVariantValue)
+      console.log('variant selected', this.currentProductVariantValue)
       this.dispatch('variant-slug-selected', {
         detail: {
           variant_slug: this.currentProductVariantValue.variants_slug
@@ -113,10 +132,14 @@ export default class extends Controller {
         el.classList.add('opacity-50', 'pointer-events-none')
         el.disabled = true
         this.outOfStockTarget.classList.remove('hidden')
+
+        this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px';
       } else {
         el.classList.remove('opacity-50', 'pointer-events-none')
         el.disabled = false
         this.outOfStockTarget.classList.add('hidden')
+
+        this.notifyFormTarget.style.height = '0';
       }
     })
   }
@@ -155,10 +178,7 @@ export default class extends Controller {
       if (load) {
         el.classList.add('cursor-wait', 'opacity-50', 'pointer-events-none')
         el.innerHTML = `
-        <svg aria-hidden="true" role="status" class="inline mr-2 w-4 h-4 text-gray-200 animate-spin dark:text-gray-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"></path>
-          <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="#1f2937"></path>
-        </svg>
+        ${animatedSpinner}
         Acheter
         `
       } else {
@@ -200,4 +220,65 @@ export default class extends Controller {
     this.productValue.product_variants.forEach((variant) => {
     })
   }
+
+
+  submitStockNotification() {
+    const email = this.notifyEmailTarget.value
+    if (!email || !this.currentProductVariantValue) {
+      return
+    }
+
+    this.notifyButtonTarget.innerHTML = `
+      ${animatedSpinner}
+      Envoi en cours...
+    `
+
+    fetch('/stock_notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        product_variant_id: this.currentProductVariantValue.id,
+      })
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to submit notification')
+        }
+
+        setTimeout(() => {
+          const successChildNode = `
+          <span class="text-xs text-emerald-500 mt-2">
+            Nous vous préviendrons dès que ce produit sera de nouveau disponible
+          </span>`
+          this.notifyFormTarget.appendChild(textToNode(successChildNode))
+          // Update form height after adding success message
+          this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px'
+
+          this.notifyEmailTarget.disabled = true
+          this.notifyEmailTarget.classList.add('opacity-50', 'pointer-events-none')
+          this.notifyButtonTarget.disabled = true
+          this.notifyButtonTarget.classList.add('opacity-50', 'pointer-events-none')
+          this.notifyButtonTarget.innerHTML = 'Envoyé avec succès'
+        }, 1000)
+      })
+      .catch(error => {
+        const errorChildNode = `
+          <span class="text-xs text-red-500 mt-2">
+            Une erreur est survenue lors de la soumission de votre notification
+          </span>`
+        this.notifyFormTarget.appendChild(textToNode(errorChildNode))
+        // Update form height after adding error message
+        this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px'
+      })
+  }
 }
+
+function textToNode(htmlString: string): HTMLElement {
+  const template = document.createElement('template')
+  template.innerHTML = htmlString.trim()
+  return <HTMLElement>template.content.firstElementChild
+}
+

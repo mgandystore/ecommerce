@@ -62,7 +62,12 @@ module Dashboard
       end
 
       if product_variant_params[:stock].present?
+        stock_before = @product_variant.stock
         @product_variant.stock = product_variant_params[:stock].to_i
+        if stock_before < @product_variant.stock
+          puts "stock changed. sending notification"
+          StockNotificationMailer.send_stock_notifications(@product_variant.id)
+        end
       end
 
       if product_variant_params[:additional_price].present?

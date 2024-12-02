@@ -40,7 +40,7 @@
             <div class="flex flex-col gap-4">
               <div
                 data-controller="product-variant"
-                data-product-variant-variant-value="rouge"
+                data-product-variant-variant-value="<%= @default_variant.variants["couleur"] %>"
                 data-product-variant-value-to-class-value="<%= color_to_tailwind.to_json %>"
                 data-product-variant-type-value="couleur"
               >
@@ -72,12 +72,12 @@
                 data-visibility-name-value="buy-btn"
                 data-product-target="buyButtons"
                 class="
-                            cursor-pointer
+                cursor-pointer
                 hover:bg-amber-300
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
                 transition duration-200 ease-in-out
-                text-stone-950 text-base max-sm:text-sm font-base font-bold
-                py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
+                text-stone-800 text-base max-sm:text-sm font-base font-bold
+                py-2.5 bg-amber-400 rounded-lg justify-center items-center gap-2.5 inline-flex
                 w-full
                 ">
                 Acheter
@@ -85,6 +85,28 @@
               <span class="text-red-500 text-xs mt-2 hidden" data-product-target="outOfStock">
                 Rupture de stock
               </span>
+            </div>
+            <div class="mt-4 overflow-hidden duration-300 ease-in-out h-0" data-product-target="notifyForm">
+              <label class="flex flex-col gap-1">
+                <span class="text-gray-500 text-xs">Soyez le premier informé du retour en stock</span>
+                <input
+                  type="email"
+                  placeholder="Entrez votre adresse e-mail"
+                  class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-300 focus:border-gray-500 outline-none"
+                  data-product-target="notifyEmail"
+                >
+              </label>
+              <button
+              data-action="click->product#submitStockNotification"
+              data-product-target="notifyButton"
+              class="w-full px-4 py-2 bg-emerald-950 text-white rounded-lg hover:bg-emerald-900 focus:ring-2
+          focus:ring-emerald-300 focus:outline-none transition duration-200 ease-in-out text-sm
+          cursor-pointer
+          justify-center items-center gap-2.5 inline-flex mt-2
+          "
+            >
+              M'avertir du retour en stock
+            </button>
             </div>
           </div>
 
@@ -129,11 +151,11 @@
       class="
                           cursor-pointer
               hover:bg-amber-300
-              focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
-              transition duration-200 ease-in-out
-              text-stone-950 text-base max-sm:text-sm font-base font-bold
-              py-2.5 bg-amber-400 rounded-full justify-center items-center gap-2.5 inline-flex
-              w-full
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
+                transition duration-200 ease-in-out
+                text-stone-800 text-base max-sm:text-sm font-base font-bold
+                py-2.5 bg-amber-400 rounded-lg justify-center items-center gap-2.5 inline-flex
+                w-full
               ">
       Acheter
     </button>

@@ -10,7 +10,6 @@ class OrderMailer < ApplicationMailer
     @variant_human = order.order_items.first.product_variant.human_format
     @client_email = order.customer.email
     mail(to: order.customer.email,
-         from: "boutique@assmac.com",
          subject: "#{order.customer.full_name}, merci d'avoir commandé")
   end
 
@@ -27,7 +26,6 @@ class OrderMailer < ApplicationMailer
     @shop_address = "Lyon 69100"
     @shop_email = "contact@assmac.com"
     mail(to: order.customer.email,
-         from: "boutique@assmac.com",
          subject: "#{order.customer.full_name}, votre commande est en route")
   end
 end

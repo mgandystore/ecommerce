@@ -14,6 +14,8 @@ Rails.application.routes.draw do
 
   get "checkout/:product_variant_id", to: "checkout#create"
 
+  post "stock_notifications", to: "stock_notifications#create"
+
   root "home#index", as: :home
   get "success", to: "home#success", as: :success
 
