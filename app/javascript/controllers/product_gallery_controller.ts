@@ -1,3 +1,4 @@
+// product_gallery_controller.ts
 import { Controller } from "@hotwired/stimulus"
 import { VariantSelectEvent } from './product_variant_controller'
 import { VariantSlugSelectedEvent } from './product_controller'
@@ -7,6 +8,7 @@ type Image = {
   url_thumb: string
   url_medium: string
   url_large: string
+  url_blur: string
   alt: string
 }
 
@@ -29,6 +31,7 @@ export default class extends Controller {
   declare modalImageTarget: HTMLImageElement
   declare thumbnailsContainerTarget: HTMLDivElement
   declare thumbnailsTemplateTarget: HTMLTemplateElement
+  declare fullImage: HTMLImageElement | null
 
   declare readonly imagesValue: Images
   declare imageUsedValue: Image[]
@@ -38,8 +41,33 @@ export default class extends Controller {
 
   connect() {
     this.updateThumbnailStates()
-    // Add event listener for Escape key
     document.addEventListener('keydown', this.handleKeyDown.bind(this))
+    this.preloadMainImage()
+  }
+
+  disconnect() {
+    document.removeEventListener('keydown', this.handleKeyDown.bind(this))
+  }
+
+  preloadMainImage() {
+    if (this.imageUsedValue && this.imageUsedValue[this.currentIndexValue]) {
+      const currentImage = this.imageUsedValue[this.currentIndexValue]
+
+      // Create a new image element
+      this.fullImage = new Image()
+
+      this.fullImage.onload = () => {
+        // Once loaded, update the main image source
+        if (this.mainImageTarget) {
+          this.mainImageTarget.src = this.fullImage!.src
+          this.mainImageTarget.classList.remove('opacity-0')
+          this.mainImageTarget.classList.add('opacity-100')
+        }
+      }
+
+      // Start loading the full resolution image
+      this.fullImage.src = currentImage.url_large
+    }
   }
 
   // variantSlugSelectedEvent is dispatched by the Product controller
@@ -53,8 +81,6 @@ export default class extends Controller {
     currentVariant: string,
     currentIndex: number,
   ): { newImageUsed: Image[]; newIndex: number } {
-    console.log("variant select changed gallery", currentVariant);
-
     // Build new imageUsed array starting with product images
     let newImageUsed: Image[] = [...imagesValue.product_images];
 
@@ -98,13 +124,8 @@ export default class extends Controller {
       this.currentIndexValue,
     )
 
-    console.log("before index", this.currentIndexValue, "after index", newIndex)
-    console.log("before images", this.imageUsedValue, "after images", newImageUsed)
-
     this.imageUsedValue = newImageUsed
     this.currentIndexValue = newIndex
-
-    console.log("new images used", this.imageUsedValue)
 
     // Clear existing thumbnails
     this.thumbnailsContainerTarget.innerHTML = ''
@@ -126,21 +147,27 @@ export default class extends Controller {
     this.currentIndexValueChanged()
   }
 
-  disconnect() {
-    // Clean up event listener
-    document.removeEventListener('keydown', this.handleKeyDown.bind(this))
-  }
-
   currentIndexValueChanged() {
     if (this.imageUsedValue) {
       const currentImage = this.imageUsedValue[this.currentIndexValue]
       if (currentImage) {
-        this.mainImageTarget.src = currentImage.url_large
-        this.mainImageTarget.alt = currentImage.alt
+        // First set the blur image
+        this.mainImageTarget.classList.remove('opacity-100')
+        this.mainImageTarget.classList.add('opacity-0')
+        this.mainImageTarget.src = currentImage.url_blur
+
+        // Update modal image
         this.modalImageTarget.src = currentImage.url
         this.modalImageTarget.alt = currentImage.alt
+
+        // Update counter
         this.counterTarget.textContent = `${this.currentIndexValue + 1} / ${this.imageUsedValue.length}`
+
+        // Update thumbnails
         this.updateThumbnailStates()
+
+        // Load the full resolution image
+        this.preloadMainImage()
       }
     }
   }
@@ -153,7 +180,7 @@ export default class extends Controller {
     this.currentIndexValue = (this.currentIndexValue - 1 + this.imageUsedValue.length) % this.imageUsedValue.length
   }
 
-  // @ts-ignore
+  //@ts-ignore
   selectImage({ params: { index } }) {
     this.currentIndexValue = parseInt(index)
   }
@@ -171,7 +198,6 @@ export default class extends Controller {
     })
   }
 
-  // Zoom functionality
   zoomIn() {
     this.modalTarget.classList.remove('hidden')
     document.body.classList.add('overflow-hidden')
@@ -190,7 +216,6 @@ export default class extends Controller {
     }
   }
 
-  // Close modal when clicking outside the image
   closeModalFromBackground(event: Event) {
     if (event.target === this.modalTarget) {
       this.zoomOut()

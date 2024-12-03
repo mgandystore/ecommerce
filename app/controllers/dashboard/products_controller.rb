@@ -14,6 +14,15 @@ module Dashboard
                    .find_by!(id: params[:id])
     end
 
+    def create
+      ActiveRecord::Base.transaction do
+        @product = Product.from_params(params)
+        render :product, status: :created, formats: [:json], content_type: "application/json"
+      rescue ActiveRecord::RecordInvalid => e
+        render json: { error: e.message }, status: :unprocessable_entity
+      end
+    end
+
     def update
       @product = Product.find(params[:id])
 

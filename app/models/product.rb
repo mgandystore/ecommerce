@@ -3,6 +3,7 @@ class Product < ApplicationRecord
     attachment.variant :thumbnail, resize_to_limit: [200, nil]
     attachment.variant :medium, resize_to_limit: [500, nil]
     attachment.variant :large, resize_to_limit: [1000, nil]
+    attachment.variant :blur, blur: 32, resize_to_limit: [16, nil]
   end
 
   after_commit :create_image_variants, on: [:create, :update]

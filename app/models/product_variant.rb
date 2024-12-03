@@ -3,6 +3,7 @@ class ProductVariant < ApplicationRecord
     attachment.variant :thumbnail, resize_to_limit: [200, nil]
     attachment.variant :medium, resize_to_limit: [500, nil]
     attachment.variant :large, resize_to_limit: [1000, nil]
+    attachment.variant :blur, blur: 10, resize_to_limit: [10, nil]
   end
 
   belongs_to :product

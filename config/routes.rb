@@ -7,9 +7,6 @@ Rails.application.routes.draw do
 
   post "webhooks/stripe", to: "webhooks#stripe"
 
-  post "products", to: "products#create"
-  post "products/:id/images", to: "products#add_product_images"
-  post "product_variants/:id/images", to: "products#add_product_variant_images"
   get "products/:id", to: "products#show"
 
   get "checkout/:product_variant_id", to: "checkout#create"
@@ -29,6 +26,7 @@ Rails.application.routes.draw do
   patch "dashboard/orders/:id", to: "dashboard/orders#update", as: :update_dashboard_order
 
   get "dashboard/products", to: "dashboard/products#index", as: :dashboard_products
+  post "dashboard/products", to: "dashboard/products#create"
   get "dashboard/products/:id", to: "dashboard/products#show", as: :dashboard_product
   patch "dashboard/products/:id", to: "dashboard/products#update", as: :update_dashboard_product
   get "dashboard/products/:id/specifications", to: "dashboard/products#edit_specifications", as: :edit_dashboard_product_specifications

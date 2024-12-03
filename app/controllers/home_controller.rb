@@ -32,6 +32,7 @@ class HomeController < ApplicationController
       url_medium: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :medium),
       url_thumb: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :thumbnail),
       url_large: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :large),
+      url_blur: Rails.application.routes.url_helpers.attachment_url(record_id: id, id: image.id, variant: :blur),
       alt: "none"
     }
   end

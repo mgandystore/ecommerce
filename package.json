@@ -26,6 +26,7 @@
     "@rails/actiontext": "^8.0.0",
     "@tailwindcss/forms": "^0.5.9",
     "stimulus-use": "^0.52.2",
-    "trix": "^2.1.8"
+    "trix": "^2.1.8",
+    "vanilla-lazyload": "^19.1.3"
   }
 }
