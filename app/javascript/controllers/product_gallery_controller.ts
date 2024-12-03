@@ -72,7 +72,6 @@ export default class extends Controller {
 
   // variantSlugSelectedEvent is dispatched by the Product controller
   variantSlugSelectedEvent(evt: VariantSlugSelectedEvent) {
-    console.log("receive event for variant slug", evt.detail.variant_slug)
     this.variantSelectedValue = evt.detail.variant_slug
   }
 
@@ -186,7 +185,6 @@ export default class extends Controller {
   }
 
   updateThumbnailStates() {
-    console.log("update thumbnail state to", this.currentIndexValue)
     this.thumbnailTargets.forEach((thumbnail, index) => {
       if (index === this.currentIndexValue) {
         thumbnail.classList.add('border-black')

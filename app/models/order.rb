@@ -14,6 +14,10 @@ class Order < ApplicationRecord
     self[:"#{status}_at"] = Time.current if self.respond_to?(:"#{status}_at")
   end
 
+  def shipped?
+    shipped_at != nil
+  end
+
   def self.count_paid
     where(status: :paid).count
   end

@@ -7,7 +7,7 @@
         </li>
         <li>
           <svg class="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd" />
+            <path fill-rule="evenodd" d="M7.21 14.77a.75.75 0 01.02-1.06L11.168 10 7.23 6.29a.75.75 0 111.04-1.08l4.5 4.25a.75.75 0 010 1.08l-4.5 4.25a.75.75 0 01-1.06-.02z" clip-rule="evenodd"/>
           </svg>
         </li>
         <li class="font-medium text-gray-900">
@@ -17,8 +17,7 @@
     </nav>
 
     <!-- Header -->
-    <div class="flex justify-between items-baseline  pb-4">
-
+    <div class="flex justify-between items-baseline pb-4 flex-col lg:flex-row gap-4">
       <div>
         <h1 class="text-xl leading-6 font-medium text-gray-900">
           Commande <%= @order.id %>
@@ -27,21 +26,77 @@
           Créée le <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %>
         </p>
       </div>
-      <div class="flex gap-2">
+      <div class="flex gap-2" data-controller="dashboard-shipping-modal">
         <%= form_with model: @order,
                       url: update_dashboard_order_path(@order),
                       method: :patch,
-                      class: "flex items-center gap-2" do |f| %>
+                      data: { dashboard_shipping_modal_target: "form", action: "submit->dashboard-shipping-modal#submitForm" },
+                      class: "flex flex-col lg:flex-row gap-2" do |f| %>
 
           <div class="w-48">
             <%= f.select :status,
                          statuses_for_select,
                          {},
+                         data: { dashboard_shipping_modal_target: "status" },
                          class: "dash-btn-select" %>
           </div>
 
           <%= f.submit "Mettre à jour le statut",
                        class: "dash-btn-primary" %>
+
+          <dialog class="rounded-lg shadow-xl p-0 w-full max-w-md" data-dashboard-shipping-modal-target="dialog">
+            <div class="p-6">
+              <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">
+                Informations de livraison
+              </h3>
+
+              <div class="bg-red-100 text-red-700 p-3 rounded-md mb-4 hidden" data-dashboard-shipping-modal-target="error">
+                Le transporteur et le numéro de suivi sont obligatoires
+              </div>
+
+
+              <div class="space-y-4">
+                <div>
+                  <%= f.label :carrier_name, "Transporteur", class: "block text-sm font-medium text-gray-700" %>
+                  <%= f.select :carrier_name,
+                               ["La Poste/Colissimo", "Chronopost", "DHL", "DPD"],
+                               { prompt: "Sélectionner un transporteur" },
+                               data: { dashboard_shipping_modal_target: "carrierName" },
+                               class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
+                </div>
+
+                <div>
+                  <%= f.label :carrier_tracking_number, "Numéro de suivi", class: "block text-sm font-medium text-gray-700" %>
+                  <%= f.text_field :carrier_tracking_number, data: { dashboard_shipping_modal_target: "trackingNumber" },
+                                   class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
+                </div>
+
+                <div>
+                  <%= f.label :carrier_tracking_link, "Lien de suivi", class: "block text-sm font-medium text-gray-700" %>
+                  <%= f.text_field :carrier_tracking_link,
+                                   class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
+                </div>
+              </div>
+
+              <div class="mt-6 flex justify-end gap-3">
+                <%= render(Dashboard::ButtonComponent.new(
+                  text: "Annuler",
+                  submit: false,
+                  html_options: {
+                    "data-action": "dashboard-shipping-modal#close",
+                    "type": "button",
+                  },
+                  variant: Dashboard::ButtonComponent.variant_danger)) %>
+
+                <%= render(Dashboard::ButtonComponent.new(
+                  text: "Confirmer",
+                  html_options: {
+                    "data-action": "dashboard-shipping-modal#confirm"
+                  },
+                  variant: Dashboard::ButtonComponent.variant_primary)) %>
+              </div>
+            </div>
+          </dialog>
         <% end %>
       </div>
     </div>
@@ -216,6 +271,44 @@
                   <td class="py-2 text-sm font-medium text-gray-900">Code pays</td>
                   <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.country %></td>
                 </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        <% end %>
+
+        <% if @order.shipped? %>
+          <div class="bg-white rounded-lg border border-gray-200">
+            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+              <h3 class="text-lg leading-6 font-medium text-gray-900">Informations de livraison</h3>
+            </div>
+            <div class="px-4 py-5 sm:p-6">
+              <table class="min-w-full">
+                <tbody class="divide-y divide-gray-200">
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Transporteur</td>
+                  <td class="py-2 text-sm text-gray-500 text-right">
+                    <%= @order.carrier_name %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Numéro de suivi</td>
+                  <td class="py-2 text-sm text-gray-500 text-right">
+                    <%= @order.carrier_tracking_number %>
+                  </td>
+                </tr>
+                <% if @order.carrier_tracking_link.present? %>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Suivi</td>
+                    <td class="py-2 text-sm text-gray-500 text-right">
+                      <%= render(Dashboard::ButtonComponent.new(
+                        text: "Lien de tracking",
+                        link: @order.carrier_tracking_link,
+                        html_options: { class: "w-fit" },
+                        variant: Dashboard::ButtonComponent.variant_minimal)) %>
+                    </td>
+                  </tr>
+                <% end %>
                 </tbody>
               </table>
             </div>

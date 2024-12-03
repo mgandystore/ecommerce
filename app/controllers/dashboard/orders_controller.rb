@@ -8,7 +8,7 @@ module Dashboard
 
     def show
       @order = Order
-                 .includes(:customer, :order_notes,:shipping_address, order_items: [:product_variant, :product])
+                 .includes(:customer, :order_notes, :shipping_address, order_items: [:product_variant, :product])
                  .find_by!(id: params[:id])
 
       # create 3 statistic on orders
@@ -20,10 +20,20 @@ module Dashboard
       @order = Order.find(params[:id])
 
       if Order.statuses.include?(order_params[:status])
-        @order.update(status: order_params[:status])
+        @order.status = order_params[:status]
+
+        if @order.status == "shipped"
+          @order.carrier_tracking_number = order_params[:carrier_tracking_number] if order_params[:carrier_tracking_number].present?
+          @order.carrier_name = order_params[:carrier_name] if order_params[:carrier_name].present?
+          @order.carrier_tracking_link = order_params[:carrier_tracking_link] if order_params[:carrier_tracking_link].present?
+        end
+
+        @order.save
+
         if @order.status == "shipped"
           OrderMailer.order_shipped(@order.id).deliver_later
         end
+
         flash[:success] = "L'état de la commande a été mis à jour avec succès"
       end
 
@@ -32,15 +42,13 @@ module Dashboard
         flash[:success] = "La note d'informations a été ajoutée avec succès"
       end
 
-
-
       redirect_to dashboard_order_path(@order)
     end
 
     private
 
     def order_params
-      params.require(:order).permit(:status, :notes)
+      params.require(:order).permit(:status, :notes, :carrier_tracking_number, :carrier_name, :carrier_tracking_link)
     end
 
     def orders_scope

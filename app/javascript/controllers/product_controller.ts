@@ -102,7 +102,6 @@ export default class extends Controller {
 
     if (someProductVariant) {
       this.currentProductVariantValue = someProductVariant
-      console.log('variant selected', this.currentProductVariantValue)
       this.dispatch('variant-slug-selected', {
         detail: {
           variant_slug: this.currentProductVariantValue.variants_slug

@@ -16,7 +16,9 @@ module Dashboard
       icon_left: nil,
       icon_right: nil,
       variant: :primary,
-      html_options: {}
+      html_options: {},
+      text_html_options: {},
+      submit: true
     )
       @text = text
       @link = link
@@ -24,12 +26,13 @@ module Dashboard
       @icon_right = icon_right
       @variant = variant
       @html_options = html_options
+      @submit = submit
     end
 
     def call
       if @link
         link_to(@link, link_html_options) do
-          button_content
+          button_content(link: true)
         end
       else
         button_tag(button_html_options) do
@@ -40,8 +43,8 @@ module Dashboard
 
     private
 
-    def button_content
-      content_tag(:span, class: "flex items-center gap-2") do
+    def button_content(link: false)
+      content_tag(:span, class: "#{link ? "" : "flex items-center gap-2"}") do
         safe_join([
                     icon_left_tag,
                     text_tag,
@@ -74,13 +77,13 @@ module Dashboard
 
     def link_html_options
       @html_options.merge(
-        class: [@html_options[:class], base_classes].compact.join(" ")
+        class: [@html_options[:class], VARIANTS[@variant.to_sym]].compact.join(" ")
       )
     end
 
     def button_html_options
       @html_options.merge(
-        type: "submit",
+        type: @submit ? "submit" : "button",
         class: [@html_options[:class], base_classes].compact.join(" ")
       )
     end
