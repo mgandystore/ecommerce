@@ -1,4 +1,6 @@
 class ProductVariant < ApplicationRecord
+  include PositionableImages
+
   has_many_attached :images do |attachment|
     attachment.variant :thumbnail, resize_to_limit: [200, nil]
     attachment.variant :medium, resize_to_limit: [500, nil]
@@ -12,5 +14,9 @@ class ProductVariant < ApplicationRecord
   # sorted by key to have the same order
   def human_format
     variants.sort_by { |k, _v| k }.map { |k, v| "#{k} #{v}" }.join(" / ")
+  end
+
+  def create_image_variants
+    ::CreateImageVariantsJob.perform_later(record_type: self.class, record_id: id)
   end
 end

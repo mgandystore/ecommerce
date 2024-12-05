@@ -11,6 +11,7 @@ class CreateImageVariantsJob < ApplicationJob
         image.variant(:thumbnail).processed
         image.variant(:medium).processed
         image.variant(:large).processed
+        image.variant(:blur).processed
       end
     when ProductVariant.class
       product_variant = ProductVariant.find(criteria[:record_id])
@@ -20,6 +21,7 @@ class CreateImageVariantsJob < ApplicationJob
         image.variant(:thumbnail).processed
         image.variant(:medium).processed
         image.variant(:large).processed
+        image.variant(:blur).processed
       end
     else
       Rails.logger.error "Unknown record type: #{criteria[:record_type]}"

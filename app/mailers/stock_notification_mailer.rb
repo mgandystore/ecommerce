@@ -21,9 +21,6 @@ class StockNotificationMailer < ApplicationMailer
     @product_variant = ProductVariant.find(product_variant_id)
     @variant_name = @product_variant.human_format
     @product_url = Rails.application.routes.url_helpers.home_url + "?variant=couleur:#{@product_variant.variants["couleur"]}"
-    @shop_name = "La Boutique"
-    @shop_address = "Lyon 69100"
-    @shop_email = "contact@assmac.com"
     @client_email = email
 
     mail(

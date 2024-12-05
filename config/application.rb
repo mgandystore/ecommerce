@@ -6,7 +6,7 @@ require "rails/all"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
-module Hassmac
+module Assmac
   class Application < Rails::Application
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
@@ -25,7 +25,6 @@ module Hassmac
     # config.eager_load_paths << Rails.root.join("extras")
     config.stripe = config_for(:stripe)
     config.auth = config_for(:auth)
-
     config.i18n.default_locale = :fr
 
 

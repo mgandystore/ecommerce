@@ -21,7 +21,7 @@ class Product
     def update_product(stripe_product, stripe_product_price, product, variant)
       update_product_params = {
         name: product.name + " " + variant.human_format,
-        description: ActionView::Base.full_sanitizer.sanitize(product.description)
+        description: product.short_description,
       }
 
       change_price = @product.base_price + variant.additional_price != stripe_product_price.unit_amount

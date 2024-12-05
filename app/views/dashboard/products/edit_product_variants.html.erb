@@ -55,11 +55,15 @@
 
                     <!-- Image Preview Section -->
                     <div data-dashboard-image-upload-target="preview" class="flex flex-wrap gap-4">
-                      <% @product_variant.images.each do |image| %>
+                      <% @ordered_images.each do |image| %>
                         <%= render 'dashboard/shared/image_preview', image: image, data: { image_id: image.id } %>
                       <% end %>
                     </div>
                   </div>
+
+                  <%= hidden_field_tag "product_variant[images_positions]", @default_images_positions.to_json, data: {
+                    dashboard_image_upload_target: "imagesPositions"
+                  } %>
 
                   <!-- Hidden File Input -->
                   <%= f.file_field :images,

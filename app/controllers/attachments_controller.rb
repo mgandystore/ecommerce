@@ -33,7 +33,9 @@ class AttachmentsController < ApplicationController
   private
 
   def send_blob(blob)
-    redirect_to blob.url(expires_in: 6.hour), allow_other_host: true
+    http_cache_forever(public: true) do
+      redirect_to blob.url(expires_in: 6.hour), allow_other_host: true
+    end
   end
 
   def parse_dimension(param_value)

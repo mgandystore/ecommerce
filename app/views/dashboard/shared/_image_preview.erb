@@ -1,9 +1,17 @@
-<div class="image-preview relative" <%= "data-image-id=#{data[:image_id]}" if local_assigns[:data].present? %>>
+<div
+  class="image-preview relative flex items-center gap-2 sortable-item"
+  <%= "data-image-id=#{data[:image_id]}" if local_assigns[:data].present? %>
+>
+  <div class="cursor-move">
+    <%= inline_svg 'icons/grip_vertical.svg', class: 'h-4 w-4' %>
+  </div>
+
   <% if image %>
     <%= image_tag url_for(image.variant(:thumbnail)), class: "w-24 h-24 object-cover rounded" %>
   <% else %>
     <img src="" class="w-24 h-24 object-cover rounded" />
   <% end %>
+
   <button type="button"
           class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
           data-action="click->dashboard-image-upload#removeImage">

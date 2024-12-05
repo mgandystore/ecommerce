@@ -4,7 +4,7 @@
       { label: "Produits", path: dashboard_products_path },
       { label: @product.name, path: dashboard_product_path(@product), current: false },
       { label: "Modifier la FAQ", current: true },
-    ]))%>
+    ])) %>
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <!-- Left Column - Main Product Info -->
@@ -21,14 +21,29 @@
                           data: { controller: "dashboard-dynamic-kv-form" },
                           class: "space-y-6" do |f| %>
 
-              <div data-dashboard-dynamic-kv-form-target="container" class="flex flex-col gap-4">
-                <% @product.faq.each do |key, value| %>
-                  <div class="dynamic-form-item flex flex-row gap-4 min-w-0"> <!-- Added min-w-0 -->
+
+
+              <%= hidden_field_tag "positions", @product.faq.map { |faq| { id: faq["id"], position: faq["position"] } }.to_json,
+                                   data: {
+                                     "dashboard-dynamic-kv-form-target": "positions"
+                                   } %>
+
+              <div data-dashboard-dynamic-kv-form-target="container" class="flex flex-col gap-12">
+                <% @product.faq.each do |faq| %>
+
+                  <div class="dynamic-form-item flex flex-row gap-4 min-w-0">
+                    <div class="cursor-move">
+                      <%= inline_svg 'icons/grip_vertical.svg', class: 'h-4 w-4' %>
+                    </div>
+
+                    <%= hidden_field_tag "faq[][id]", faq["id"], class: "unique_id" %>
+
                     <div class="flex-1 min-w-0"> <!-- Added min-w-0 -->
                       <div class="mb-4">
                         <label class="block text-sm font-medium text-gray-700 mb-1">Question</label>
+
                         <div class="relative">
-                          <%= text_field_tag "faq[][key]", key,
+                          <%= text_field_tag "faq[][key]", faq["key"],
                                              class: "block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
                         </div>
                       </div>
@@ -36,13 +51,14 @@
                       <div>
                         <label class="block text-sm font-medium text-gray-700 mb-1">Réponse</label>
                         <div class="min-w-0"> <!-- Added wrapper with min-w-0 -->
-                          <%= rich_text_area_tag "faq[][value]", value, class: "trix-content" %>
+                          <%= rich_text_area_tag "faq[][value]", faq["value"], class: "trix-content" %>
                         </div>
                       </div>
                     </div>
                     <div class="my-auto">
                       <%= render(Dashboard::ButtonComponent.new(
                         text: "",
+                        submit: false,
                         icon_left: 'icons/trash.svg',
                         html_options: {
                           "data-action": "dashboard-dynamic-kv-form#removeItem"
@@ -57,6 +73,13 @@
               <%# Template for new items %>
               <template data-dashboard-dynamic-kv-form-target="template">
                 <div class="dynamic-form-item flex flex-row gap-4 min-w-0">
+                  <div class="cursor-move">
+                    <%= inline_svg 'icons/grip_vertical.svg', class: 'h-4 w-4' %>
+                  </div>
+
+                  <%= hidden_field_tag "faq[][id]", "", class: "unique_id" %>
+
+
                   <div class="flex-1 min-w-0">
                     <div class="mb-4">
                       <label class="block text-sm font-medium text-gray-700 mb-1">Titre</label>
@@ -76,6 +99,7 @@
                     <%= render(Dashboard::ButtonComponent.new(
                       text: "",
                       icon_left: 'icons/trash.svg',
+                      submit: false,
                       html_options: {
                         "data-action": "dashboard-dynamic-kv-form#removeItem"
                       },
@@ -88,6 +112,7 @@
                 <%= render(Dashboard::ButtonComponent.new(
                   text: "Ajouter une spécification",
                   icon_left: 'icons/plus.svg',
+                  submit: false,
                   html_options: {
                     "data-action": "dashboard-dynamic-kv-form#addItem"
                   },
@@ -96,7 +121,6 @@
                 <%= render(Dashboard::ButtonComponent.new(
                   text: "Enregistrer",
                   html_options: {
-                    type: "submit",
                     class: "w-full md:w-auto",
                   },
                   variant: Dashboard::ButtonComponent.variant_primary)) %>

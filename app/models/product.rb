@@ -1,4 +1,6 @@
 class Product < ApplicationRecord
+  include PositionableImages
+
   has_many_attached :images do |attachment|
     attachment.variant :thumbnail, resize_to_limit: [200, nil]
     attachment.variant :medium, resize_to_limit: [500, nil]
@@ -6,7 +8,6 @@ class Product < ApplicationRecord
     attachment.variant :blur, blur: 32, resize_to_limit: [16, nil]
   end
 
-  after_commit :create_image_variants, on: [:create, :update]
   after_create_commit :create_stripe_products
 
   has_many :product_variants
@@ -27,8 +28,9 @@ class Product < ApplicationRecord
   def self.from_params(params)
     product = create!(
       name: params[:product][:name],
-      description: params[:product][:description],
-      specifications: params[:product][:specifications] || {},
+      short_description: params[:product][:short_description],
+      specifications: structured_data_from_hash(product_params[:specifications]),
+      faq: structured_data_from_hash(product_params[:faq]),
       features: params[:product][:features] || {},
       base_price: params[:product][:base_price] || 0
     )
@@ -38,6 +40,19 @@ class Product < ApplicationRecord
     end
 
     product
+  end
+
+  def self.structured_data_from_hash(hash)
+    return [] if hash.blank?
+
+    hash.map.with_index do |(key, value), index|
+      {
+        id: SecureRandom.uuid,
+        key: key,
+        value: value,
+        position: index
+      }
+    end
   end
 
   def self.variants_from_parms(params, product)
@@ -72,6 +87,6 @@ class Product < ApplicationRecord
 
   def create_image_variants
     return unless images.attached?
-    ::CreateImageVariantsJob.perform_later({ record_type: Product.class, record_id: id })
+    ::CreateImageVariantsJob.perform_later({ record_type: self.class, record_id: id })
   end
 end

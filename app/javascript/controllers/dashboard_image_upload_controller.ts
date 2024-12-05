@@ -1,15 +1,41 @@
 import { Controller } from "@hotwired/stimulus"
+import Sortable from 'sortablejs';
 
 export default class extends Controller {
-  static targets = ["preview", "input", "template"]
+  static targets = ["preview", "input", "template", 'imagesPositions']
   static values = { model: String }
 
   declare readonly previewTarget: HTMLDivElement
   declare readonly inputTarget: HTMLInputElement
   declare readonly templateTarget: HTMLTemplateElement
   declare readonly modelValue: string
+  declare readonly imagesPositionsTarget: HTMLInputElement
+
+  private sortable: Sortable | null = null
+  private newFiles: Set<string> = new Set()
 
   connect() {
+    this.initializeSortable()
+  }
+
+  disconnect() {
+    this.sortable?.destroy()
+  }
+
+  private initializeSortable() {
+    this.sortable?.destroy()
+
+    this.sortable = Sortable.create(this.previewTarget, {
+      handle: ".cursor-move",
+      onChange: () => {
+        this.updateFilePosition()
+      }
+    })
+  }
+
+  updateFiles() {
+    this.updateFilePosition()
+    this.initializeSortable()
   }
 
   addImage() {
@@ -36,19 +62,34 @@ export default class extends Controller {
     // Update the input's files
     input.files = existingFiles.files
 
+    // Track how many files we're adding
+    let filesProcessed = 0
+
     // Create previews for new files
     currentFiles.forEach(file => {
       const reader = new FileReader()
 
+      this.newFiles.add(file.name)
+
       reader.onload = (e) => {
         const preview = this.templateTarget.content.cloneNode(true) as HTMLElement
+
+        preview.querySelector('.sortable-item')?.setAttribute('data-image-id', file.name)
+
         const img = preview.querySelector('img')
         if (img && e.target?.result) {
           img.src = e.target.result as string
         }
         this.previewTarget.appendChild(preview)
-      }
 
+        // Increment processed files counter
+        filesProcessed++
+
+        // Only update after all files have been processed
+        if (filesProcessed === currentFiles.length) {
+          this.updateFiles()
+        }
+      }
       reader.readAsDataURL(file)
     })
   }
@@ -67,5 +108,19 @@ export default class extends Controller {
     }
 
     preview.remove()
+    this.updateFiles()
+  }
+
+  private updateFilePosition() {
+    const images = Array.from(this.previewTarget.children)
+      .map((child, index) => {
+        return {
+          id: child.getAttribute('data-image-id'),
+          position: index,
+          new: this.newFiles.has(child.getAttribute('data-image-id') || '')
+        }
+      })
+
+    this.imagesPositionsTarget.value = JSON.stringify(images)
   }
 }

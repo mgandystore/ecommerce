@@ -4,6 +4,28 @@ module Dashboard
       @orders = orders_scope
                   .includes(:customer, :order_notes, :shipping_address, order_items: [:product_variant, :product])
                   .order(id: :desc)
+
+      @total_orders = Order.count
+
+      @orders_this_month = Order.where('created_at >= ?', Time.current.beginning_of_month).count
+
+      # Average shipping duration for shipped orders
+      @avg_shipping_duration = Order.where.not(paid_at: nil)
+                                    .where.not(shipped_at: nil)
+                                    .average("EXTRACT(EPOCH FROM shipped_at - paid_at)").to_i
+
+      best_variant = OrderItem
+                       .group(:product_variant_id)
+                       .order(Arel.sql('COUNT(*) DESC'))
+                       .limit(1)
+                       .count
+                       .first
+
+      @best_variant = best_variant ? {
+        name: ProductVariant.find(best_variant[0]).human_format,
+        sales_count: best_variant[1]
+      } : nil
+
     end
 
     def show
@@ -76,8 +98,6 @@ module Dashboard
       scope = scope.where(status: params[:status]) if params[:status].present?
 
       scope
-
     end
   end
 end
-

@@ -35,6 +35,7 @@ Rails.application.routes.draw do
   patch "dashboard/products/:id/faq", to: "dashboard/products#update_faq", as: :update_dashboard_product_faq
   get "dashboard/products/:id/variants/:product_variant_id", to: "dashboard/products#edit_product_variants", as: :edit_dashboard_product_variant
   patch "dashboard/products/:id/variants/:product_variant_id", to: "dashboard/products#update_product_variant", as: :update_dashboard_product_variant
+  get "dashboard/stock_notifications", to: "dashboard/stock_notifications#index", as: :dashboard_stock_notifications
 
   # =========================================================================
   # Utilities

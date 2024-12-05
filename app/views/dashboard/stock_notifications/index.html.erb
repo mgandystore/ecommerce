@@ -1,0 +1,31 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+    <div class="flex flex-col gap-2 py-4">
+      <h1 class="text-xl leading-6 font-medium text-gray-900">Notifications de stock</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Vue d'ensemble des notifications de stock par variante
+      </p>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Produit</th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Variante</th>
+          <th class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Notifications</th>
+        </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+        <% @notification_stats.each do |stat| %>
+          <tr>
+            <td class="px-6 py-4 text-sm text-gray-900"><%= stat.product_name %></td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= stat.variants_slug %></td>
+            <td class="px-6 py-4 text-sm text-gray-500"><%= stat.notification_count %></td>
+          </tr>
+        <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

@@ -9,6 +9,11 @@ module Dashboard::BaseHelper
   def navbar_items
     [
       {
+        label: "La boutique",
+        path: Rails.application.routes.url_helpers.home_path,
+        icon: inline_svg_tag("icons/store.svg", class: "w-5 h-5 text-gray-400")
+      },
+      {
         label: "Commandes",
         path: Rails.application.routes.url_helpers.dashboard_orders_path,
         icon: inline_svg_tag("icons/package.svg", class: "w-5 h-5 text-gray-400"),
@@ -19,10 +24,11 @@ module Dashboard::BaseHelper
         path: Rails.application.routes.url_helpers.dashboard_products_path,
         icon: inline_svg_tag("icons/cart.svg", class: "w-5 h-5 text-gray-400")
       },
+
       {
-        label: "La boutique",
-        path: Rails.application.routes.url_helpers.home_path,
-        icon: inline_svg_tag("icons/store.svg", class: "w-5 h-5 text-gray-400")
+        label: "Stock notifications",
+        path: Rails.application.routes.url_helpers.dashboard_stock_notifications_path,
+        icon: inline_svg_tag("icons/bell.svg", class: "w-5 h-5 text-gray-400")
       }
     ]
   end

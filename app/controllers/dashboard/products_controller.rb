@@ -12,6 +12,11 @@ module Dashboard
                    .includes(images_attachments: :blob)
                    .includes(:product_variants)
                    .find_by!(id: params[:id])
+
+      @default_images_positions = @product.images_positions
+      @ordered_images = @product.ordered_images
+      @product.faq.sort_by { |element| element["position"] }
+      @product.specifications.sort_by { |element| element["position"] }
     end
 
     def create
@@ -30,6 +35,14 @@ module Dashboard
         @product.name = product_params[:name]
       end
 
+      if product_params[:short_description].present?
+        @product.short_description = product_params[:short_description]
+      end
+
+      if product_params[:base_price].present?
+        @product.base_price = product_params[:base_price].to_i * 100
+      end
+
       if product_params[:description].present?
         @product.description = product_params[:description]
       end
@@ -39,7 +52,8 @@ module Dashboard
       end
 
       if product_params[:images].present?
-        @product.images.attach(product_params[:images])
+        @product.attach_images_with_positions(product_params[:images], product_params[:images_positions])
+        @product.create_image_variants
       end
 
       if @product.changed? || product_params[:images].present? || params[:product][:images_to_delete].present?
@@ -55,15 +69,17 @@ module Dashboard
       product_variant_id = params[:product_variant_id]
       @product = Product.find(params[:id])
       @product_variant = @product.product_variants.find(product_variant_id)
+      @default_images_positions = @product_variant.images_positions
+      @ordered_images = @product_variant.ordered_images
     end
 
     def update_product_variant
       @product = Product.find(params[:id])
       @product_variant = @product.product_variants.find(params[:product_variant_id])
 
-      puts "product_variant_params: #{product_variant_params.inspect}"
       if product_variant_params[:images].present?
-        @product_variant.images.attach(product_variant_params[:images])
+        @product_variant.attach_images_with_positions(product_variant_params[:images], product_variant_params[:images_positions])
+        @product_variant.create_image_variants
       end
 
       if product_variant_params[:images_to_delete].present?
@@ -94,56 +110,63 @@ module Dashboard
 
     def edit_specifications
       @product = Product.find(params[:id])
-    end
-
-    def update_specifications
-      @product = Product.find(params[:id])
-
-      specifications = {}
-
-      if params[:specifications].present?
-        params[:specifications].each do |spec|
-          next if spec[:key].blank? && spec[:value].blank?
-          specifications[spec[:key]] = spec[:value]
-        end
-      end
-
-      @product.update(specifications: specifications)
-
-      flash[:success] = "Les spécifications ont été mises à jour avec succès"
-      redirect_to dashboard_product_path(@product)
+      @product.specifications.sort_by { |element| element["position"] }
     end
 
     def edit_faq
       @product = Product.find(params[:id])
+      @product.faq.sort_by { |element| element["position"] }
+    end
+
+    def update_specifications
+      positions = JSON.parse(params[:positions].to_s, symbolize_names: true)
+      update_structured_attribute(:specifications, positions: positions)
     end
 
     def update_faq
+      positions = JSON.parse(params[:positions].to_s, symbolize_names: true)
+      update_structured_attribute(:faq, positions: positions)
+    end
+
+    private
+
+    def update_structured_attribute(attribute, positions:)
       @product = Product.find(params[:id])
+      structured_data = []
 
-      faq = {}
-
-      if params[:faq].present?
-        params[:faq].each do |item|
+      if params[attribute].present?
+        params[attribute].each do |item|
           next if item[:key].blank? && item[:value].blank?
-          faq[item[:key]] = item[:value]
+
+          structured_data << {
+            key: item[:key],
+            value: item[:value],
+            id: item[:id],
+            position: positions.find { |pos| pos[:id] == item[:id].to_s }&.dig(:position)
+          }
         end
       end
 
-      @product.update(faq: faq)
+      @product.update(attribute => structured_data)
 
-      flash[:success] = "La FAQ a été mise à jour avec succès"
+      success_messages = {
+        specifications: "Les spécifications ont été mises à jour avec succès",
+        faq: "La FAQ a été mise à jour avec succès"
+      }
+
+      flash[:success] = success_messages[attribute]
       redirect_to dashboard_product_path(@product)
     end
 
     private
 
     def product_params
-      params.require(:product).permit(:name, :description, specifications: {}, faq: {}, images: [], images_to_delete: [])
+      params.require(:product).permit(:images_positions, :base_price, :short_description,
+                                      :name, :description, specifications: {}, faq: {}, images: [], images_to_delete: [])
     end
 
     def product_variant_params
-      params.require(:product_variant).permit(:stock, :additional_price, images: [], images_to_delete: [])
+      params.require(:product_variant).permit(:images_positions, :stock, :additional_price, images: [], images_to_delete: [])
     end
 
     def products_scope
@@ -167,3 +190,5 @@ module Dashboard
     end
   end
 end
+
+

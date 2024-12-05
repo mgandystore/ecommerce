@@ -4,7 +4,7 @@
     <%= render(Dashboard::BreadcrumbComponent.new(items: [
       { label: "Produits", path: dashboard_products_path },
       { label: @product.name, current: true },
-    ]))%>
+    ])) %>
 
     <!-- Main Grid Layout -->
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -29,6 +29,21 @@
               </div>
 
               <div>
+                <%= f.label :base_price, "Prix de base", class: "block text-sm font-medium text-gray-700" %>
+                <%= f.number_field :base_price, min: 0, step: 1, value: @product.base_price / 100.0,
+                                   class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+
+              </div>
+
+
+              <div>
+                <%= f.label :short_description, "Description courte", class: "block text-sm font-medium text-gray-700" %>
+                <%= f.text_field :short_description,
+                                 class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+              </div>
+
+
+              <div>
                 <%= f.label :description, "Description", class: "block text-sm font-medium text-gray-700" %>
                 <div class="mt-1">
                   <%= f.rich_text_area :description,
@@ -50,10 +65,15 @@
 
                   <!-- Image Preview Section -->
                   <div data-dashboard-image-upload-target="preview" class="flex flex-wrap gap-4">
-                    <% @product.images.each do |image| %>
-                      <%= render 'dashboard/shared/image_preview', image: image, data: { image_id: image.id } %>
+                    <% @ordered_images.each do |image| %>
+                       <%= render 'dashboard/shared/image_preview', image: image, data: { image_id: image.id } %>
                     <% end %>
                   </div>
+
+                  <!-- Hidden File Positions input -->
+                  <%= hidden_field_tag "product[images_positions]", @default_images_positions.to_json, data: {
+                    dashboard_image_upload_target: "imagesPositions"
+                  } %>
                 </div>
 
                 <!-- Hidden File Input -->
@@ -144,11 +164,11 @@
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <tbody class="divide-y divide-gray-200">
-                <% @product.specifications.each do |key, value| %>
+                <% @product.specifications.each do |item| %>
                   <tr>
-                    <td class="px-4 py-2 text-sm text-gray-500"><%= key %></td>
+                    <td class="px-4 py-2 text-sm text-gray-500"><%= item["key"] %></td>
                     <td class="px-4 py-2 text-sm font-medium text-gray-900">
-                      <%= truncate(strip_tags(value), length: 125, escape: false) %>
+                      <%= truncate(strip_tags(item["value"]), length: 125, escape: false) %>
                     </td>
                   </tr>
                 <% end %>
@@ -172,11 +192,11 @@
             <div class="overflow-x-auto">
               <table class="min-w-full divide-y divide-gray-200">
                 <tbody class="divide-y divide-gray-200">
-                <% @product.faq.each do |key, value| %>
+                <% @product.faq.each do |item| %>
                   <tr>
-                    <td class="px-4 py-2 text-sm text-gray-500"><%= key %></td>
+                    <td class="px-4 py-2 text-sm text-gray-500"><%= item["key"] %></td>
                     <td class="px-4 py-2 text-sm font-medium text-gray-900">
-                      <%= truncate(strip_tags(value), length: 125, escape: false) %>
+                      <%= truncate(strip_tags(item["value"]), length: 125, escape: false) %>
                     </td>
                   </tr>
                 <% end %>

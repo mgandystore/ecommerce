@@ -34,7 +34,8 @@ module.exports = {
     resolve: {
         extensions: [ '.tsx', '.ts', '.js' ],
         alias: {
-            '@glidejs/glide': path.resolve(__dirname, 'node_modules/@glidejs/glide')
+            '@glidejs/glide': path.resolve(__dirname, 'node_modules/@glidejs/glide'),
+            'swapy': path.resolve(__dirname, 'node_modules/swapy')
         }
     },
 }

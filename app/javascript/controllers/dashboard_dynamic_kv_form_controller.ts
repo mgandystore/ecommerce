@@ -1,22 +1,55 @@
 import { Controller } from "@hotwired/stimulus"
+import Sortable from 'sortablejs'
 
 export default class extends Controller {
-  static targets = ["template", "container"]
+  static targets = ["template", "container", "positions"]
 
   declare readonly templateTarget: HTMLTemplateElement
   declare readonly containerTarget: HTMLDivElement
+  declare readonly positionsTarget: HTMLInputElement
+  private sortable: Sortable | null = null
 
   connect(): void {
+    console.log(this)
     if (this.containerTarget.children.length === 0) {
       this.addItem()
     }
+
+    this.initializeSortable()
+  }
+
+  disconnect(): void {
+    this.sortable?.destroy()
+  }
+
+  private initializeSortable(): void {
+    this.sortable?.destroy()
+
+    this.sortable = new Sortable(this.containerTarget, {
+      handle: '.cursor-move',
+      onChange: () => {
+        this.updateItemPosition()
+      }
+    })
+  }
+
+  updateItemPosition(): void {
+    const items = Array.from(this.containerTarget.children)
+      .map((child, index) => {
+        return {
+          id: (child.querySelector('.unique_id') as HTMLInputElement).value,
+          position: index,
+        }
+      })
+
+    this.positionsTarget.value = JSON.stringify(items)
   }
 
   addItem(event?: Event): void {
-    event?.preventDefault()
-
     // Clone the template content
-    const template = this.templateTarget.content.cloneNode(true) as DocumentFragment
+    const template = this.templateTarget.content.cloneNode(true) as DocumentFragment;
+
+    (template.querySelector(".unique_id") as HTMLInputElement).value = crypto.randomUUID();
 
     // Create and add the title input field
     const keyContainer = template.querySelector('.new_key')
@@ -62,7 +95,6 @@ export default class extends Controller {
   }
 
   removeItem(event: Event): void {
-    event.preventDefault()
     const item = (event.target as HTMLElement).closest('.dynamic-form-item')
 
     if (this.containerTarget.children.length > 1 && item) {

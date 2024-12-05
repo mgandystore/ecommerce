@@ -5,22 +5,23 @@ class HomeController < ApplicationController
                  .order(id: :desc)
                  .first
 
-    @images = {
-      product_images: @product.images.map { |image| to_image(@product.id, image) }
-    }
-
     @product.product_variants.sort_by { |variant| variant.variants_slug }
 
+    @images = {
+      product_images: @product.ordered_images.map { |image| to_image(@product.id, image) }
+    }
+
     @product.product_variants.each do |variant|
-      variant.images.each do |image|
+      variant.ordered_images.each do |image|
         @images[variant.variants_slug] ||= []
         @images[variant.variants_slug] << to_image(variant.id, image)
       end
     end
 
-
     @default_variant = find_default_variant(@product.product_variants.to_a, params)
-    puts "debug #{@default_variant.variants["couleur"]}"
+
+    @product.faq.sort_by { |element| element["position"] }
+    @product.specifications.sort_by { |element| element["position"] }
   end
 
   def success

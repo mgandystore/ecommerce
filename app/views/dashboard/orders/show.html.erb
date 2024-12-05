@@ -59,21 +59,22 @@
                 <div>
                   <%= f.label :carrier_name, "Transporteur", class: "block text-sm font-medium text-gray-700" %>
                   <%= f.select :carrier_name,
-                               ["La Poste/Colissimo", "Chronopost", "DHL", "DPD"],
+                               ["Mondial Relay", "La Poste/Colissimo", "Chronopost" , "DHL", "DPD"],
                                { prompt: "Sélectionner un transporteur" },
+                               value: @order.carrier_name || "Mondial Relay",
                                data: { dashboard_shipping_modal_target: "carrierName" },
                                class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
                 </div>
 
                 <div>
                   <%= f.label :carrier_tracking_number, "Numéro de suivi", class: "block text-sm font-medium text-gray-700" %>
-                  <%= f.text_field :carrier_tracking_number, data: { dashboard_shipping_modal_target: "trackingNumber" },
+                  <%= f.text_field :carrier_tracking_number, data: { dashboard_shipping_modal_target: "trackingNumber" }, value: @order.carrier_tracking_number,
                                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
                 </div>
 
                 <div>
                   <%= f.label :carrier_tracking_link, "Lien de suivi", class: "block text-sm font-medium text-gray-700" %>
-                  <%= f.text_field :carrier_tracking_link,
+                  <%= f.text_field :carrier_tracking_link, data: { dashboard_shipping_modal_target: "trackingLink" }, value: @order.carrier_tracking_link,
                                    class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-primary-500 focus:ring-primary-500" %>
                 </div>
               </div>
@@ -90,6 +91,7 @@
 
                 <%= render(Dashboard::ButtonComponent.new(
                   text: "Confirmer",
+                  submit: false,
                   html_options: {
                     "data-action": "dashboard-shipping-modal#confirm"
                   },

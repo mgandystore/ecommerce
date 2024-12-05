@@ -197,6 +197,11 @@
   dependencies:
     undici-types "~6.19.8"
 
+"@types/sortablejs@^1.15.8":
+  version "1.15.8"
+  resolved "https://registry.npmjs.org/@types/sortablejs/-/sortablejs-1.15.8.tgz"
+  integrity sha512-b79830lW+RZfwaztgs1aVPgbasJ8e7AXtZYHTELNXZPsERt4ymJdjV4OccDbHQAvHrCcFpbF78jkm0R6h/pZVg==
+
 "@webassemblyjs/ast@^1.12.1", "@webassemblyjs/ast@1.14.1":
   version "1.14.1"
   resolved "https://registry.npmjs.org/@webassemblyjs/ast/-/ast-1.14.1.tgz"
@@ -1492,6 +1497,11 @@ signal-exit@^4.0.1:
   resolved "https://registry.npmjs.org/signal-exit/-/signal-exit-4.1.0.tgz"
   integrity sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==
 
+sortablejs@^1.15.6:
+  version "1.15.6"
+  resolved "https://registry.npmjs.org/sortablejs/-/sortablejs-1.15.6.tgz"
+  integrity sha512-aNfiuwMEpfBM/CN6LY0ibyhxPfPbyFeBTYJKCvzkJ2GkUpazIt3H+QIPAMHwqQ7tMKaHz1Qj+rJJCqljnf4p3A==
+
 source-map-js@^1.2.1:
   version "1.2.1"
   resolved "https://registry.npmjs.org/source-map-js/-/source-map-js-1.2.1.tgz"
@@ -1628,6 +1638,11 @@ supports-preserve-symlinks-flag@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/supports-preserve-symlinks-flag/-/supports-preserve-symlinks-flag-1.0.0.tgz"
   integrity sha512-ot0WnXS9fgdkgIcePe6RHNk1WA8+muPa6cSjeR3V8K27q9BB1rTE3R1p7Hv0z1ZyAc8s6Vvv8DIyWf681MAt0w==
+
+swapy@^0.4.2:
+  version "0.4.2"
+  resolved "https://registry.npmjs.org/swapy/-/swapy-0.4.2.tgz"
+  integrity sha512-vxs9OjXCfaQRXUxUBZb7KAWSAJeWlOYsG8N6lJBseEaQZ3XfxW6uIvJo/ebyxQ3mdFxNHEWhxPSbfrfCvevh6Q==
 
 tailwindcss@^3.4.15, "tailwindcss@>=2.0.0 || >=3.0.0 || >=3.0.0-alpha.1", "tailwindcss@>=3.0.0 || >= 3.0.0-alpha.1 || >= 4.0.0-alpha.20", "tailwindcss@>=3.0.0 || insiders || >=4.0.0-alpha.20", tailwindcss@>=3.2.0:
   version "3.4.15"

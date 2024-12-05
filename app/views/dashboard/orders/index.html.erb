@@ -8,6 +8,49 @@
       </p>
     </div>
 
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+      <!-- Total Orders -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Total commandes</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <%= @total_orders %>
+        </div>
+      </div>
+
+      <!-- Orders This Month -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Commandes ce mois</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <%= @orders_this_month %>
+        </div>
+      </div>
+
+      <!-- Average Shipping Time -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Délai moyen d'expédition</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <% if @avg_shipping_duration %>
+            <%= distance_of_time_in_words(@avg_shipping_duration) %>
+          <% else %>
+            -
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Best Selling Variant -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Meilleure variante</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <% if @best_variant %>
+            <div class="text-lg font-medium"><%= @best_variant[:name] %></div>
+            <div class="text-sm text-gray-500"><%= pluralize(@best_variant[:sales_count], 'vente') %></div>
+          <% else %>
+            -
+          <% end %>
+        </div>
+      </div>
+    </div>
+
     <%= form_tag dashboard_orders_path, method: :get, class: "space-y-4" do %>
       <div class="flex flex-col sm:flex-row gap-4 w-full items-baseline align">
         <div class="flex flex-col sm:flex-row gap-4 sm:flex-1 w-full">
