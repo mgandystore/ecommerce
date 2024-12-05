@@ -29,9 +29,6 @@ class Product < ApplicationRecord
     product = create!(
       name: params[:product][:name],
       short_description: params[:product][:short_description],
-      specifications: structured_data_from_hash(params[:product][:specifications]),
-      faq: structured_data_from_hash(params[:product][:faq]),
-      features: params[:product][:features] || {},
       base_price: params[:product][:base_price] || 0
     )
 
@@ -40,19 +37,6 @@ class Product < ApplicationRecord
     end
 
     product
-  end
-
-  def self.structured_data_from_hash(hash)
-    return [] if hash.blank?
-
-    hash.map.with_index do |(key, value), index|
-      {
-        id: SecureRandom.uuid,
-        key: key,
-        value: value,
-        position: index
-      }
-    end
   end
 
   def self.variants_from_parms(params, product)
