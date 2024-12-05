@@ -1,13 +1,6 @@
 # syntax=docker/dockerfile:1
 # check=error=true
 
-# This Dockerfile is designed for production, not development. Use with Kamal or build'n'run by hand:
-# docker build -t assmac .
-# docker run -d -p 80:80 -e RAILS_MASTER_KEY=<value from config/master.key> --name hassmac hassmac
-
-# For a containerized dev environment, see Dev Containers: https://guides.rubyonrails.org/getting_started_with_devcontainer.html
-
-# Make sure RUBY_VERSION matches the Ruby version in .ruby-version
 ARG RUBY_VERSION=3.3.6
 FROM docker.io/library/ruby:$RUBY_VERSION-slim AS base
 
@@ -61,9 +54,7 @@ RUN bundle exec bootsnap precompile app/ lib/
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
 RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
 
-
 RUN rm -rf node_modules
-
 
 # Final stage for app image
 FROM base
@@ -72,10 +63,14 @@ FROM base
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
 
-# Run and own only the runtime files as a non-root user for security
+RUN mkdir -p /rails/log /rails/tmp
+
+# Create rails user and set up directory permissions
 RUN groupadd --system --gid 1000 rails && \
     useradd rails --uid 1000 --gid 1000 --create-home --shell /bin/bash && \
-    chown -R rails:rails db
+    mkdir -p /rails/tmp/pids /rails/tmp/cache /rails/tmp/sockets /rails/log && \
+    chown -R rails:rails /rails/tmp /rails/log /rails/db
+
 USER 1000:1000
 
 # Entrypoint prepares the database.
