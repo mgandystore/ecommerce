@@ -10,7 +10,7 @@ Rails.application.configure do
   config.eager_load = true
 
   # Full error reports are disabled.
-  config.consider_all_requests_local = false
+  config.consider_all_requests_local = true
 
   # Turn on fragment caching in view templates.
   config.action_controller.perform_caching = true
@@ -22,7 +22,11 @@ Rails.application.configure do
   # config.asset_host = "http://assets.example.com"
 
   # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  config.active_storage.service = :cloudflare
+  config.active_storage.variant_processor = :mini_magick
+  config.active_storage.track_variants = true
+  config.active_storage.analyzers = [ActiveStorage::Analyzer::ImageAnalyzer::ImageMagick]
+  config.active_storage.service_urls_expire_in = 30.minutes
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   config.assume_ssl = true
@@ -59,8 +63,10 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
+  routes.default_url_options[:host] = ENV.fetch("WEBSITE_URL", "localhost:3000")
+
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { host: ENV.fetch("WEBSITE_URL", "localhost:3000") }
 
   # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
   # config.action_mailer.smtp_settings = {
