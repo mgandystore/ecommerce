@@ -37,17 +37,6 @@ Rails.application.configure do
   # Skip http-to-https redirect for the default health check endpoint.
   # config.ssl_options = { redirect: { exclude: ->(request) { request.path == "/up" } } }
 
-  # Log to STDOUT with the current request id as a default log tag.
-
-  config.logger = ActiveSupport::BroadcastLogger.new(
-    ActiveSupport::TaggedLogging.new(ActiveSupport::Logger.new($stdout, formatter: config.log_formatter)),
-  )
-
-  config.after_initialize do
-    ActiveJob::Base.logger ||= Rails.logger
-    ActiveSupport::TaggedLogging.new(ActiveJob::Base.logger) if ActiveJob::Base.logger
-  end
-
   # Change to "debug" to log everything (including potentially personally-identifiable information!)
   config.log_level = ENV.fetch("RAILS_LOG_LEVEL", "debug")
 
@@ -73,15 +62,13 @@ Rails.application.configure do
   # Set host to be used by links generated in mailer templates.
   config.action_mailer.default_url_options = { host: ENV.fetch("WEBSITE_URL", "localhost:3000") }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
-
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    address: ENV.fetch("SMTP_HOST", "localhost"),
+    port: ENV.fetch("SMTP_PORT", 1025),
+    user_name: ENV.fetch("SMTP_LOGIN", "user"),
+    password: ENV.fetch("SMTP_PASSWORD", "password"),
+  }
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
   config.i18n.fallbacks = true
