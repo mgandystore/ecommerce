@@ -3,7 +3,7 @@ json.product do
   json.name @product.name
   json.description @product.description
   json.specifications @product.specifications
-  json.features @product.features
+  json.faq @product.faq
   json.base_price @product.base_price
   json.created_at @product.created_at
   json.updated_at @product.updated_at
