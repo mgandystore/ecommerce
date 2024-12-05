@@ -1,5 +1,7 @@
 module Dashboard
   class ProductsController < BaseController
+    skip_before_action :verify_authenticity_token, except: [ :create ]
+
     def index
       @products = products_scope
                     .includes(images_attachments: :blob)
@@ -20,6 +22,9 @@ module Dashboard
     end
 
     def create
+
+      
+
       ActiveRecord::Base.transaction do
         @product = Product.from_params(params)
         render :product, status: :created, formats: [:json], content_type: "application/json"

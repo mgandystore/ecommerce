@@ -4,7 +4,15 @@ module HomeHelper
       "rouge": "red",
       "bleu": "blue",
       "jaune": "yellow",
-      "vert": "green"
+      "vert": "green",
+      "noir": "black",
+      "blanc": "white",
+      "gris": "gray",
+      "rose": "pink",
+      "violet": "purple",
+      "orange": "orange",
+      "marron": "brown",
+      "turquoise": "teal"
     }
   end
 
