@@ -68,10 +68,11 @@ test:
 production:
   primary: &primary_production
     <<: *default
-    database: <%= ENV["HASSMAC_DATABASE_NAME"] %>
-    username: <%= ENV["HASSMAC_DATABASE_USERNAME"] %>
-    password: <%= ENV["HASSMAC_DATABASE_PASSWORD"] %>
-    port: <%= ENV["HASSMAC_DATABASE_PORT"] %>
+    database: <%= ENV["DATABASE_NAME"] %>
+    username: <%= ENV["DATABASE_USERNAME"] %>
+    password: <%= ENV["DATABASE_PASSWORD"] %>
+    port: <%= ENV["DATABASE_PORT"] %>
+    host: <%= ENV["DATABASE_HOST"] %>
   cache:
     <<: *primary_production
     database: hassmac_production_cache
