@@ -29,8 +29,8 @@ class Product < ApplicationRecord
     product = create!(
       name: params[:product][:name],
       short_description: params[:product][:short_description],
-      specifications: structured_data_from_hash(product_params[:specifications]),
-      faq: structured_data_from_hash(product_params[:faq]),
+      specifications: structured_data_from_hash(params[:product][:specifications]),
+      faq: structured_data_from_hash(params[:product][:faq]),
       features: params[:product][:features] || {},
       base_price: params[:product][:base_price] || 0
     )

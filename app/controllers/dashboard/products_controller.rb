@@ -22,9 +22,6 @@ module Dashboard
     end
 
     def create
-
-      
-
       ActiveRecord::Base.transaction do
         @product = Product.from_params(params)
         render :product, status: :created, formats: [:json], content_type: "application/json"
