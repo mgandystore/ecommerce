@@ -1,6 +1,6 @@
 development: &default
-  secret: <%= ENV.fetch('STRIPE_SECRET') %>
-  webhook_signing: <%= ENV.fetch('STRIPE_WEBHOOK_SIGNING') %>
+  secret: <%= ENV.fetch('STRIPE_SECRET', "") %>
+  webhook_signing: <%= ENV.fetch('STRIPE_WEBHOOK_SIGNING', "") %>
   url: https://dashboard.stripe.com/test
 
 production:
