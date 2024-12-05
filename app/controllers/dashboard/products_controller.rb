@@ -1,6 +1,6 @@
 module Dashboard
   class ProductsController < BaseController
-    skip_before_action :verify_authenticity_token, except: [ :create ]
+    skip_before_action :verify_authenticity_token, only: [ :create ]
 
     def index
       @products = products_scope
