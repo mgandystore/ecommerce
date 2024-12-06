@@ -49,10 +49,11 @@ Rails.application.configure do
   # Replace the default in-process memory cache store with a durable alternative.
   config.cache_store = :solid_cache_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :solid_queue
-  config.solid_queue.connects_to = { database: { writing: :production } }
-  config.solid_queue.silence_polling = false
+  config.active_job.queue_adapter = :good_job
+  config.good_job.preserve_job_records = true
+  config.good_job.retry_on_unhandled_error = false
+  config.good_job.on_thread_error = ->(exception) { Rails.error.report(exception) }
+  config.good_job.execution_mode = :async
 
   # Ignore bad email addresses and do not raise email delivery errors.
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.

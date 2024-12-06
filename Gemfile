@@ -27,7 +27,6 @@ gem "tzinfo-data", platforms: %i[ windows jruby ]
 
 # Use the database-backed adapters for Rails.cache, Active Job, and Action Cable
 gem "solid_cache"
-gem "solid_queue"
 gem "solid_cable"
 gem "ksuid"
 gem "stripe"
@@ -78,3 +77,5 @@ gem "inline_svg", "~> 1.10"
 gem "rails-i18n", "~> 8.0"
 
 gem "view_component", "~> 3.20"
+
+gem "good_job", "~> 4.5"

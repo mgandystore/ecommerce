@@ -17,9 +17,10 @@ class OrderMailer < ApplicationMailer
     @order_number = order.id
     @tracking_number = order.carrier_tracking_number
     @carrier_name = order.carrier_name
-    @tracking_url = order.carrier_tracking_link
+    @tracking_url = order.carrier_tracking_link.start_with?("http") ? order.carrier_tracking_link : "https://#{order.carrier_tracking_link}"
     @delivery_address = order.human_address
     @client_email = order.customer.email
+
     mail(to: order.customer.email, subject: "#{order.customer.full_name}, votre commande est en route")
   end
 end
