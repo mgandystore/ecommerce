@@ -21,20 +21,21 @@ class Product
       @product.product_variants.each do |variant|
         stripe_product = Stripe::Product.create(
           name: @product.base_price + " " +  variant.additional_price,
-          description: ActionView::Base.full_sanitizer.sanitize(product.description),
+          description: product.short_description,
           shippable: true,
           default_price_data: {
-            unit_amount: @product.base_price + variant.additional_price,
+            unit_amount: @product.base_price.to_i + variant.additional_price.to_i,
             currency: "eur"
           },
           metadata: { product_id: @product.id, variant_id: variant.id }
         )
 
-        puts "Creating price for #{stripe_product.inspect}"
         variant.update!(
           stripe_product_id: stripe_product.id,
           stripe_product_price_id: stripe_product.default_price
         )
+
+        Rails.logger.info "Stripe Product created: #{stripe_product.id} for product: #{product.id} and variant: #{variant.variants_slug}"
       end
     end
   end

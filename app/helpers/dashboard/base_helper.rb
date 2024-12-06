@@ -1,8 +1,9 @@
 module Dashboard::BaseHelper
-  def truncate_long_id(stripe_session)
-    return stripe_session if stripe_session.length < 15
-    prefix = stripe_session[0...10]
-    suffix = stripe_session[-8..]
+  def truncate_long_id(value)
+    return "-" if value == nil || value.blank?
+    return value if value.length < 15
+    prefix = value[0...10]
+    suffix = value[-8..]
     "#{prefix}[...]#{suffix}"
   end
 
