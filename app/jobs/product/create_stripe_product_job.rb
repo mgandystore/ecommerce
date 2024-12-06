@@ -21,8 +21,8 @@ class Product
       @product.product_variants.each do |variant|
 
         stripe_product = Stripe::Product.create(
-          name: product.name + " " + variant.human_format,
-          description: product.short_description,
+          name: @product.name + " " + variant.human_format,
+          description: @product.short_description,
           shippable: true,
           default_price_data: {
             unit_amount: @product.base_price.to_i + variant.additional_price.to_i,
@@ -36,7 +36,7 @@ class Product
           stripe_product_price_id: stripe_product.default_price
         )
 
-        Rails.logger.info "Stripe Product created: #{stripe_product.id} for product: #{product.id} and variant: #{variant.variants_slug}"
+        Rails.logger.info "Stripe Product created: #{stripe_product.id} for product: #{@product.id} and variant: #{variant.variants_slug}"
       end
     end
   end

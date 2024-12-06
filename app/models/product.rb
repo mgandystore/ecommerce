@@ -28,7 +28,6 @@ class Product < ApplicationRecord
   def self.from_params(params)
     product = create!(
       name: params[:product][:name],
-      short_description: params[:product][:short_description],
       base_price: params[:product][:base_price] || 0
     )
 
