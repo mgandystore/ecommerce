@@ -3,7 +3,7 @@ class CreateImageVariantsJob < ApplicationJob
 
   def perform(criteria)
     case criteria[:record_type]
-    when Product.class
+    when Product.name
       product = Product.find(criteria[:record_id])
       return unless product.images.attached?
 
@@ -13,7 +13,7 @@ class CreateImageVariantsJob < ApplicationJob
         image.variant(:large).processed
         image.variant(:blur).processed
       end
-    when ProductVariant.class
+    when ProductVariant.name
       product_variant = ProductVariant.find(criteria[:record_id])
       return unless product_variant.images.attached?
 

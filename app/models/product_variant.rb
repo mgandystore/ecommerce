@@ -17,6 +17,6 @@ class ProductVariant < ApplicationRecord
   end
 
   def create_image_variants
-    ::CreateImageVariantsJob.perform_later(record_type: self.class, record_id: id)
+    ::CreateImageVariantsJob.perform_later(record_type: ProductVariant.name, record_id: id)
   end
 end

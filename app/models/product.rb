@@ -70,6 +70,6 @@ class Product < ApplicationRecord
 
   def create_image_variants
     return unless images.attached?
-    ::CreateImageVariantsJob.perform_later({ record_type: self.class, record_id: id })
+    ::CreateImageVariantsJob.perform_later({ record_type: Product.name, record_id: id })
   end
 end
