@@ -52,7 +52,9 @@ Rails.application.configure do
   config.active_job.queue_adapter = :good_job
   config.good_job.preserve_job_records = true
   config.good_job.retry_on_unhandled_error = false
-  config.good_job.on_thread_error = ->(exception) { Rails.error.report(exception) }
+  config.good_job.on_thread_error = ->(exception) {
+    Rails.logger.error(exception)
+  }
   config.good_job.execution_mode = :async
 
   # Ignore bad email addresses and do not raise email delivery errors.
