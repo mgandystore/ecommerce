@@ -20,7 +20,8 @@ class Product
     def create_stripe_product_with_prices
       @product.product_variants.each do |variant|
 
-        puts "DEBUG create_stripe_product_with_prices: #{variant.inspect} #{@product.inspect}"
+        puts "DEBUG: #{variant.as_json}"
+        puts "DEBUG: #{@product.as_json}"
 
         stripe_product = Stripe::Product.create(
           name: @product.base_price + " " + variant.additional_price,
