@@ -19,8 +19,11 @@ class Product
 
     def create_stripe_product_with_prices
       @product.product_variants.each do |variant|
+
+        puts "DEBUG create_stripe_product_with_prices: #{variant.inspect} #{@product.inspect}"
+
         stripe_product = Stripe::Product.create(
-          name: @product.base_price + " " +  variant.additional_price,
+          name: @product.base_price + " " + variant.additional_price,
           description: product.short_description,
           shippable: true,
           default_price_data: {
