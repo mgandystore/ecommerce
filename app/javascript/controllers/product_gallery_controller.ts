@@ -1,5 +1,5 @@
 // product_gallery_controller.ts
-import { Controller } from "@hotwired/stimulus"
+import { Controller } from '@hotwired/stimulus'
 import { VariantSelectEvent } from './product_variant_controller'
 import { VariantSlugSelectedEvent } from './product_controller'
 
@@ -15,7 +15,7 @@ type Image = {
 type Images = Record<string, Image[]>
 
 export default class extends Controller {
-  static targets = ["mainImage", "counter", "thumbnail", "modal", "modalImage", 'thumbnailsContainer', 'thumbnailsTemplate']
+  static targets = [ 'mainImage', 'counter', 'thumbnail', 'modal', 'modalImage', 'thumbnailsContainer', 'thumbnailsTemplate' ]
   static values = {
     images: Object,
     imageUsed: Array,
@@ -39,34 +39,72 @@ export default class extends Controller {
   declare isZoomedValue: boolean
   declare variantSelectedValue: string
 
+  private largeImagesLoaded = new Set<string>()
+
   connect() {
     this.updateThumbnailStates()
     document.addEventListener('keydown', this.handleKeyDown.bind(this))
-    this.preloadMainImage()
+    this.updateMainImage()
   }
 
   disconnect() {
     document.removeEventListener('keydown', this.handleKeyDown.bind(this))
   }
 
-  preloadMainImage() {
+  getImage() {
     if (this.imageUsedValue && this.imageUsedValue[this.currentIndexValue]) {
-      const currentImage = this.imageUsedValue[this.currentIndexValue]
+      return this.imageUsedValue[this.currentIndexValue]
+    }
+  }
 
-      // Create a new image element
-      this.fullImage = new Image()
+  updateMainImage() {
+    const currentImage = this.getImage()
+    if (!currentImage) {
+      return
+    }
 
-      this.fullImage.onload = () => {
-        // Once loaded, update the main image source
-        if (this.mainImageTarget) {
-          this.mainImageTarget.src = this.fullImage!.src
-          this.mainImageTarget.classList.remove('opacity-0')
-          this.mainImageTarget.classList.add('opacity-100')
-        }
+    const toggleAnimation = (appear: boolean) => {
+      if (appear) {
+        this.mainImageTarget.classList.remove('opacity-0')
+        this.mainImageTarget.classList.add('opacity-100')
+      } else {
+        this.mainImageTarget.classList.remove('opacity-100')
+        this.mainImageTarget.classList.add('opacity-0')
+      }
+    }
+
+    // check if the current image is already the same we do nothing
+    if (this.mainImageTarget.src === currentImage.url_large) {
+      return
+    }
+
+    // check if the image is already loaded, if so we just update the src
+    if (this.largeImagesLoaded.has(currentImage.url_large)) {
+      this.mainImageTarget.src = currentImage.url_large
+      return
+    }
+
+    toggleAnimation(false)
+    this.mainImageTarget.src = currentImage.url_blur
+    toggleAnimation(true)
+
+    this.fullImage = new Image()
+    this.fullImage.src = currentImage.url_large
+    this.fullImage.onload = () => {
+      const mayNewCurrentImage = this.getImage()
+
+      // Between the time we started loading the image and the time it was loaded, the user may have changed the image
+      // If so, we don't update the image
+      if (mayNewCurrentImage && mayNewCurrentImage.url !== currentImage.url) {
+        return
       }
 
-      // Start loading the full resolution image
-      this.fullImage.src = currentImage.url_large
+      // Once loaded, update the main image source
+      this.mainImageTarget.src = this.fullImage!.src
+
+      toggleAnimation(false)
+      this.largeImagesLoaded.add(currentImage.url_large)
+      toggleAnimation(true)
     }
   }
 
@@ -81,39 +119,39 @@ export default class extends Controller {
     currentIndex: number,
   ): { newImageUsed: Image[]; newIndex: number } {
     // Build new imageUsed array starting with product images
-    let newImageUsed: Image[] = [...imagesValue.product_images];
+    let newImageUsed: Image[] = [ ...imagesValue.product_images ]
 
     // Count of base product images
-    const productImagesCount = imagesValue.product_images.length;
+    const productImagesCount = imagesValue.product_images.length
 
     // Add current variant images if they exist
-    const currentVariantImages = imagesValue[currentVariant] || [];
-    newImageUsed.push(...currentVariantImages);
+    const currentVariantImages = imagesValue[currentVariant] || []
+    newImageUsed.push(...currentVariantImages)
 
     // Ensure the index doesn't exceed the new array length
-    let newIndex = Math.min(currentIndex, newImageUsed.length - 1);
+    let newIndex = Math.min(currentIndex, newImageUsed.length - 1)
 
     // If we were viewing a variant image (index >= productImagesCount)
     if (currentIndex >= productImagesCount) {
       // If new variant has images, try to maintain relative position
       if (currentVariantImages.length > 0) {
-        const previousVariantIndex = currentIndex - productImagesCount;
+        const previousVariantIndex = currentIndex - productImagesCount
         if (previousVariantIndex < currentVariantImages.length) {
-          newIndex = productImagesCount + previousVariantIndex;
+          newIndex = productImagesCount + previousVariantIndex
         } else {
           // If relative position is too high, show last image of new variant
-          newIndex = productImagesCount + currentVariantImages.length - 1;
+          newIndex = productImagesCount + currentVariantImages.length - 1
         }
       } else {
         // If new variant has no images, fall back to last product image
-        newIndex = productImagesCount - 1;
+        newIndex = productImagesCount - 1
       }
     }
 
     return {
       newImageUsed,
       newIndex
-    };
+    }
   }
 
   variantSelectedValueChanged() {
@@ -151,9 +189,7 @@ export default class extends Controller {
       const currentImage = this.imageUsedValue[this.currentIndexValue]
       if (currentImage) {
         // First set the blur image
-        this.mainImageTarget.classList.remove('opacity-100')
-        this.mainImageTarget.classList.add('opacity-0')
-        this.mainImageTarget.src = currentImage.url_blur
+        this.updateMainImage()
 
         // Update modal image
         this.modalImageTarget.src = currentImage.url
@@ -164,9 +200,6 @@ export default class extends Controller {
 
         // Update thumbnails
         this.updateThumbnailStates()
-
-        // Load the full resolution image
-        this.preloadMainImage()
       }
     }
   }

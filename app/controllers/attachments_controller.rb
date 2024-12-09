@@ -33,9 +33,71 @@ class AttachmentsController < ApplicationController
   private
 
   def send_blob(blob)
-    http_cache_forever(public: true) do
-      redirect_to blob.url(expires_in: 6.hour), allow_other_host: true
+    # Set longer cache control headers for better client-side caching
+    response.headers["Cache-Control"] = "public, max-age=#{1.year.to_i}"
+    response.headers["ETag"] = blob.checksum
+    response.headers["Accept-Ranges"] = "bytes"
+
+    # Use conditional GET to avoid unnecessary transfers
+    if stale?(etag: blob.checksum, public: true)
+      begin
+        # Get short-lived presigned URL
+        uri = URI.parse(blob.url(expires_in: 5.minutes))
+
+        # Use persistent connections
+        Net::HTTP.start(uri.host, uri.port,
+                        use_ssl: uri.scheme == "https",
+                        pool_size: 5,
+                        read_timeout: 10,
+                        open_timeout: 5) do |http|
+          net_request = Net::HTTP::Get.new(uri)
+
+          # Support range requests for large files
+          if request.headers["Range"]
+            net_request["Range"] = request.headers["Range"]
+          end
+
+          # Stream the response in chunks to reduce memory usage
+          http.request(net_request) do |blob_response|
+            response.headers["Content-Type"] = blob_response.content_type
+            response.headers["Content-Length"] = blob_response.content_length
+
+            if blob_response.code == "206" # Partial content
+              response.headers["Content-Range"] = blob_response["Content-Range"]
+              response.status = 206
+            end
+
+            # Set content disposition based on file type
+            disposition = content_type_requires_download?(blob_response.content_type) ? "attachment" : "inline"
+            response.headers["Content-Disposition"] = disposition
+
+            # Stream in chunks instead of reading entire body
+            blob_response.read_body do |chunk|
+              response.stream.write(chunk)
+            rescue IOError => e
+              # Handle closed stream gracefully
+              logger.info "Stream closed by client: #{e.message}"
+              break
+            end
+          end
+        end
+      rescue StandardError => e
+        logger.error "Error proxying blob: #{e.message}"
+        response.stream.close rescue nil
+        raise
+      ensure
+        response.stream.close rescue nil
+      end
     end
+  end
+
+
+
+
+
+  def content_type_requires_download?(content_type)
+    dangerous_types = %w[application/octet-stream application/x-executable]
+    dangerous_types.include?(content_type)
   end
 
   def parse_dimension(param_value)
@@ -69,7 +131,7 @@ class AttachmentsController < ApplicationController
     height = parse_dimension(params[:resize_to_limit_height])
 
     if width || height
-      options[:resize_to_limit] = [width, height]
+      options[:resize_to_limit] = [ width, height ]
     end
 
     quality = parse_quality(params[:quality])

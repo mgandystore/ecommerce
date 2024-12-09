@@ -41,7 +41,7 @@ Rails.application.routes.draw do
   # Utilities
   # =========================================================================
 
-  get "attachments/:record_id/:id", to: "attachments#show", as: :attachment
+  get "v1/attachments/:record_id/:id", to: "attachments#show", as: :attachment
 
 
   mount GoodJob::Engine => 'good_job'
