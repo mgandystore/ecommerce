@@ -14,7 +14,7 @@
     </div>
   </div>
 
-  <hr class="w-100 border-mgray">
+  <hr class="w-100 border-t border-gray-500 border-opacity-50 max-sm:hidden">
 
   <div id="product_detail" class=" bg-gray-50 ">
     <div class="max-w-screen-2xl  mx-auto py-24 px-6 max-sm:py-8">
@@ -24,54 +24,59 @@
         </div>
 
         <div id="product" class="col-span-2 max-sm:col-span-1">
-          <div class="flex flex-col w-full">
+
+          <div class="flex flex-col gap-4">
+
+            <!-- NAME -->
             <h2 class="text-4xl max-sm:text-3xl font-bold text-emerald-700"><%= @product.name %></h2>
 
+            <!-- PRICE -->
             <div id="price">
               <div data-product-target="price" class="text-3xl max-sm:text-1xl font-bold text-stone-950">...</div>
             </div>
 
-            <div class="flex flex-col justify-between mt-4">
+            <!-- DESCRIPTION -->
+            <div class="flex flex-col justify-between">
               <p class="text-gray-500 text-base max-sm:text-sm"><%= @product.description.html_safe %></p>
             </div>
 
+            <!-- VARIANTS-->
+            <div class="flex flex-col gap-4">
+              <div
+                data-controller="product-variant"
+                data-product-variant-variant-value="<%= @default_variant.variants["couleur"] %>"
+                data-product-variant-value-to-class-value="<%= color_to_tailwind.to_json %>"
+                data-product-variant-type-value="couleur"
+              >
 
-            <div class="flex flex-col pt-6">
-              <div class="flex flex-col gap-4">
-                <div
-                  data-controller="product-variant"
-                  data-product-variant-variant-value="<%= @default_variant.variants["couleur"] %>"
-                  data-product-variant-value-to-class-value="<%= color_to_tailwind.to_json %>"
-                  data-product-variant-type-value="couleur"
-                >
-
-                  <div class="flex flex-row gap-1">
-                    <div class="text-stone-950 text-base max-sm:text-sm font-bold pb-2">Couleur</div>
-                    <div data-product-variant-target="variantname"
-                         class="text-stone-950 text-base max-sm:text-sm"></div>
-                  </div>
-                  <div class="flex flex-row gap-4 pl-1">
-                    <% @product.variants_map[color_key].each do |value| %>
-                      <% color = color_to_tailwind[value.to_sym] %>
-                      <button
-                        data-action="click->product-variant#handleVariantValueChanged"
-                        data-product-variant-target="variant"
-                        data-product-variant-variant-param="<%= value %>"
-                        data-product-variant-type-param="couleur"
-                        type="button"
-                        class="bg-<%= color %>-300 hover:bg-<%= color %>-500 focus:bg-<%= color %>-500 focus:ring-<%= color %>-500">
-                      </button>
-                    <% end %>
-                  </div>
+                <div class="flex flex-row gap-1">
+                  <div class="text-stone-950 text-base max-sm:text-sm font-bold pb-2">Couleur</div>
+                  <div data-product-variant-target="variantname"
+                       class="text-stone-950 text-base max-sm:text-sm"></div>
+                </div>
+                <div class="flex flex-row gap-4 pl-1">
+                  <% @product.variants_map[color_key].each do |value| %>
+                    <% color = color_to_tailwind[value.to_sym] %>
+                    <button
+                      data-action="click->product-variant#handleVariantValueChanged"
+                      data-product-variant-target="variant"
+                      data-product-variant-variant-param="<%= value %>"
+                      data-product-variant-type-param="couleur"
+                      type="button"
+                      class="bg-<%= color %>-300 hover:bg-<%= color %>-500 focus:bg-<%= color %>-500 focus:ring-<%= color %>-500">
+                    </button>
+                  <% end %>
                 </div>
               </div>
-              <div class="flex flex-col items-center mt-8">
-                <button
-                  data-action="click->product#buy"
-                  data-controller="visibility"
-                  data-visibility-name-value="buy-btn"
-                  data-product-target="buyButtons"
-                  class="
+            </div>
+
+            <!-- MAIN BUY BUTTON -->
+            <div class="flex flex-col items-center" data-product-target="mainBuyButtonContainer">
+              <button
+                data-action="click->product#buy"
+                data-product-target="buyButtons"
+                class="
+                  max-sm:hidden
                 cursor-pointer
                 hover:bg-amber-300
                 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
@@ -80,48 +85,57 @@
                 py-2.5 bg-amber-400 rounded-lg justify-center items-center gap-2.5 inline-flex
                 w-full
                 ">
-                  Acheter
-                </button>
-                <span class="text-red-500 text-xs mt-2 hidden" data-product-target="outOfStock">
-                Rupture de stock
-              </span>
-              </div>
-              <div class="mt-4 overflow-hidden duration-300 ease-in-out h-0" data-product-target="notifyForm">
-                <label class="flex flex-col gap-1">
-                  <span class="text-gray-500 text-xs">Soyez le premier informé du retour en stock</span>
-                  <input
-                    type="email"
-                    placeholder="Entrez votre adresse e-mail"
-                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-300 focus:border-gray-500 outline-none"
-                    data-product-target="notifyEmail"
-                  >
-                </label>
-                <button
-                  data-action="click->product#submitStockNotification"
-                  data-product-target="notifyButton"
-                  class="w-full px-4 py-2 bg-emerald-950 text-white rounded-lg hover:bg-emerald-900 focus:ring-2
-          focus:ring-emerald-300 focus:outline-none transition duration-200 ease-in-out text-sm
-          cursor-pointer
-          justify-center items-center gap-2.5 inline-flex mt-2
-          "
-                >
-                  M'avertir du retour en stock
-                </button>
-              </div>
+                Acheter
+              </button>
             </div>
 
+            <!-- EVENTUALLY STOCK NOTIF FORM -->
+            <template data-product-target="notifyFormTemplate">
+              <div class="opacity-0 transition-opacity duration-200 ease-in-out">
+                <div class="flex flex-col gap-4">
+                  <div class="text-red-500 text-sm bg-red-100 p-2 rounded-lg">
+                    Cette couleur est en rupture de stock
+                  </div>
+
+                  <div class="flex flex-col gap-2">
+                    <label class="flex flex-col">
+                      <span class="text-stone-950 text-xl py-2">Soyez le premier informé du retour en stock</span>
+                      <input
+                        type="email"
+                        placeholder="Entrez votre adresse e-mail"
+                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-gray-300 focus:border-gray-500 outline-none"
+                      >
+                    </label>
+                    <button
+                      class="w-full px-4 py-2 bg-emerald-950 text-white rounded-lg hover:bg-emerald-900 focus:ring-2
+              focus:ring-emerald-300 focus:outline-none transition duration-200 ease-in-out text-sm
+              cursor-pointer
+              justify-center items-center gap-2.5 inline-flex mt-2">
+                      M'avertir du retour en stock
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </template>
           </div>
 
-          <div>
-            <div class="mt-8">
-              <p class="text-stone-950 text-xl pb-2">Spécifications</p>
+
+          <div class="flex flex-col gap-4 mt-4">
+            <p class="text-stone-950 text-xl mb-4">Spécifications</p>
+            <table class="w-full">
+              <tbody>
               <% @product.specifications.each_with_index do |item, index| %>
-                <div class="grid grid-cols-2 py-4 <%= 'border-t border-gray-500 border-opacity-50' unless index == 0 %> justify-start max-sm:grid-cols-1">
-                  <div class="text-stone-950 text-sm font-base max-sm:pb-4"><%= item["key"] %></div>
-                  <div class="text-gray-500 text-sm font-base"><%= item["value"].html_safe %></div>
-                </div>
+                <tr class="<%= 'border-t border-gray-500 border-opacity-50' unless index == 0 %>">
+                  <td class="text-stone-950 text-sm font-base py-4 pr-6 max-sm:pr-4 align-top">
+                    <%= item["key"] %>
+                  </td>
+                  <td class="text-gray-500 text-sm font-base py-4 align-top">
+                    <%= item["value"].html_safe %>
+                  </td>
+                </tr>
               <% end %>
-            </div>
+              </tbody>
+            </table>
           </div>
         </div>
       </div>
@@ -142,28 +156,7 @@
 
   </div>
 
-  <div class="default-transition hidden max-sm:block fixed bottom-0 w-full"
-       data-product-target="fixedBuyBtnContainer">
-    <div class="bg-white w-full py-4 px-6 drop-shadow-lg">
-      <button
-        data-action="click->product#buy"
-        data-product-target="buyButtons"
-        class="
-                          cursor-pointer
-              hover:bg-amber-300
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
-                transition duration-200 ease-in-out
-                text-stone-800 text-base max-sm:text-sm font-base font-bold
-                py-2.5 bg-amber-400 rounded-lg justify-center items-center gap-2.5 inline-flex
-                w-full
-              ">
-        Acheter
-      </button>
-    </div>
-
-  </div>
-  <footer data-controller="visibility"
-          data-visibility-name-value="footer" id="footer" class="bg-emerald-700 w-100 py-8 px-6">
+  <footer id="footer" class="bg-emerald-700 w-100 py-8 px-6 max-sm:pb-20">
     <div class="max-w-screen-2xl mx-auto  py-24 px-6 max-sm:py-8 w-full flex flex-row justify-between">
       <div class="text-white text-sm font-base">© mgandy</div>
       <div class="flex gap-2">
@@ -188,6 +181,28 @@
       </div>
     </div>
   </footer>
+
+
+  <div class="default-transition hidden max-sm:block fixed bottom-0 w-full"
+       data-product-target="fixedBuyBtnContainer">
+    <div class="bg-white w-full py-4 px-6 drop-shadow-lg">
+      <button
+        data-action="click->product#buy"
+        data-product-target="buyButtons"
+        class="
+                          cursor-pointer
+              hover:bg-amber-300
+                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500 focus:bg-amber-500
+                transition duration-200 ease-in-out
+                text-stone-800 text-base max-sm:text-sm font-base font-bold
+                py-2.5 bg-amber-400 rounded-lg justify-center items-center gap-2.5 inline-flex
+                w-full
+              ">
+        Acheter
+      </button>
+    </div>
+
+  </div>
 
 
 </div>

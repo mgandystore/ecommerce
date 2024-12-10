@@ -21,8 +21,10 @@ export default class extends Controller {
     'buyButtons',
     'outOfStock',
     'notifyForm',
+    'notifyFormTemplate',
     'notifyEmail',
-    'notifyButton'
+    'notifyButton',
+    'mainBuyButtonContainer',
   ]
   static values = {
     product: Object,
@@ -32,17 +34,22 @@ export default class extends Controller {
   }
 
 
-  declare readonly priceTarget: HTMLElement
   declare productValue: Product
   declare variantsSelectedValue: Record<string, string>
   declare currentProductVariantValue: ProductVariant | undefined
+
+  declare readonly priceTarget: HTMLElement
   declare readonly fixedBuyBtnContainerTarget: HTMLButtonElement
   declare readonly buyButtonsTargets: HTMLButtonElement[]
-  declare readonly outOfStockTarget: HTMLElement
-
-  declare readonly notifyFormTarget: HTMLFormElement
+  declare readonly notifyFormTemplateTarget: HTMLTemplateElement
   declare readonly notifyEmailTarget: HTMLInputElement
   declare readonly notifyButtonTarget: HTMLButtonElement
+  declare readonly mainBuyButtonContainerTarget: HTMLElement
+  declare readonly notifyFormTarget: HTMLElement
+
+  declare readonly hasNotifyFormTarget: boolean
+
+  private mainBuyButtonContainer: Node | undefined
 
   connect() {
   }
@@ -63,9 +70,6 @@ export default class extends Controller {
   setVisibilityFixedBuyBtnContainer(visible: boolean) {
     if (visible) {
       this.fixedBuyBtnContainerTarget.classList.remove('max-sm:hidden')
-      // # get the first button in child and set Acheter - {PRICE} € as text
-      this.fixedBuyBtnContainerTarget.querySelector('button')!.innerText = `Acheter — ${this.priceTarget.innerText}`
-
     } else {
       this.fixedBuyBtnContainerTarget.classList.add('max-sm:hidden')
     }
@@ -87,8 +91,6 @@ export default class extends Controller {
       return
     }
 
-    this.debugProductVariantStock()
-
     // find a product variant that matches the selected variants
     let someProductVariant = this.productValue.product_variants.find((pv) => {
       for (const [ type, variant ] of Object.entries(this.variantsSelectedValue)) {
@@ -102,6 +104,11 @@ export default class extends Controller {
 
     if (someProductVariant) {
       this.currentProductVariantValue = someProductVariant
+      const price = this.productValue.base_price + (someProductVariant.additional_price ?? 0)
+
+      // Update price of the fixed button to Do something like "Acheter - {PRICE} €"
+      this.fixedBuyBtnContainerTarget.querySelector('button')!.innerText = `Acheter — ${+price / 100} €`
+
       this.dispatch('variant-slug-selected', {
         detail: {
           variant_slug: this.currentProductVariantValue.variants_slug
@@ -126,21 +133,104 @@ export default class extends Controller {
 
   private updateStockStatus() {
     const isOutOfStock = this.currentProductVariantValue?.stock === 0
-    this.buyButtonsTargets.forEach((el) => {
-      if (isOutOfStock) {
-        el.classList.add('opacity-50', 'pointer-events-none')
-        el.disabled = true
-        this.outOfStockTarget.classList.remove('hidden')
 
-        this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px';
-      } else {
-        el.classList.remove('opacity-50', 'pointer-events-none')
-        el.disabled = false
-        this.outOfStockTarget.classList.add('hidden')
+    if (this.hasNotifyFormTarget) {
+      this.notifyFormTarget.remove()
+    }
 
-        this.notifyFormTarget.style.height = '0';
+    if (isOutOfStock) {
+      // Remove the fixed buy button container (in mobile)
+      this.fixedBuyBtnContainerTarget.classList.add('opacity-0')
+
+      // Remove from the dom the main buy button container
+      // before removing it, we need to get the html and set it in the this.mainBuyButtonContainer
+      if (!this.mainBuyButtonContainer) {
+        this.mainBuyButtonContainer = this.mainBuyButtonContainerTarget.cloneNode(true)
+        this.mainBuyButtonContainerTarget.remove()
       }
+
+
+      // Clone the template content and insert it before the template
+      const template = this.notifyFormTemplateTarget
+      const formContainer = textToNode(template.innerHTML)
+
+      formContainer.setAttribute('data-product-target', 'notifyForm')
+      formContainer.querySelector('input')?.setAttribute('data-product-target', 'notifyEmail')
+      formContainer.querySelector('button')?.setAttribute('data-action', 'click->product#submitStockNotification')
+      formContainer.querySelector('button')?.setAttribute('data-product-target', 'notifyButton')
+      template.parentElement?.insertBefore(formContainer, template)
+
+      // Force a reflow to ensure the initial state is rendered
+      formContainer.offsetHeight
+
+      // Then remove opacity-0 in the next frame
+      requestAnimationFrame(() => {
+        formContainer.classList.remove('opacity-0')
+      })
+    } else {
+      this.fixedBuyBtnContainerTarget.classList.remove('opacity-0')
+
+      // insert before the template form the mainButtonContainer
+      if (this.mainBuyButtonContainer) {
+        this.notifyFormTemplateTarget.parentElement?.insertBefore(this.mainBuyButtonContainer, this.notifyFormTemplateTarget)
+        this.mainBuyButtonContainer = undefined
+      }
+
+      // Remove out of stock form if exists
+      const outOfStockForm = document.getElementById('out_of_stock_form')
+      if (outOfStockForm) {
+        outOfStockForm.remove()
+      }
+    }
+  }
+
+  submitStockNotification() {
+    const email = this.notifyEmailTarget.value
+    if (!email || !this.currentProductVariantValue) {
+      return
+    }
+
+    this.notifyButtonTarget.innerHTML = `
+      ${animatedSpinner}
+      Envoi en cours...
+    `
+
+    fetch('/stock_notifications', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email: email,
+        product_variant_id: this.currentProductVariantValue.id,
+      })
     })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Failed to submit notification')
+        }
+
+        setTimeout(() => {
+          const successChildNode = `
+          <span class="text-xs text-emerald-500 mt-2">
+            Nous vous préviendrons dès que ce produit sera de nouveau disponible
+          </span>`
+
+          this.notifyFormTarget.appendChild(textToNode(successChildNode))
+          this.notifyEmailTarget.disabled = true
+          this.notifyEmailTarget.classList.add('opacity-50', 'pointer-events-none')
+          this.notifyButtonTarget.disabled = true
+          this.notifyButtonTarget.classList.add('opacity-50', 'pointer-events-none')
+          this.notifyButtonTarget.innerHTML = 'Envoyé avec succès'
+        }, 1000)
+      })
+      .catch(error => {
+        const errorChildNode = `
+          <span class="text-xs text-red-500 mt-2">
+            Une erreur est survenue lors de la soumission de votre notification
+          </span>`
+        this.notifyFormTarget.appendChild(textToNode(errorChildNode))
+      })
   }
 
   async buy(evt: ActionEvent) {
@@ -172,7 +262,6 @@ export default class extends Controller {
   }
 
   private setButtonLoading(load: boolean) {
-
     this.buyButtonsTargets.forEach((el) => {
       if (load) {
         el.classList.add('cursor-wait', 'opacity-50', 'pointer-events-none')
@@ -212,67 +301,9 @@ export default class extends Controller {
       })
     }
 
-    this.debugProductVariantStock()
-  }
-
-  debugProductVariantStock() {
-    this.productValue.product_variants.forEach((variant) => {
-    })
   }
 
 
-  submitStockNotification() {
-    const email = this.notifyEmailTarget.value
-    if (!email || !this.currentProductVariantValue) {
-      return
-    }
-
-    this.notifyButtonTarget.innerHTML = `
-      ${animatedSpinner}
-      Envoi en cours...
-    `
-
-    fetch('/stock_notifications', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        email: email,
-        product_variant_id: this.currentProductVariantValue.id,
-      })
-    })
-      .then(response => {
-        if (!response.ok) {
-          throw new Error('Failed to submit notification')
-        }
-
-        setTimeout(() => {
-          const successChildNode = `
-          <span class="text-xs text-emerald-500 mt-2">
-            Nous vous préviendrons dès que ce produit sera de nouveau disponible
-          </span>`
-          this.notifyFormTarget.appendChild(textToNode(successChildNode))
-          // Update form height after adding success message
-          this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px'
-
-          this.notifyEmailTarget.disabled = true
-          this.notifyEmailTarget.classList.add('opacity-50', 'pointer-events-none')
-          this.notifyButtonTarget.disabled = true
-          this.notifyButtonTarget.classList.add('opacity-50', 'pointer-events-none')
-          this.notifyButtonTarget.innerHTML = 'Envoyé avec succès'
-        }, 1000)
-      })
-      .catch(error => {
-        const errorChildNode = `
-          <span class="text-xs text-red-500 mt-2">
-            Une erreur est survenue lors de la soumission de votre notification
-          </span>`
-        this.notifyFormTarget.appendChild(textToNode(errorChildNode))
-        // Update form height after adding error message
-        this.notifyFormTarget.style.height = this.notifyFormTarget.scrollHeight + 'px'
-      })
-  }
 }
 
 function textToNode(htmlString: string): HTMLElement {

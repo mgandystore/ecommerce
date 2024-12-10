@@ -69,6 +69,10 @@
               <%# Template for new items %>
               <template data-dashboard-dynamic-kv-form-target="template">
                 <div class="dynamic-form-item flex flex-row gap-4 min-w-0">
+                  <div class="cursor-move">
+                    <%= inline_svg 'icons/grip_vertical.svg', class: 'h-4 w-4' %>
+                  </div>
+
                   <%= hidden_field_tag "specifications[][id]", "", class: "unique_id" %>
 
                   <div class="flex-1 min-w-0">
@@ -102,6 +106,7 @@
                 <%= render(Dashboard::ButtonComponent.new(
                   text: "Ajouter une spécification",
                   icon_left: 'icons/plus.svg',
+                  submit: false,
                   html_options: {
                     "data-action": "dashboard-dynamic-kv-form#addItem"
                   },
