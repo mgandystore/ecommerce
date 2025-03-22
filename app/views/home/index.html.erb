@@ -1,6 +1,6 @@
 <%
   average_rating = if @reviews.size > 0
-                     @reviews.map { |review| review[:stars] }.sum.to_f / @reviews.size
+                     (@reviews.map { |review| review[:stars] }.sum.to_f / @reviews.size).round(1)
                    else
                      0
                    end
