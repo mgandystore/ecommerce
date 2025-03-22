@@ -1,0 +1,188 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+    <div class="flex flex-col gap-2 py-4">
+      <h1 class="text-xl leading-6 font-medium text-gray-900">Modifier les paramètres</h1>
+    </div>
+
+    <%= form_with(model: @settings, url: update_dashboard_settings_path, method: :patch, class: "space-y-6") do |f| %>
+      <% if @settings.errors.any? %>
+        <div class="rounded-md bg-red-50 p-4">
+          <ul class="list-disc pl-5 space-y-1">
+            <% @settings.errors.full_messages.each do |msg| %>
+              <li class="text-sm text-red-700"><%= msg %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
+      <!-- Section Informations de la boutique -->
+      <div class="border-b border-gray-200 pb-5">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Informations de la boutique</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="max-w-lg">
+            <%= f.label :shop_name, "Nom du site", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :shop_name, class: "mt-1 block w-full rounded-md #{@settings.errors[:shop_name].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:shop_name].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:shop_name].join(', ') %></p>
+            <% end %>
+          </div>
+
+          <div class="max-w-lg">
+            <%= f.label :short_desc, "Description courte", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :short_desc, class: "mt-1 block w-full rounded-md #{@settings.errors[:short_desc].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:short_desc].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:short_desc].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Informations légales -->
+      <div class="border-b border-gray-200 pb-5 pt-5">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Informations légales</h2>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+          <div class="max-w-lg">
+            <%= f.label :siret, "SIRET", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :siret, class: "mt-1 block w-full rounded-md #{@settings.errors[:siret].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:siret].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:siret].join(', ') %></p>
+            <% end %>
+          </div>
+
+          <div class="max-w-lg">
+            <%= f.label :siren, "SIREN", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :siren, class: "mt-1 block w-full rounded-md #{@settings.errors[:siren].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:siren].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:siren].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-4 mb-4">
+          <div class="max-w-lg">
+            <%= f.label :address, "Adresse", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_field :address, class: "mt-1 block w-full rounded-md #{@settings.errors[:address].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:address].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:address].join(', ') %></p>
+            <% end %>
+          </div>
+
+          <div class="max-w-lg">
+            <%= f.label :contact_mail, "Email de contact", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.email_field :contact_mail, class: "mt-1 block w-full rounded-md #{@settings.errors[:contact_mail].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <% if @settings.errors[:contact_mail].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:contact_mail].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Réseaux sociaux -->
+      <div class="border-b border-gray-200 pb-5 pt-5">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Réseaux sociaux</h2>
+
+        <div class="max-w-lg mb-4">
+          <%= f.label :instagram, "Lien Instagram", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :instagram, class: "mt-1 block w-full rounded-md #{@settings.errors[:instagram].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <% if @settings.errors[:instagram].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:instagram].join(', ') %></p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Section SEO et Métadonnées -->
+      <div class="border-b border-gray-200 pb-5 pt-5">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">SEO et Métadonnées</h2>
+
+        <div class="max-w-lg mb-4">
+          <%= f.label :keywords, "Mots-clés", class: "block text-sm font-medium text-gray-700" %>
+          <%= f.text_field :keywords, class: "mt-1 block w-full rounded-md #{@settings.errors[:keywords].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <% if @settings.errors[:keywords].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:keywords].join(', ') %></p>
+          <% else %>
+            <p class="mt-1 text-xs text-gray-500">Séparés par des virgules (ex: hamac,grimpe,escalade)</p>
+          <% end %>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div>
+            <%= f.label :og, "Configuration Open Graph", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_area :og, rows: 4, class: "mt-1 block w-full rounded-md #{@settings.errors[:og].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: '{"image":"https://example.com/image.jpg","type":"website"}' %>
+            <% if @settings.errors[:og].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:og].join(', ') %></p>
+            <% else %>
+              <p class="mt-1 text-xs text-gray-500">Format JSON pour les métadonnées Open Graph</p>
+            <% end %>
+          </div>
+
+          <div>
+            <%= f.label :twitter, "Configuration Twitter", class: "block text-sm font-medium text-gray-700" %>
+            <%= f.text_area :twitter, rows: 4, class: "mt-1 block w-full rounded-md #{@settings.errors[:twitter].any? ? 'border-red-300' : 'border-gray-300'} shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: '{"site":"@votre_compte","creator":"@votre_compte"}' %>
+            <% if @settings.errors[:twitter].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:twitter].join(', ') %></p>
+            <% else %>
+              <p class="mt-1 text-xs text-gray-500">Format JSON pour les métadonnées Twitter Card</p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section Documents légaux -->
+      <div class="pt-5">
+        <h2 class="text-lg font-medium text-gray-900 mb-4">Documents légaux</h2>
+
+        <div class="rounded-md bg-blue-50 p-4 mb-4">
+          <div class="flex">
+            <div class="flex-shrink-0">
+              <svg class="h-5 w-5 text-blue-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2h-1V9z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div class="ml-3 flex-1">
+              <h3 class="text-sm font-medium text-blue-800">Variables de remplacement</h3>
+              <div class="mt-2 text-sm text-blue-700">
+                <p>Les valeurs suivantes seront automatiquement remplacées dans les CGV et mentions légales :</p>
+                <ul class="list-disc pl-5 mt-1 space-y-1">
+                  <li><code>{{contact_mail}}</code> - Email de contact</li>
+                  <li><code>{{siret}}</code> - Numéro SIRET</li>
+                  <li><code>{{siren}}</code> - Numéro SIREN</li>
+                  <li><code>{{address}}</code> - Adresse</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :cgv, "CGV", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= f.rich_text_area :cgv,
+                                 class: "trix-content #{@settings.errors[:cgv].any? ? 'border-red-300' : ''}",
+                                 placeholder: "Conditions générales de vente..." %>
+            <% if @settings.errors[:cgv].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:cgv].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="mb-4">
+          <%= f.label :legal_notices, "Mentions légales", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= f.rich_text_area :legal_notices,
+                                 class: "trix-content #{@settings.errors[:legal_notices].any? ? 'border-red-300' : ''}",
+                                 placeholder: "Mentions légales..." %>
+            <% if @settings.errors[:legal_notices].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @settings.errors[:legal_notices].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+      </div>
+
+      <div class="flex gap-4 pt-4">
+        <%= f.submit "Mettre à jour", class: "dash-btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>

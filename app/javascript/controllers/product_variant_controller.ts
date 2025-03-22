@@ -52,21 +52,33 @@ export default class extends Controller {
   }
 
   unselectVariant(el: HTMLDivElement, variant: string) {
+    const hasImage = el.dataset.productVariantHasImageParam === 'true'
+
     switch (this.typeValue) {
       case VariantType.Color:
-        const color = this.valueToClassValue[variant]
         el.innerHTML = ''
-        el.className = `bg-${color}-300 hover:bg-${color}-500 focus:bg-${color}-500 color-variant-button`
+        if (hasImage) {
+          el.className = `bg-cover bg-center color-variant-button`
+        } else {
+          const color = this.valueToClassValue[variant]
+          el.className = `bg-${color}-300 hover:bg-${color}-500 focus:bg-${color}-500 color-variant-button`
+        }
         break
     }
   }
 
   selectVariant(el: HTMLDivElement, variant: string) {
+    const hasImage = el.dataset.productVariantHasImageParam === 'true'
+
     switch (this.typeValue) {
       case VariantType.Color:
-        let color = this.valueToClassValue[variant]
         el.innerHTML = this.checkSvg()
-        el.className = `bg-${color}-500 ring-${color}-300 color-variant-button-active`
+        if (hasImage) {
+          el.className = `bg-cover bg-center ring-2 ring-offset-1 color-variant-button-active`
+        } else {
+          const color = this.valueToClassValue[variant]
+          el.className = `bg-${color}-500 ring-${color}-300 color-variant-button-active`
+        }
         break
     }
   }

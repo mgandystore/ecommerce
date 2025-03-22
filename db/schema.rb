@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2024_12_06_084811) do
+ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -230,6 +230,31 @@ ActiveRecord::Schema[8.0].define(version: 2024_12_06_084811) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.string "short_description"
+  end
+
+  create_table "reviews", id: :string, force: :cascade do |t|
+    t.string "name"
+    t.text "content"
+    t.decimal "stars"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "settings", id: :string, force: :cascade do |t|
+    t.string "cgv"
+    t.string "instagram"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.string "legal_notices", default: "Mentions légales..."
+    t.string "address", default: "RUE LOUIS GANEL 38090 VILLEFONTAINE"
+    t.string "siret", default: "941949372"
+    t.string "siren", default: "94194937200010"
+    t.string "contact_mail", default: "martin@assmac.com"
+    t.string "shop_name", default: "La boutique du Assmac"
+    t.string "short_desc", default: "Hamac léger pour la grande voie et les ascensions verticales"
+    t.string "keywords", default: "hamac,grimpe,escalade,voie sportive,grande voie,confort,ultralight,materiel sportif"
+    t.string "og", default: "{}"
+    t.string "twitter", default: "{}"
   end
 
   create_table "stock_notifications", id: :string, force: :cascade do |t|

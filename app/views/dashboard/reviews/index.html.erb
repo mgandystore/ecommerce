@@ -1,0 +1,49 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+    <div class="flex justify-between items-center py-4">
+      <div>
+        <h1 class="text-xl leading-6 font-medium text-gray-900">Avis clients</h1>
+        <p class="mt-1 text-sm text-gray-500">Liste des avis triés par date</p>
+      </div>
+      <%= link_to new_dashboard_review_path, class: "dash-btn-primary" do %>
+        <span>Ajouter un avis</span>
+      <% end %>
+    </div>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Nom</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Contenu</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Note</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Créé le</th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @reviews.each do |review| %>
+            <tr>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900"><%= review.id %></td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500"><%= review.name %></td>
+              <td class="px-6 py-4 text-sm text-gray-500"> <%= truncate(strip_tags(review.content), length: 125, escape: false) %></td>
+
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 flex items-center gap-1">
+                <%= review.stars %> <%= inline_svg_tag 'icons/star.svg', class: "h-5 w-5 text-yellow-400 inline" %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= l review.created_at, format: :long %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                <%= link_to "Voir", edit_dashboard_review_path(review), class: "text-indigo-600 hover:text-indigo-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

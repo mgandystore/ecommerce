@@ -19,10 +19,10 @@ class CheckoutController < ApplicationController
       begin
         session = Stripe::Checkout::Session.create(
           success_url: Rails.application.routes.url_helpers.success_url,
-          cancel_url: "http://localhost:3000",
+          cancel_url: Rails.application.routes.url_helpers.home_url,
           payment_method_types: ["card"],
           shipping_address_collection: {
-            allowed_countries: %w[FR BE]
+            allowed_countries: %w[FR]
           },
           locale: "fr",
           customer_creation: "always",
@@ -33,6 +33,7 @@ class CheckoutController < ApplicationController
                        }],
           currency: "eur",
           mode: "payment",
+          allow_promotion_codes: true,
           )
 
         # Optionally, you could reserve the stock here

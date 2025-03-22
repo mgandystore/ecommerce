@@ -25,11 +25,20 @@ module Dashboard::BaseHelper
         path: Rails.application.routes.url_helpers.dashboard_products_path,
         icon: inline_svg_tag("icons/cart.svg", class: "w-5 h-5 text-gray-400")
       },
-
+      {
+        label: "Reviews",
+        path: Rails.application.routes.url_helpers.dashboard_reviews_path,
+        icon: inline_svg_tag("icons/star.svg", class: "w-5 h-5 text-gray-400")
+      },
       {
         label: "Stock notifications",
         path: Rails.application.routes.url_helpers.dashboard_stock_notifications_path,
         icon: inline_svg_tag("icons/bell.svg", class: "w-5 h-5 text-gray-400")
+      },
+      {
+        label: "Paramètres",
+        path: Rails.application.routes.url_helpers.edit_dashboard_settings_path,
+        icon: inline_svg_tag("icons/settings.svg", class: "w-5 h-5 text-gray-400")
       }
     ]
   end

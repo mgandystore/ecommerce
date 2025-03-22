@@ -16,6 +16,10 @@ class Product < ApplicationRecord
     CreateStripeProductJob.perform_later(self.id)
   end
 
+  def in_stock?
+    product_variants.any? { |v| v.stock > 0 }
+  end
+
   def variants_map
     product_variants.each_with_object({}) do |variant, map|
       variant.variants.each do |key, value|

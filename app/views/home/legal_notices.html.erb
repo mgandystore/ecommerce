@@ -1,0 +1,15 @@
+<%= render 'home/shared/header' %>
+
+<hr class="w-100 border-t border-gray-500 border-opacity-50">
+
+<div class="bg-white">
+  <div class="max-w-screen-2xl mx-auto py-12 px-6">
+    <h1 class="text-3xl font-bold text-emerald-700 mb-8"><%= title "Mention légales" %></h1>
+
+    <div class="prose prose-emerald max-w-none">
+      <%= @legal_notices.html_safe %>
+    </div>
+  </div>
+</div>
+
+<%= render 'home/shared/footer' %>

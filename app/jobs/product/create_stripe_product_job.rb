@@ -18,12 +18,14 @@ class Product
     private
 
     def create_stripe_product_with_prices
+      default_tax_code = "txcd_30071000"
       @product.product_variants.each do |variant|
 
         stripe_product = Stripe::Product.create(
           name: @product.name + " " + variant.human_format,
           description: @product.short_description,
           shippable: true,
+          tax_code: default_tax_code,
           default_price_data: {
             unit_amount: @product.base_price.to_i + variant.additional_price.to_i,
             currency: "eur"

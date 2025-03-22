@@ -2,56 +2,159 @@
   Commande confirmée - La boutique du assmac
 <% end %>
 
-<main class="min-h-screen flex-grow flex items-center justify-center">
-  <div class="max-w-screen-2xl w-full px-6">
-    <div class="flex flex-col items-center justify-center text-center">
-      <div class="w-24 h-24 bg-emerald-100 rounded-full flex items-center justify-center mb-8">
-        <svg class="w-12 h-12 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-        </svg>
-      </div>
+<main class="min-h-screen flex-grow flex items-center justify-center bg-gray-50 py-12">
+  <div class="max-w-screen-lg w-full px-4 sm:px-6">
+    <div class="bg-white rounded-xl shadow-md p-5 sm:p-8">
+      <div class="flex flex-col items-center justify-center text-center mb-10">
+        <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mb-6">
+          <svg class="w-10 h-10 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+          </svg>
+        </div>
 
-      <h1 class="text-4xl max-sm:text-3xl font-bold text-emerald-700 mb-4">
-        Commande confirmée !
-      </h1>
+        <h1 class="text-3xl font-bold text-emerald-700 mb-3">
+          Commande confirmée !
+        </h1>
 
-      <p class="text-xl text-gray-500 mb-8 max-w-lg">
-        Merci pour votre commande.
-      </p>
-
-      <p class="text-xl text-gray-500 mb-8 max-w-lg">
-        Un email de confirmation vous sera envoyé dans les prochaines minutes.
-      </p>
-
-      <div class="bg-white p-6 rounded-lg shadow-sm w-full max-w-md mb-8">
-        <p class="text-gray-500 text-base">
-          Vous recevrez bientôt un email contenant :
+        <p class="text-lg text-gray-600 max-w-xl">
+          Votre commande a été enregistrée avec succès. Un email de confirmation vous sera envoyé dans les prochaines minutes.
         </p>
-        <ul class="mt-4 text-left text-gray-500">
-          <li class="flex items-center mb-3">
-            <svg class="w-5 h-5 mr-2 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            Votre récapitulatif de commande
-          </li>
-          <li class="flex items-center mb-3">
-            <svg class="w-5 h-5 mr-2 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            Les instructions de suivi
-          </li>
-          <li class="flex items-center">
-            <svg class="w-5 h-5 mr-2 text-emerald-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-            </svg>
-            Les détails de livraison
-          </li>
-        </ul>
       </div>
 
-      <a href="/" class="inline-flex items-center justify-center px-8 py-3 bg-emerald-700 text-white rounded-full hover:bg-emerald-800 transition duration-200">
-        Retour à la boutique
-      </a>
+      <!-- Stepper - Desktop (horizontal) -->
+      <div class="mb-12 hidden md:block">
+        <div class="flex items-center justify-between w-full mb-2">
+          <div class="flex flex-col items-center">
+            <div class="w-12 h-12 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold mb-2">
+              1
+            </div>
+            <span class="text-sm font-medium text-emerald-700">Commande créée</span>
+          </div>
+
+          <div class="flex-1 h-1 bg-gray-200 mx-2 relative -top-3">
+            <div class="h-full bg-gray-300 w-0"></div>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold mb-2">
+              2
+            </div>
+            <span class="text-sm font-medium text-gray-500">Expédition</span>
+          </div>
+
+          <div class="flex-1 h-1 bg-gray-200 mx-2 relative -top-3">
+            <div class="h-full bg-gray-300 w-0"></div>
+          </div>
+
+          <div class="flex flex-col items-center">
+            <div class="w-12 h-12 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold mb-2">
+              3
+            </div>
+            <span class="text-sm font-medium text-gray-500">Livraison</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Stepper - Mobile (vertical) -->
+      <div class="mb-8 md:hidden">
+        <div class="flex flex-col space-y-6">
+          <!-- Step 1 -->
+          <div class="flex items-start">
+            <div class="relative">
+              <div class="w-10 h-10 bg-emerald-700 rounded-full flex items-center justify-center text-white font-bold z-10">
+                1
+              </div>
+              <div class="absolute top-10 left-1/2 w-1 h-full -ml-0.5 bg-gray-200 z-0"></div>
+            </div>
+            <div class="ml-4">
+              <p class="font-medium text-emerald-700">Commande créée</p>
+              <p class="text-sm text-gray-500">Votre commande a été enregistrée</p>
+            </div>
+          </div>
+
+          <!-- Step 2 -->
+          <div class="flex items-start">
+            <div class="relative">
+              <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold z-10">
+                2
+              </div>
+              <div class="absolute top-10 left-1/2 w-1 h-full -ml-0.5 bg-gray-200 z-0"></div>
+            </div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-500">Expédition</p>
+              <p class="text-sm text-gray-500">Votre colis est en préparation</p>
+            </div>
+          </div>
+
+          <!-- Step 3 -->
+          <div class="flex items-start">
+            <div>
+              <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center text-gray-500 font-bold">
+                3
+              </div>
+            </div>
+            <div class="ml-4">
+              <p class="font-medium text-gray-500">Livraison</p>
+              <p class="text-sm text-gray-500">Votre colis sera bientôt livré</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="bg-gray-50 p-6 rounded-lg mb-8">
+        <h2 class="text-xl font-semibold text-gray-800 mb-4">Suivi de votre commande</h2>
+
+        <div class="space-y-4 text-gray-600">
+          <div class="flex items-start">
+            <svg class="w-6 h-6 mr-3 text-emerald-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path>
+            </svg>
+            <div>
+              <p class="font-medium">Email de confirmation</p>
+              <p class="text-sm">Vous recevrez un email récapitulatif de votre commande.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-6 h-6 mr-3 text-emerald-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"></path>
+            </svg>
+            <div>
+              <p class="font-medium">Notification d'expédition</p>
+              <p class="text-sm">Un email vous sera envoyé dès que votre commande sera expédiée.</p>
+            </div>
+          </div>
+
+          <div class="flex items-start">
+            <svg class="w-6 h-6 mr-3 text-emerald-700 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+            </svg>
+            <div>
+              <p class="font-medium">Confirmation de livraison</p>
+              <p class="text-sm">Nous vous informerons lorsque votre commande aura été livrée.</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-6 p-4 bg-blue-50 rounded-lg border border-blue-100">
+          <p class="text-blue-800 text-sm">
+            <span class="font-medium">Conseil :</span> Si vous ne recevez pas nos emails, n'oubliez pas de vérifier votre dossier de courriers indésirables. Nous faisons tout notre possible pour vous tenir informé à chaque étape !
+          </p>
+        </div>
+      </div>
+
+      <div class="border-t border-gray-200 pt-6 text-center">
+        <p class="text-gray-600 mb-6">
+          Une question ? N'hésitez pas à me contacter à l'addresse suivante :
+          <a href="mailto:<%= ENV['CONTACT_EMAIL'] %>" class="text-emerald-700 font-medium hover:underline">
+            <%= ENV['CONTACT_EMAIL'] %>
+          </a>
+        </p>
+
+        <a href="/" class="inline-flex items-center justify-center px-8 py-3 bg-emerald-700 text-white rounded-lg hover:bg-emerald-800 transition duration-200">
+          Retour à la boutique
+        </a>
+      </div>
     </div>
   </div>
 </main>

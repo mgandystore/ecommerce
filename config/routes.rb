@@ -14,6 +14,8 @@ Rails.application.routes.draw do
   post "stock_notifications", to: "stock_notifications#create"
 
   root "home#index", as: :home
+  get "/cgv", to: "home#sales_terms", as: :sales_terms
+  get "/mention-legales", to: "home#legal_notices", as: :legal_notices
   get "success", to: "home#success", as: :success
 
   # =========================================================================
@@ -35,14 +37,24 @@ Rails.application.routes.draw do
   patch "dashboard/products/:id/faq", to: "dashboard/products#update_faq", as: :update_dashboard_product_faq
   get "dashboard/products/:id/variants/:product_variant_id", to: "dashboard/products#edit_product_variants", as: :edit_dashboard_product_variant
   patch "dashboard/products/:id/variants/:product_variant_id", to: "dashboard/products#update_product_variant", as: :update_dashboard_product_variant
+
   get "dashboard/stock_notifications", to: "dashboard/stock_notifications#index", as: :dashboard_stock_notifications
+
+  get "dashboard/reviews", to: "dashboard/reviews#index", as: :dashboard_reviews
+  get "dashboard/reviews/new", to: "dashboard/reviews#new", as: :new_dashboard_review
+  post "dashboard/reviews", to: "dashboard/reviews#create"
+  get "dashboard/reviews/:id/edit", to: "dashboard/reviews#edit", as: :edit_dashboard_review
+  patch "dashboard/reviews/:id", to: "dashboard/reviews#update", as: :update_dashboard_review
+  delete "dashboard/reviews/:id", to: "dashboard/reviews#destroy", as: :delete_dashboard_review
+
+  get "dashboard/settings", to: "dashboard/settings#edit", as: :edit_dashboard_settings
+  patch "dashboard/settings", to: "dashboard/settings#update", as: :update_dashboard_settings
 
   # =========================================================================
   # Utilities
   # =========================================================================
 
   get "v1/attachments/:record_id/:id", to: "attachments#show", as: :attachment
-
 
   mount GoodJob::Engine => 'good_job'
 

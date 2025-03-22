@@ -118,19 +118,6 @@ export default class extends Controller {
     }
   }
 
-  currentProductVariantValueChanged() {
-    if (!this.currentProductVariantValue) {
-      this.priceTarget.innerText = '— €'
-      return
-    }
-
-    const priceAmount = this.productValue.base_price + (this.currentProductVariantValue.additional_price ?? 0)
-    const price = priceAmount.toString() ?? '?'
-    this.priceTarget.innerText = `${+price / 100} €`
-
-    this.updateStockStatus()
-  }
-
   private updateStockStatus() {
     const isOutOfStock = this.currentProductVariantValue?.stock === 0
 
@@ -301,6 +288,42 @@ export default class extends Controller {
       })
     }
 
+  }
+
+  currentProductVariantValueChanged() {
+    if (!this.currentProductVariantValue) {
+      this.priceTarget.innerText = '— €'
+      return
+    }
+
+    const priceAmount = this.productValue.base_price + (this.currentProductVariantValue.additional_price ?? 0)
+    const price = priceAmount.toString() ?? '?'
+    this.priceTarget.innerText = `${+price / 100} €`
+
+    this.updateStockStatus()
+    this.updateStockIndicator()
+  }
+
+  private updateStockIndicator() {
+    const isInStock = this.currentProductVariantValue?.stock !== 0
+
+    // Remove existing indicator if any
+    const existingIndicator = document.querySelector('[data-product-stock-indicator]')
+    if (existingIndicator) {
+      existingIndicator.remove()
+    }
+
+    if (isInStock) {
+      const stockIndicator = textToNode(`
+        <div data-product-stock-indicator class="flex items-center gap-2 mt-2 text-emerald-600">
+          <div class="w-3 h-3 rounded-full bg-emerald-500"></div>
+          <span class="text-sm font-medium">En stock</span>
+        </div>
+      `)
+
+      // Insert after price
+      this.priceTarget.parentElement?.appendChild(stockIndicator)
+    }
   }
 
 
