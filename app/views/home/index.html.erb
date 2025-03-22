@@ -1,5 +1,9 @@
 <%
-  average_rating = @reviews.map { |review| review[:stars] }.sum.to_f / @reviews.size
+  average_rating = if @reviews.size > 0
+                     @reviews.map { |review| review[:stars] }.sum.to_f / @reviews.size
+                   else
+                     0
+                   end
   review_count = @reviews.size
 
   guarantees = {
@@ -155,9 +159,9 @@
                         <% if has_image %>bg-cover bg-center
                         <% else %>bg-<%= color %>-300 hover:bg-<%= color %>-500 focus:bg-<%= color %>-500
                         <% end %> color-variant-button"
-                        <% if has_image %>style="background-image: url('<%= image_path("colors/#{value}_cropped.webp") %>');"
-                    <% end %>
-                    >
+                      <% if has_image %>style="background-image: url('<%= image_path("colors/#{value}_cropped.webp") %>');"
+                      <% end %>
+                      >
                     </button>
                   <% end %>
                 </div>

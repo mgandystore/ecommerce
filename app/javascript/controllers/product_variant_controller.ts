@@ -38,7 +38,7 @@ export default class extends Controller {
     })
 
     if (this.hasVariantnameTarget) {
-      this.variantnameTarget.innerHTML = this.variantValue
+      this.variantnameTarget.innerHTML = titleize(this.variantValue)
     }
 
     this.variantTargets.forEach((el) => {
@@ -97,4 +97,12 @@ export default class extends Controller {
   handleVariantValueChanged(event: ActionEvent) {
     this.variantValue = event.params.variant
   }
+}
+
+function titleize(str: string) {
+  if (!str) return '';
+  return str.toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 }
