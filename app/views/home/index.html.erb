@@ -256,7 +256,7 @@
           <div class="bg-white p-4 rounded-lg border border-gray-200 mb-4">
             <div class="flex justify-between mb-2">
               <p class="font-bold text-stone-950"><%= review.name %></p>
-              <p class="text-gray-500 text-sm"><%= l(review.created_at, format: :long, locale: :fr) %></p>
+              <p class="text-gray-500 text-sm"><%= l(review.created_at, format: :short, locale: :fr) %></p>
             </div>
             <div class="flex mb-2">
               <%= render 'home/shared/star_rating', rating: review.stars, size: 'sm' %>
