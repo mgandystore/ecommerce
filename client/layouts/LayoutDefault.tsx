@@ -73,7 +73,7 @@ function Footer() {
 
 	return (
 		<footer id="footer" className="bg-emerald-700 w-full py-8" style={additionalPaddingDueToStickyButton > 0 ? { paddingBottom: `${additionalPaddingDueToStickyButton+24}px` } : {}}>
-			<div className="max-w-screen-2xl mx-auto px-6 w-full">
+			<div className="max-w-screen-lg mx-auto px-6 w-full">
 				<div className="flex flex-col md:flex-row md:justify-between gap-6">
 					<div className="text-white text-sm">
 						© Assmac {new Date().getFullYear()}

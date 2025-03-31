@@ -22,8 +22,9 @@ const ReviewsSection = ({ reviews, averageRating }: ReviewSectionProps) => {
 	});
 
 	return (
-		<div id="reviews" className="max-w-screen-2xl mx-auto py-8 px-6 max-sm:py-8">
-			<h2 className="text-emerald-700 text-2xl font-bold mb-8">Avis clients</h2>
+		<div id="reviews" className="py-12 px-6 max-sm:py-8">
+			<div className="max-w-screen-lg mx-auto">
+				<h2 className="text-emerald-700 text-2xl font-bold mb-8">Avis clients</h2>
 
 			<div className="flex flex-col md:flex-row gap-8 mb-8">
 				<div className="md:w-1/3 h-fit bg-white p-6 rounded-lg border border-gray-200">
@@ -71,6 +72,7 @@ const ReviewsSection = ({ reviews, averageRating }: ReviewSectionProps) => {
 							/>
 						</div>
 					))}
+				</div>
 				</div>
 			</div>
 		</div>

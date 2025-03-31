@@ -58,7 +58,7 @@ export function FooterReassurance() {
 
 	return (
 		<div className="bg-gray-50 py-12 border-t border-gray-200">
-			<div className="max-w-screen-2xl mx-auto px-6">
+			<div className="max-w-screen-lg mx-auto px-6">
 				<div className="grid grid-cols-1 md:grid-cols-4 gap-6">
 					{badges.map((badge, index) => {
 						const IconComponent = iconMap[badge.icon];

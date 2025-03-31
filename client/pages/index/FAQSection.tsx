@@ -18,10 +18,11 @@ function FAQSection({ faqs }: FAQSectionProps) {
   };
 
   return (
-    <div className="pb-12 px-6 max-sm:py-8 max-w-screen-lg">
-      <h2 className="text-emerald-700 text-2xl font-bold mb-8 align-items-center">Questions fréquentes</h2>
+    <div className="py-12 px-6 max-sm:py-8">
+      <div className="max-w-screen-lg mx-auto">
+        <h2 className="text-emerald-700 text-2xl font-bold mb-8 align-items-center">Questions fréquentes</h2>
 
-      <div className="space-y-4">
+        <div className="space-y-4">
         {faqs.map((faq) => (
           <div
             key={faq.id}
@@ -47,6 +48,7 @@ function FAQSection({ faqs }: FAQSectionProps) {
             </div>
           </div>
         ))}
+        </div>
       </div>
     </div>
   );
