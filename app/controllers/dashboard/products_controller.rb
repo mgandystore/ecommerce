@@ -17,8 +17,8 @@ module Dashboard
 
       @default_images_positions = @product.images_positions
       @ordered_images = @product.ordered_images
-      @product.faq.sort_by { |element| element["position"] }
-      @product.specifications.sort_by { |element| element["position"] }
+      @sorted_faq = @product.faq.sort_by { |element| element["position"].to_i }
+      @sorted_specifications = @product.specifications.sort_by { |element| element["position"].to_i }
     end
 
     def create
@@ -112,12 +112,12 @@ module Dashboard
 
     def edit_specifications
       @product = Product.find(params[:id])
-      @product.specifications.sort_by { |element| element["position"] }
+      @sorted_specifications = @product.specifications.sort_by { |element| element["position"].to_i }
     end
 
     def edit_faq
       @product = Product.find(params[:id])
-      @product.faq.sort_by { |element| element["position"] }
+      @sorted_faq = @product.faq.sort_by { |element| element["position"].to_i }
     end
 
     def update_specifications
@@ -130,21 +130,39 @@ module Dashboard
       update_structured_attribute(:faq, positions: positions)
     end
 
-    private
-
     def update_structured_attribute(attribute, positions:)
       @product = Product.find(params[:id])
       structured_data = []
 
       if params[attribute].present?
+        # Find the highest position or default to 0
+        max_position = positions.map { |pos| pos[:position].to_i }.max || 0
+
         params[attribute].each do |item|
           next if item[:key].blank? && item[:value].blank?
+
+          # For items without an ID, generate a UUID
+          item_id = item[:id].presence || SecureRandom.uuid
+
+          # Find position from existing positions or assign a new position
+          position = nil
+          if item[:id].present?
+            # Try to find position for existing items
+            position_entry = positions.find { |pos| pos[:id] == item[:id].to_s }
+            position = position_entry&.dig(:position)
+          end
+
+          # If position is still nil, assign the next position
+          if position.nil?
+            max_position += 1
+            position = max_position
+          end
 
           structured_data << {
             key: item[:key],
             value: item[:value],
-            id: item[:id],
-            position: positions.find { |pos| pos[:id] == item[:id].to_s }&.dig(:position)
+            id: item_id,
+            position: position
           }
         end
       end
@@ -192,5 +210,3 @@ module Dashboard
     end
   end
 end
-
-
