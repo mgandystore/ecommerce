@@ -1,5 +1,6 @@
 class CheckoutController < ApplicationController
   skip_before_action :verify_authenticity_token
+  before_action :set_cors_headers
 
   def create
     variant = ProductVariant.includes(:product).find_by(id: params[:product_variant_id])
@@ -18,8 +19,8 @@ class CheckoutController < ApplicationController
 
       begin
         session = Stripe::Checkout::Session.create(
-          success_url: Rails.application.routes.url_helpers.success_url,
-          cancel_url: Rails.application.routes.url_helpers.home_url,
+          success_url: ENV.fetch("FRONT_URL") + "/checkout/success",
+          cancel_url: ENV.fetch("FRONT_URL"),
           payment_method_types: ["card"],
           shipping_address_collection: {
             allowed_countries: %w[FR]

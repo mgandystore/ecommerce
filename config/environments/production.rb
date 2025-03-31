@@ -61,11 +61,10 @@ Rails.application.configure do
   # Set this to true and configure the email server for immediate delivery to raise delivery errors.
   # config.action_mailer.raise_delivery_errors = false
 
-  routes.default_url_options[:host] = ENV.fetch("WEBSITE_URL", "localhost:3000")
+  routes.default_url_options[:host] = ENV.fetch("SRV_URL", "localhost:3000")
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: ENV.fetch("WEBSITE_URL", "localhost:3000") }
-
+  config.action_mailer.default_url_options = { host: ENV.fetch("FRONT_URL", "localhost:3000") }
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("SMTP_HOST", "localhost"),

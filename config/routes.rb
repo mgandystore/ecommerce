@@ -18,6 +18,29 @@ Rails.application.routes.draw do
   get "/mention-legales", to: "home#legal_notices", as: :legal_notices
   get "success", to: "home#success", as: :success
 
+
+  # Add a constraint for subdomain routing
+  constraints(subdomain: "api") do
+    root to: redirect("/api"), as: :api_root
+  end
+
+  constraints(subdomain: "dashboard") do
+    root to: redirect("/dashboard"), as: :dashboard_root
+  end
+
+
+  # =========================================================================
+  # API
+  # =========================================================================
+  #
+  get "/api/assmac", to: "home#api_home", as: :api_home
+  get "/api/settings", to: "home#api_settings", as: :api_settings
+  get "/api/legal-notices", to: "home#api_legal_notices", as: :api_legal_notices
+  get "/api/sales-terms", to: "home#api_sales_terms", as: :api_sales_terms
+  get "/api/checkout/:product_variant_id", to: "checkout#create"
+  post "/api/stock_notifications", to: "stock_notifications#create"
+
+
   # =========================================================================
   # Dashboard
   # =========================================================================
@@ -56,7 +79,7 @@ Rails.application.routes.draw do
 
   get "v1/attachments/:record_id/:id", to: "attachments#show", as: :attachment
 
-  mount GoodJob::Engine => 'good_job'
+  mount GoodJob::Engine => "good_job"
 
   # Render dynamic PWA files from app/views/pwa/* (remember to link manifest in application.html.erb)
   # get "manifest" => "rails/pwa#manifest", as: :pwa_manifest
