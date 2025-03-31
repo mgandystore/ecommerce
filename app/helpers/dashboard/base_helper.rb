@@ -11,7 +11,7 @@ module Dashboard::BaseHelper
     [
       {
         label: "La boutique",
-        path: Rails.application.routes.url_helpers.home_path,
+        path: Rails.env.fetch("FRONT_URL", "https://assmac.com"),
         icon: inline_svg_tag("icons/store.svg", class: "w-5 h-5 text-gray-400")
       },
       {
