@@ -17,7 +17,7 @@ function FAQSection({ faqs }: FAQSectionProps) {
   };
 
   return (
-    <div className="py-12 px-6 max-sm:py-8">
+    <div className="px-6 max-sm:px-0">
       <div className="max-w-screen-lg mx-auto">
         <h2 className="text-emerald-700 text-2xl font-bold mb-8 align-items-center">Questions fréquentes</h2>
 

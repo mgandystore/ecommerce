@@ -1,5 +1,14 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { ChevronUp, ChevronDown, X, Maximize2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
+// Import Swiper and required modules
+import { Swiper, SwiperSlide } from 'swiper/react';
+import { Thumbs, Pagination, FreeMode } from 'swiper/modules';
+import { Swiper as SwiperType } from 'swiper';
+// Import Swiper styles
+import 'swiper/css';
+import 'swiper/css/pagination';
+import 'swiper/css/thumbs';
+import 'swiper/css/free-mode';
 
 // Define types for image structure
 type Image = {
@@ -23,28 +32,36 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 																																			 images,
 																																			 variant = 'product_images'
 																																		 }) => {
-	// Get the appropriate images based on variant
+	// State
+	const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+	const [activeIndex, setActiveIndex] = useState(0);
+	const [isFullscreen, setIsFullscreen] = useState(false);
+	const [isMobile, setIsMobile] = useState(false);
+	const [isLoading, setIsLoading] = useState(true);
+	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
+
+	// Reference to Swiper instance
+	const mainSwiperRef = useRef<SwiperType | null>(null);
+	const fullscreenSwiperRef = useRef<SwiperType | null>(null);
+
+	// Helper function to get gallery images
 	const getGalleryImages = () => {
+		// Check if images and variant exist
+		if (!images) return [];
+
 		const variantImages = variant && images[variant] ? images[variant] : [];
 		const defaultImages = images.product_images || [];
+
+		// Return concatenated array of images - always show variant images followed by base product images
 		return [...variantImages, ...defaultImages];
 	};
 
-	// State for active image index and fullscreen mode
-	const [activeIndex, setActiveIndex] = useState(0);
-	const [isFullscreen, setIsFullscreen] = useState(false);
-	const [isLoading, setIsLoading] = useState(true);
-	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 	const [galleryImages, setGalleryImages] = useState<Image[]>(getGalleryImages());
-	const [isMobile, setIsMobile] = useState(false);
 
-	const mainImageRef = useRef<HTMLDivElement>(null);
-	const thumbnailContainerRef = useRef<HTMLDivElement>(null);
-
-	// Check if device is mobile on mount and when window resizes
+	// Check if device is mobile or tablet on mount and when window resizes
 	useEffect(() => {
 		const checkIfMobile = () => {
-			setIsMobile(window.innerWidth < 1024);
+			setIsMobile(window.innerWidth < 1024); // Using 1024px as the lg breakpoint
 		};
 
 		// Initial check
@@ -59,128 +76,81 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 		};
 	}, []);
 
-	// Reset index when variant changes and images are different
+	// Update gallery images when variant or images change
 	useEffect(() => {
 		const newGalleryImages = getGalleryImages();
-		// Only reset if the images actually changed
-		if (JSON.stringify(newGalleryImages) !== JSON.stringify(galleryImages)) {
-			setActiveIndex(0);
-			setGalleryImages(newGalleryImages);
-			setIsLoading(true);
-			setLoadedImages(new Set());
+		setGalleryImages(newGalleryImages);
+		setActiveIndex(0);
+		setLoadedImages(new Set());
+		setIsLoading(true);
+
+		// Reset the main swiper to the first slide
+		if (mainSwiperRef.current) {
+			mainSwiperRef.current.slideTo(0, 0); // Jump to first slide with no animation
 		}
 	}, [variant, images]);
 
-	// Scroll to active thumbnail when active index changes
+	// Cleanup effect for Swiper instances
 	useEffect(() => {
-		scrollToThumbnail();
-		// Set loading state when changing images
-		setIsLoading(!loadedImages.has(activeIndex));
-	}, [activeIndex]);
-
-	// Handle large image load
-	const handleImageLoad = () => {
-		setIsLoading(false);
-		setLoadedImages(prev => new Set([...prev, activeIndex]));
-	};
-
-	// Start preloading when component mounts
-	useEffect(() => {
-		// Preload the initial image
-		if (galleryImages.length > 0) {
-			const img = new Image();
-			img.src = galleryImages[0].url_large;
-			img.onload = () => {
-				setLoadedImages(prev => new Set([...prev, 0]));
-				setIsLoading(false);
-			};
-		}
-	}, [galleryImages]);
-
-	// Preload adjacent images
-	useEffect(() => {
-		const preloadAdjacentImages = () => {
-			const prevIdx = getPrevIndex();
-			const nextIdx = getNextIndex();
-
-			if (galleryImages[prevIdx] && !loadedImages.has(prevIdx)) {
-				const prevImg = new Image();
-				prevImg.src = galleryImages[prevIdx].url_large;
-				prevImg.onload = () => {
-					setLoadedImages(prev => new Set([...prev, prevIdx]));
-				};
+		return () => {
+			// Cleanup on unmount
+			if (mainSwiperRef.current && mainSwiperRef.current.destroy) {
+				mainSwiperRef.current.destroy(true, true);
 			}
-
-			if (galleryImages[nextIdx] && !loadedImages.has(nextIdx)) {
-				const nextImg = new Image();
-				nextImg.src = galleryImages[nextIdx].url_large;
-				nextImg.onload = () => {
-					setLoadedImages(prev => new Set([...prev, nextIdx]));
-				};
+			if (fullscreenSwiperRef.current && fullscreenSwiperRef.current.destroy) {
+				fullscreenSwiperRef.current.destroy(true, true);
 			}
 		};
+	}, []);
 
-		preloadAdjacentImages();
-	}, [activeIndex, galleryImages, loadedImages]);
+	// Preload active image and adjacent images
+	useEffect(() => {
+		if (galleryImages.length === 0) return;
 
-	// Get previous image index
-	const getPrevIndex = () => {
-		return activeIndex === 0 ? galleryImages.length - 1 : activeIndex - 1;
-	};
+		// Preload current image
+		const preloadImage = (index: number) => {
+			if (!galleryImages[index]) return;
 
-	// Get next image index
-	const getNextIndex = () => {
-		return activeIndex === galleryImages.length - 1 ? 0 : activeIndex + 1;
-	};
-
-	// Navigate to previous image
-	const prevImage = () => {
-		setActiveIndex(getPrevIndex());
-		setIsLoading(!loadedImages.has(getPrevIndex()));
-	};
-
-	// Navigate to next image
-	const nextImage = () => {
-		setActiveIndex(getNextIndex());
-		setIsLoading(!loadedImages.has(getNextIndex()));
-	};
-
-	// Select image by index
-	const selectImage = (index: number) => {
-		setActiveIndex(index);
-		setIsLoading(!loadedImages.has(index));
-	};
-
-	// Toggle fullscreen mode
-	const toggleFullscreen = () => {
-		setIsFullscreen(!isFullscreen);
-	};
-
-	// Scroll thumbnail container to ensure active image is visible
-	const scrollToThumbnail = () => {
-		if (thumbnailContainerRef.current) {
-			const container = thumbnailContainerRef.current;
-			const thumbnailElements = container.querySelectorAll('.thumbnail');
-
-			if (activeIndex < thumbnailElements.length) {
-				const activeThumbnail = thumbnailElements[activeIndex] as HTMLElement;
-				if (activeThumbnail) {
-					container.scrollTop = activeThumbnail.offsetTop - container.clientHeight / 2 + activeThumbnail.clientHeight / 2;
+			const img = new Image();
+			img.src = galleryImages[index].url_large;
+			img.onload = () => {
+				setLoadedImages(prev => {
+					const newSet = new Set(prev);
+					newSet.add(index);
+					return newSet;
+				});
+				if (index === activeIndex) {
+					setIsLoading(false);
 				}
-			}
-		}
-	};
+			};
+		};
 
-	// Handle keyboard navigation
+		// Preload active image
+		preloadImage(activeIndex);
+
+		// Preload adjacent images
+		const prevIdx = activeIndex === 0 ? galleryImages.length - 1 : activeIndex - 1;
+		const nextIdx = activeIndex === galleryImages.length - 1 ? 0 : activeIndex + 1;
+
+		if (!loadedImages.has(prevIdx)) {
+			preloadImage(prevIdx);
+		}
+
+		if (!loadedImages.has(nextIdx)) {
+			preloadImage(nextIdx);
+		}
+	}, [activeIndex, galleryImages]);
+
+	// Handle keyboard navigation in fullscreen mode
 	useEffect(() => {
 		const handleKeyDown = (e: KeyboardEvent) => {
 			if (isFullscreen) {
 				if (e.key === 'ArrowLeft') {
-					prevImage();
+					slidePrev();
 				} else if (e.key === 'ArrowRight') {
-					nextImage();
+					slideNext();
 				} else if (e.key === 'Escape') {
-					toggleFullscreen();
+					setIsFullscreen(false);
 				}
 			}
 		};
@@ -189,10 +159,51 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 		return () => {
 			window.removeEventListener('keydown', handleKeyDown);
 		};
+	}, [isFullscreen]);
+
+	// Handle slide change
+	const handleSlideChange = (swiper: SwiperType) => {
+		if (swiper && typeof swiper.activeIndex === 'number') {
+			const newIndex = swiper.activeIndex;
+			setActiveIndex(newIndex);
+			setIsLoading(!loadedImages.has(newIndex));
+		}
+	};
+
+	// Effect to sync normal and fullscreen swipers
+	useEffect(() => {
+		// Sync active index between main swiper and fullscreen swiper
+		if (isFullscreen && fullscreenSwiperRef.current) {
+			fullscreenSwiperRef.current.slideTo(activeIndex, 0);
+		} else if (!isFullscreen && mainSwiperRef.current) {
+			mainSwiperRef.current.slideTo(activeIndex, 0);
+		}
 	}, [isFullscreen, activeIndex]);
 
+	// Navigation functions
+	const slidePrev = () => {
+		if (isFullscreen && fullscreenSwiperRef.current) {
+			fullscreenSwiperRef.current.slidePrev();
+		} else if (mainSwiperRef.current) {
+			mainSwiperRef.current.slidePrev();
+		}
+	};
+
+	const slideNext = () => {
+		if (isFullscreen && fullscreenSwiperRef.current) {
+			fullscreenSwiperRef.current.slideNext();
+		} else if (mainSwiperRef.current) {
+			mainSwiperRef.current.slideNext();
+		}
+	};
+
+	// Toggle fullscreen mode
+	const toggleFullscreen = () => {
+		setIsFullscreen(!isFullscreen);
+	};
+
 	// If there are no images, display a placeholder
-	if (!galleryImages.length) {
+	if (!galleryImages || galleryImages.length === 0) {
 		return (
 			<div className="w-full h-64 bg-gray-100 flex items-center justify-center">
 				<p className="text-gray-500">No images available</p>
@@ -200,253 +211,230 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 		);
 	}
 
-	const currentImage = galleryImages[activeIndex];
+	// Main gallery render
+	const renderMainGallery = () => (
+		<div className="w-full flex flex-col lg:flex-row gap-4">
+			{/* Thumbnails - vertical on desktop (lg and above), hidden on smaller screens */}
+			<div className="hidden lg:block relative flex-shrink-0 w-20">
+				<Swiper
+					onSwiper={setThumbsSwiper}
+					direction="vertical"
+					spaceBetween={8}
+					slidesPerView={5}
+					freeMode={true}
+					loop={true}
+					watchSlidesProgress={true}
+					modules={[FreeMode]}
+					className="h-96 !w-full"
+				>
+					{galleryImages.map((image, index) => (
+						<SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
+							<div
+								className={`w-16 h-16 rounded-md overflow-hidden border-2 ${
+									index === activeIndex ? 'border-black' : 'border-transparent'
+								}`}
+								onClick={() => {
+									if (mainSwiperRef.current) {
+										mainSwiperRef.current.slideTo(index);
+									}
+								}}
+							>
+								<img
+									src={image.url_thumb || image.url}
+									alt={`Thumbnail ${index + 1}`}
+									className="w-full h-full object-cover"
+								/>
+							</div>
+						</SwiperSlide>
+					))}
+				</Swiper>
+			</div>
+
+			{/* Main image container */}
+			<div className="flex-grow w-full">
+				<div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-md">
+					{/* Navigation buttons */}
+					<button
+						onClick={slidePrev}
+						className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+						aria-label="Previous image"
+					>
+						<ChevronLeft className="w-6 h-6" />
+					</button>
+
+					<button
+						onClick={slideNext}
+						className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+						aria-label="Next image"
+					>
+						<ChevronRight className="w-6 h-6" />
+					</button>
+
+					<Swiper
+						onSwiper={(swiper) => {
+							mainSwiperRef.current = swiper;
+						}}
+						thumbs={{ swiper: !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+						modules={[Thumbs]}
+						onSlideChange={handleSlideChange}
+						initialSlide={activeIndex}
+						className="!w-full !h-full"
+					>
+						{galleryImages.map((image, index) => (
+							<SwiperSlide key={`main-${index}`} className="!w-full !h-full !overflow-hidden">
+								<div className="relative w-full h-full">
+									{/* Blur image shown only during loading */}
+									{isLoading && activeIndex === index && image.url_blur && (
+										<div className="absolute inset-0">
+											<img
+												src={image.url_blur}
+												alt={image.alt || `Product image ${index + 1}`}
+												className="w-full h-full object-cover rounded-md"
+											/>
+										</div>
+									)}
+
+									{/* Large image */}
+									<img
+										src={image.url_large || image.url}
+										alt={image.alt || `Product image ${index + 1}`}
+										className={`w-full h-full object-cover rounded-md transition-opacity duration-300 ${
+											isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
+										}`}
+									/>
+								</div>
+							</SwiperSlide>
+						))}
+					</Swiper>
+
+					{/* Image counter */}
+					<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm z-10">
+						{activeIndex + 1} / {galleryImages.length}
+					</div>
+
+					{/* Fullscreen button */}
+					<button
+						onClick={toggleFullscreen}
+						className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+						aria-label="View fullscreen"
+					>
+						<Maximize2 className="w-5 h-5" />
+					</button>
+				</div>
+			</div>
+
+			{/* Mobile thumbnails removed as requested */}
+		</div>
+	);
+
+	// Fullscreen render
+	const renderFullscreenView = () => (
+		<div className="fixed inset-0 bg-black z-50 flex flex-col">
+			<div className="flex justify-between p-4">
+				<div className="text-white">
+				</div>
+				<button
+					onClick={toggleFullscreen}
+					className="text-white p-2 hover:bg-white/10 rounded-full transition-colors"
+					aria-label="Close fullscreen"
+				>
+					<X className="w-6 h-6" />
+				</button>
+			</div>
+
+			<div className="flex-grow flex items-center justify-center p-4 relative">
+				{/* Custom fullscreen navigation buttons */}
+				<button
+					onClick={slidePrev}
+					className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
+					aria-label="Previous image"
+				>
+					<ChevronLeft className="w-8 h-8 text-white" />
+				</button>
+
+				<button
+					onClick={slideNext}
+					className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
+					aria-label="Next image"
+				>
+					<ChevronRight className="w-8 h-8 text-white" />
+				</button>
+
+				<div className="w-full h-full flex items-center justify-center">
+					{/* Add a separate Swiper for fullscreen view */}
+					<Swiper
+						onSwiper={(swiper) => {
+							fullscreenSwiperRef.current = swiper;
+						}}
+						initialSlide={activeIndex}
+						onSlideChange={handleSlideChange}
+						className="w-full h-full"
+					>
+						{galleryImages.map((image, index) => (
+							<SwiperSlide key={`fs-slide-${index}`} className="!w-full !h-full flex items-center justify-center">
+								<div className="relative max-h-full max-w-full flex items-center justify-center">
+									{/* Blur image in fullscreen (shown only during loading) */}
+									{isLoading && activeIndex === index && image.url_blur && (
+										<div className="absolute inset-0 flex items-center justify-center">
+											<img
+												src={image.url_blur}
+												alt={image.alt || `Product image ${index + 1}`}
+												className="max-h-full max-w-full object-contain mx-auto"
+												style={{ filter: 'blur(8px)' }}
+											/>
+										</div>
+									)}
+
+									{/* Large image in fullscreen */}
+									<img
+										src={image.url_large || image.url}
+										alt={image.alt || `Product image ${index + 1}`}
+										className={`max-h-full max-w-full object-contain mx-auto transition-opacity duration-300 ${
+											isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
+										}`}
+									/>
+								</div>
+							</SwiperSlide>
+						))}
+					</Swiper>
+				</div>
+
+				{/* Image counter in fullscreen */}
+				<div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-2 rounded text-sm z-10">
+					{activeIndex + 1} / {galleryImages.length}
+				</div>
+			</div>
+
+			{/* Fullscreen thumbnails */}
+			<div className="p-4 bg-black/50 overflow-x-auto">
+				<div className="flex space-x-2 max-w-full">
+					{galleryImages.map((image, index) => (
+						<button
+							key={`fs-thumb-${index}`}
+							onClick={() => {
+								if (fullscreenSwiperRef.current) {
+									fullscreenSwiperRef.current.slideTo(index);
+								}
+							}}
+							className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
+								index === activeIndex ? 'border-white' : 'border-transparent'
+							}`}
+						>
+							<img
+								src={image.url_thumb || image.url}
+								alt={`Thumbnail ${index + 1}`}
+								className="w-full h-full object-cover"
+							/>
+						</button>
+					))}
+				</div>
+			</div>
+		</div>
+	);
 
 	return (
 		<div className="w-full">
-			{/* Desktop View */}
-			{!isMobile && (
-				<div className="w-full flex flex-row gap-4">
-					{/* Vertical Thumbnails */}
-					<div className="relative flex-shrink-0 w-20">
-						<div
-							ref={thumbnailContainerRef}
-							className="flex flex-col space-y-2 h-96 overflow-y-auto pt-4 pb-4 scrollbar-thin"
-						>
-							{galleryImages.map((image, index) => (
-								<button
-									key={`${image.url_thumb}-${index}`}
-									onClick={() => selectImage(index)}
-									className={`cursor-pointer thumbnail flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
-										index === activeIndex ? 'border-black' : 'border-transparent'
-									}`}
-								>
-									<img
-										src={image.url_thumb}
-										alt={`Thumbnail ${index + 1}`}
-										className="w-full h-full object-cover"
-									/>
-								</button>
-							))}
-						</div>
-					</div>
-
-					{/* Main image container */}
-					<div className="flex-grow">
-						<div
-							ref={mainImageRef}
-							className="relative w-full aspect-square bg-gray-100"
-						>
-							{/* Blur image shown only during initial loading */}
-							{isLoading && (
-								<div className="absolute inset-0">
-									<img
-										src={currentImage.url_blur}
-										alt={currentImage.alt}
-										className="w-full h-full object-cover rounded-md"
-									/>
-								</div>
-							)}
-
-							{/* Large image */}
-							<img
-								src={currentImage.url_large}
-								alt={currentImage.alt}
-								className={`w-full h-full object-cover rounded-md ${
-									isLoading ? 'opacity-0' : 'opacity-100'
-								}`}
-								onLoad={handleImageLoad}
-							/>
-
-							{/* Image counter */}
-							<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm">
-								{activeIndex + 1} / {galleryImages.length}
-							</div>
-
-							{/* Navigation arrows */}
-							<button
-								onClick={prevImage}
-								className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-								aria-label="Previous image"
-							>
-								<ChevronLeft className="w-6 h-6" />
-							</button>
-
-							<button
-								onClick={nextImage}
-								className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-								aria-label="Next image"
-							>
-								<ChevronRight className="w-6 h-6" />
-							</button>
-
-							{/* Fullscreen button */}
-							<button
-								onClick={toggleFullscreen}
-								className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-								aria-label="View fullscreen"
-							>
-								<Maximize2 className="w-5 h-5" />
-							</button>
-						</div>
-					</div>
-				</div>
-			)}
-
-			{/* Mobile View */}
-			{isMobile && (
-				<div className="w-full">
-					<div className="relative w-full aspect-square overflow-hidden bg-gray-100">
-						{/* Blur image shown only during initial loading */}
-						{isLoading && (
-							<div className="absolute inset-0">
-								<img
-									src={currentImage.url_blur}
-									alt={currentImage.alt}
-									className="w-full h-full object-cover  object-cover rounded-md"
-								/>
-							</div>
-						)}
-
-						{/* Large image */}
-						<img
-							src={currentImage.url_large}
-							alt={currentImage.alt}
-							className={`
-							w-full h-full object-cover rounded-md
-							${isLoading ? 'opacity-0' : 'opacity-100'}`}
-							onLoad={handleImageLoad}
-						/>
-
-						{/* Image counter */}
-						<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm">
-							{activeIndex + 1} / {galleryImages.length}
-						</div>
-
-						{/* Navigation arrows for mobile view */}
-						<button
-							onClick={prevImage}
-							className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-							aria-label="Previous image"
-						>
-							<ChevronLeft className="w-6 h-6" />
-						</button>
-
-						<button
-							onClick={nextImage}
-							className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-							aria-label="Next image"
-						>
-							<ChevronRight className="w-6 h-6" />
-						</button>
-
-						{/* Fullscreen button */}
-						<button
-							onClick={toggleFullscreen}
-							className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors"
-							aria-label="View fullscreen"
-						>
-							<Maximize2 className="w-5 h-5" />
-						</button>
-					</div>
-
-					{/* Mobile Indicators (dots) */}
-					<div className="flex justify-center mt-4 space-x-2">
-						{galleryImages.map((_, index) => (
-							<button
-								key={`indicator-${index}`}
-								onClick={() => selectImage(index)}
-								className={`h-2 w-2 rounded-full transition-colors ${
-									index === activeIndex ? 'bg-black' : 'bg-gray-300'
-								}`}
-								aria-label={`View image ${index + 1}`}
-							/>
-						))}
-					</div>
-				</div>
-			)}
-
-			{/* Fullscreen Modal (same for both mobile and desktop) */}
-			{isFullscreen && (
-				<div className="fixed inset-0 bg-black z-50 flex flex-col">
-					<div className="flex justify-between p-4">
-						<div className="text-white">{currentImage.alt}</div>
-						<button
-							onClick={toggleFullscreen}
-							className="text-white p-2 hover:bg-white/10 rounded-full transition-colors"
-							aria-label="Close fullscreen"
-						>
-							<X className="w-6 h-6" />
-						</button>
-					</div>
-
-					<div className="flex-grow flex items-center justify-center p-4 relative">
-						{/* Blur image in fullscreen (shown only during loading) */}
-						{isLoading && (
-							<div className="absolute inset-0 flex items-center justify-center">
-								<img
-									src={currentImage.url_blur}
-									alt={currentImage.alt}
-									className="max-h-full max-w-full object-contain"
-									style={{ filter: 'blur(8px)' }}
-								/>
-							</div>
-						)}
-
-						{/* Large image in fullscreen */}
-						<img
-							src={currentImage.url_large}
-							alt={currentImage.alt}
-							className={`max-h-full max-w-full object-contain transition-opacity duration-300 ${
-								isLoading ? 'opacity-0' : 'opacity-100'
-							}`}
-							onLoad={handleImageLoad}
-						/>
-
-						{/* Image counter in fullscreen */}
-						<div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-2 rounded text-sm">
-							{activeIndex + 1} / {galleryImages.length}
-						</div>
-
-						<button
-							onClick={prevImage}
-							className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors"
-							aria-label="Previous image"
-						>
-							<ChevronLeft className="w-8 h-8 text-white" />
-						</button>
-
-						<button
-							onClick={nextImage}
-							className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors"
-							aria-label="Next image"
-						>
-							<ChevronRight className="w-8 h-8 text-white" />
-						</button>
-					</div>
-
-					{/* Fullscreen Indicators */}
-					<div className="flex justify-center p-4 bg-black/50">
-						<div className="flex space-x-2 overflow-x-auto max-w-full pb-2">
-							{galleryImages.map((image, index) => (
-								<button
-									key={`fullscreen-${image.url_thumb}-${index}`}
-									onClick={() => selectImage(index)}
-									className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
-										index === activeIndex ? 'border-white' : 'border-transparent'
-									}`}
-								>
-									<img
-										src={image.url_thumb}
-										alt={`Thumbnail ${index + 1}`}
-										className="w-full h-full object-cover"
-									/>
-								</button>
-							))}
-						</div>
-					</div>
-				</div>
-			)}
+			{isFullscreen ? renderFullscreenView() : renderMainGallery()}
 		</div>
 	);
 };

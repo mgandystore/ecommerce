@@ -21,10 +21,10 @@ export default function LayoutDefault({children}: { children: React.ReactNode })
 
 function Header() {
 	return (
-		<div className="max-w-screen-2xl mx-auto my-8">
-			<div className="mx-4">
+		<div className="max-w-screen-2xl mx-auto my-3">
+			<div className="mx-4 flex justify-center">
 				<a href="/">
-					<img className="h-12 w-auto" src={logoUrl} alt="Logo Assmac" />
+					<img className="h-8 w-auto" src={logoUrl} alt="Logo Assmac" />
 				</a>
 			</div>
 		</div>
