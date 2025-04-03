@@ -11,12 +11,8 @@ export const data = async (pageContext: PageContextServer) => {
 	const config = useConfig();
 	const apiUrl = import.meta.env.PUBLIC_ENV__SRV_URL as string;
 
-	console.log("API URL", apiUrl)
-
 	const response = await fetch(`${apiUrl}/api/assmac`)
 	let resp = (await response.json()) as AssmacResponse;
-
-	console.log(resp)
 
 	config({
 		title: "La boutique du Assmac",

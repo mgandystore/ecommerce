@@ -16,7 +16,6 @@ export const data = async (pageContext: PageContextServer) => {
 	})
 
 	const response = await fetch(`${apiUrl}/api/settings`)
-	console.log("response", response);
 	let resp = await (response.json()) as BaseData;
 
 	return resp;

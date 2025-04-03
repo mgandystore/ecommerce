@@ -24,7 +24,6 @@ const variantColorToImage: Record<string, string> = {
 };
 
 export default function Page() {
-	console.log("API URL", import.meta.env.PUBLIC_ENV__SRV_URL)
 	const home = useData<Data>();
 	const countRating = home.reviews.length;
 	const averageRating = +(

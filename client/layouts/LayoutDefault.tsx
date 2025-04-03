@@ -39,14 +39,11 @@ function Footer() {
 	useEffect(() => {
 		const checkStickyButton = () => {
 			const stickyButton = document.getElementById('sticky-button-buy');
-			console.log("checkStickyButton", stickyButton);
 
 			if (stickyButton) {
 				const stickyButtonHeight = stickyButton.getBoundingClientRect().height;
-				console.log("stickyButtonHeight", stickyButtonHeight);
 				setAdditionalPaddingDueToStickyButton(stickyButtonHeight);
 			} else {
-				console.log("stickyButton not found");
 				setAdditionalPaddingDueToStickyButton(0);
 			}
 		};
