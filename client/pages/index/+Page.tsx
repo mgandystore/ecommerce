@@ -198,7 +198,7 @@ export default function Page() {
 			</section>
 
 			{/* Reviews and FAQ section */}
-			<section className="bg-white px-6 max-sm:py-8">
+			<section className="bg-white px-6 py-6">
 				<Container>
 					<h2 id="reviews-heading" className="sr-only">Avis et FAQ</h2>
 					<div className="flex flex-col gap-8">
@@ -208,13 +208,14 @@ export default function Page() {
 				</Container>
 			</section>
 
-			<FooterReassurance/>
+				<FooterReassurance/>
 
-			<StickyBuyButton isInStock={isInStock}
-											 onClick={goToCheckout}
-											 loading={loadingCheckoutButton}
-											 currentVariant={currentProductVariant}
-											 price={currentPrice}/>
+				<StickyBuyButton isInStock={isInStock}
+												 onClick={goToCheckout}
+												 loading={loadingCheckoutButton}
+												 currentVariant={currentProductVariant}
+												 price={currentPrice}/>
+
 
 		</main>
 	);
