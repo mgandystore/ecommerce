@@ -252,7 +252,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 
 			{/* Main image container */}
 			<div className="flex-grow w-full">
-				<div className="relative w-full aspect-square bg-gray-100 overflow-hidden rounded-md">
+				<div className="relative w-full aspect-square bg-gray-100 overflow-hidden lg:rounded-md">
 					{/* Navigation buttons */}
 					<button
 						onClick={slidePrev}
@@ -289,7 +289,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 											<img
 												src={image.url_blur}
 												alt={image.alt || `Product image ${index + 1}`}
-												className="w-full h-full object-cover rounded-md"
+												className="w-full h-full object-cover lg:rounded-md"
 											/>
 										</div>
 									)}
@@ -298,7 +298,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 									<img
 										src={image.url_large || image.url}
 										alt={image.alt || `Product image ${index + 1}`}
-										className={`w-full h-full object-cover rounded-md transition-opacity duration-300 ${
+										className={`w-full h-full object-cover lg:rounded-md transition-opacity duration-300 ${
 											isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
 										}`}
 									/>
