@@ -2,10 +2,11 @@ import {vikeHandler} from "./server/vike-handler";
 import {Hono} from "hono";
 import {createHandler} from "@universal-middleware/hono";
 import {canonicalLogger, getLogger} from "@/server/canonical_logger";
+import pino from "pino";
 
 const app = new Hono();
 
-srv.onError((err, c) => {
+app.onError((err, c) => {
 	const requestId: string = c.get('request_id') || 'unknown';
 	console.error(`Error in requestId ${requestId}:\n`, err);
 
