@@ -90,7 +90,7 @@ export default function Page() {
 	return (
 		<main>
 			{/* Product section */}
-			<section className="bg-gray-50 py-24 px-6 max-lg:py-8 max-lg:px-0">
+			<section className="bg-gray-50 py-24 px-6 max-lg:pb-8 max-lg:pt-0 max-lg:px-0">
 				{/* Full-width gallery for mobile and tablet */}
 				<div className="lg:hidden w-full">
 					<ProductVariantGallery

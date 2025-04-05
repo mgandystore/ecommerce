@@ -211,70 +211,79 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 		);
 	}
 
+	// Check if we only have one image
+	const showNavigation = galleryImages.length > 1;
+
 	// Main gallery render
 	const renderMainGallery = () => (
 		<div className="w-full flex flex-col lg:flex-row gap-4">
 			{/* Thumbnails - vertical on desktop (lg and above), hidden on smaller screens */}
-			<div className="hidden lg:block relative flex-shrink-0 w-20">
-				<Swiper
-					onSwiper={setThumbsSwiper}
-					direction="vertical"
-					spaceBetween={8}
-					slidesPerView={5}
-					freeMode={true}
-					loop={true}
-					watchSlidesProgress={true}
-					modules={[FreeMode]}
-					className="h-96 !w-full"
-				>
-					{galleryImages.map((image, index) => (
-						<SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
-							<div
-								className={`w-16 h-16 rounded-md overflow-hidden border-2 ${
-									index === activeIndex ? 'border-black' : 'border-transparent'
-								}`}
-								onClick={() => {
-									if (mainSwiperRef.current) {
-										mainSwiperRef.current.slideTo(index);
-									}
-								}}
-							>
-								<img
-									src={image.url_thumb || image.url}
-									alt={`Thumbnail ${index + 1}`}
-									className="w-full h-full object-cover"
-								/>
-							</div>
-						</SwiperSlide>
-					))}
-				</Swiper>
-			</div>
+			{showNavigation && (
+				<div className="hidden lg:block relative flex-shrink-0 w-20">
+					<Swiper
+						onSwiper={setThumbsSwiper}
+						direction="vertical"
+						spaceBetween={8}
+						slidesPerView={5}
+						freeMode={true}
+						loop={true}
+						watchSlidesProgress={true}
+						modules={[FreeMode]}
+						className="h-96 !w-full"
+					>
+						{galleryImages.map((image, index) => (
+							<SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
+								<div
+									className={`w-16 h-16 rounded-md overflow-hidden border-2 ${
+										index === activeIndex ? 'border-black' : 'border-transparent'
+									}`}
+									onClick={() => {
+										if (mainSwiperRef.current) {
+											mainSwiperRef.current.slideTo(index);
+										}
+									}}
+								>
+									<img
+										src={image.url_thumb || image.url}
+										alt={`Thumbnail ${index + 1}`}
+										className="w-full h-full object-cover"
+									/>
+								</div>
+							</SwiperSlide>
+						))}
+					</Swiper>
+				</div>
+			)}
 
 			{/* Main image container */}
 			<div className="flex-grow w-full">
 				<div className="relative w-full aspect-square bg-gray-100 overflow-hidden lg:rounded-md">
-					{/* Navigation buttons */}
-					<button
-						onClick={slidePrev}
-						className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
-						aria-label="Previous image"
-					>
-						<ChevronLeft className="w-6 h-6" />
-					</button>
+					{/* Navigation buttons - only show if more than one image */}
+					{showNavigation && (
+						<>
+							<button
+								onClick={slidePrev}
+								className="cursor-pointer absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+								aria-label="Previous image"
+							>
+								<ChevronLeft className="w-6 h-6" />
+							</button>
 
-					<button
-						onClick={slideNext}
-						className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
-						aria-label="Next image"
-					>
-						<ChevronRight className="w-6 h-6" />
-					</button>
+							<button
+								onClick={slideNext}
+								className="cursor-pointer absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+								aria-label="Next image"
+							>
+								<ChevronRight className="w-6 h-6" />
+							</button>
+						</>
+					)}
 
 					<Swiper
 						onSwiper={(swiper) => {
 							mainSwiperRef.current = swiper;
 						}}
-						thumbs={{ swiper: !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+						thumbs={{ swiper: showNavigation && !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
 						modules={[Thumbs]}
 						onSlideChange={handleSlideChange}
 						initialSlide={activeIndex}
@@ -307,10 +316,12 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 						))}
 					</Swiper>
 
-					{/* Image counter */}
-					<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm z-10">
-						{activeIndex + 1} / {galleryImages.length}
-					</div>
+					{/* Image counter - only show if more than one image */}
+					{showNavigation && (
+						<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm z-10">
+							{activeIndex + 1} / {galleryImages.length}
+						</div>
+					)}
 
 					{/* Fullscreen button */}
 					<button
@@ -322,8 +333,6 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 					</button>
 				</div>
 			</div>
-
-			{/* Mobile thumbnails removed as requested */}
 		</div>
 	);
 
@@ -343,22 +352,26 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 			</div>
 
 			<div className="flex-grow flex items-center justify-center p-4 relative">
-				{/* Custom fullscreen navigation buttons */}
-				<button
-					onClick={slidePrev}
-					className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
-					aria-label="Previous image"
-				>
-					<ChevronLeft className="w-8 h-8 text-white" />
-				</button>
+				{/* Custom fullscreen navigation buttons - only show if more than one image */}
+				{showNavigation && (
+					<>
+						<button
+							onClick={slidePrev}
+							className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
+							aria-label="Previous image"
+						>
+							<ChevronLeft className="w-8 h-8 text-white" />
+						</button>
 
-				<button
-					onClick={slideNext}
-					className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
-					aria-label="Next image"
-				>
-					<ChevronRight className="w-8 h-8 text-white" />
-				</button>
+						<button
+							onClick={slideNext}
+							className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/20 p-3 rounded-full hover:bg-white/30 transition-colors z-10"
+							aria-label="Next image"
+						>
+							<ChevronRight className="w-8 h-8 text-white" />
+						</button>
+					</>
+				)}
 
 				<div className="w-full h-full flex items-center justify-center">
 					{/* Add a separate Swiper for fullscreen view */}
@@ -399,36 +412,40 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 					</Swiper>
 				</div>
 
-				{/* Image counter in fullscreen */}
-				<div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-2 rounded text-sm z-10">
-					{activeIndex + 1} / {galleryImages.length}
-				</div>
+				{/* Image counter in fullscreen - only show if more than one image */}
+				{showNavigation && (
+					<div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-2 rounded text-sm z-10">
+						{activeIndex + 1} / {galleryImages.length}
+					</div>
+				)}
 			</div>
 
-			{/* Fullscreen thumbnails */}
-			<div className="p-4 bg-black/50 overflow-x-auto">
-				<div className="flex space-x-2 max-w-full">
-					{galleryImages.map((image, index) => (
-						<button
-							key={`fs-thumb-${index}`}
-							onClick={() => {
-								if (fullscreenSwiperRef.current) {
-									fullscreenSwiperRef.current.slideTo(index);
-								}
-							}}
-							className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
-								index === activeIndex ? 'border-white' : 'border-transparent'
-							}`}
-						>
-							<img
-								src={image.url_thumb || image.url}
-								alt={`Thumbnail ${index + 1}`}
-								className="w-full h-full object-cover"
-							/>
-						</button>
-					))}
+			{/* Fullscreen thumbnails - only show if more than one image */}
+			{showNavigation && (
+				<div className="p-4 bg-black/50 overflow-x-auto">
+					<div className="flex space-x-2 max-w-full">
+						{galleryImages.map((image, index) => (
+							<button
+								key={`fs-thumb-${index}`}
+								onClick={() => {
+									if (fullscreenSwiperRef.current) {
+										fullscreenSwiperRef.current.slideTo(index);
+									}
+								}}
+								className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-colors ${
+									index === activeIndex ? 'border-white' : 'border-transparent'
+								}`}
+							>
+								<img
+									src={image.url_thumb || image.url}
+									alt={`Thumbnail ${index + 1}`}
+									className="w-full h-full object-cover"
+								/>
+							</button>
+						))}
+					</div>
 				</div>
-			</div>
+			)}
 		</div>
 	);
 
