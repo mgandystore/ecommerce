@@ -368,7 +368,7 @@ function StickyBuyButton({isInStock, onClick, loading, price, currentVariant}: S
 	return (
 		<div id="sticky-button-buy"
 				 className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 shadow-lg lg:hidden">
-			<div className="max-w-screen-2xl mx-auto py-6 px-4">
+			<div className="max-w-screen-2xl mx-auto pb-5 pt-3 px-4">
 				<div className="flex items-center gap-4">
 					<div className="flex items-center gap-2">
 						<div
@@ -384,7 +384,7 @@ function StickyBuyButton({isInStock, onClick, loading, price, currentVariant}: S
 					<Button
 						onClick={onClick}
 						loading={loading}
-						className="w-full pb-4 pt-2 bg-amber-400 hover:bg-amber-300 focus:bg-amber-500 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+						className="w-full py-4 bg-amber-400 hover:bg-amber-300 focus:bg-amber-500 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
 					>
 						Acheter — {price} €
 					</Button>
