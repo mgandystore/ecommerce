@@ -1,8 +1,34 @@
 import {vikeHandler} from "./server/vike-handler";
 import {Hono} from "hono";
 import {createHandler} from "@universal-middleware/hono";
+import {canonicalLogger, getLogger} from "@/server/canonical_logger";
 
 const app = new Hono();
+
+srv.onError((err, c) => {
+	const requestId: string = c.get('request_id') || 'unknown';
+	console.error(`Error in requestId ${requestId}:\n`, err);
+
+	// Log the error with the logger (if available)
+	try {
+		const logger = getLogger(c);
+		logger.addCtx({
+			type: 'error',
+			msg: err.message,
+		});
+	} catch (logErr) {
+		pino().error(logErr, 'error while logging error');
+	}
+
+	return onHttpError(err, c, requestId);
+});
+
+// Add the logger middleware
+app.use('*', canonicalLogger({
+	level: 'info',
+	excludePaths: ['/health', /^\/static\//],
+}));
+
 
 /**
  * Vike route
