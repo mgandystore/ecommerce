@@ -1,7 +1,7 @@
 import {vikeHandler} from "./server/vike-handler";
 import {Hono} from "hono";
 import {createHandler} from "@universal-middleware/hono";
-import {canonicalLogger, getLogger} from "@/server/canonical_logger";
+import {canonicalLogger, getLogger} from "./server/canonical_logger";
 import pino from "pino";
 
 const app = new Hono();
