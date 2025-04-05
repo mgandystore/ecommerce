@@ -7,6 +7,7 @@ import pino from "pino";
 const app = new Hono();
 
 app.onError((err, c) => {
+	// @ts-ignore
 	const requestId: string = c.get('request_id') || 'unknown';
 	console.error(`Error in requestId ${requestId}:\n`, err);
 
@@ -21,7 +22,11 @@ app.onError((err, c) => {
 		pino().error(logErr, 'error while logging error');
 	}
 
-	return onHttpError(err, c, requestId);
+	return c.json({
+		code: 500,
+		message: 'Internal Server Error',
+		requestId,
+	}, 500);
 });
 
 // Add the logger middleware
