@@ -18,7 +18,6 @@ Rails.application.routes.draw do
   get "/mention-legales", to: "home#legal_notices", as: :legal_notices
   get "success", to: "home#success", as: :success
 
-
   # Add a constraint for subdomain routing
   constraints(subdomain: "api") do
     root to: redirect("/api"), as: :api_root
@@ -49,6 +48,8 @@ Rails.application.routes.draw do
   get "dashboard/orders", to: "dashboard/orders#index", as: :dashboard_orders
   get "dashboard/orders/:id", to: "dashboard/orders#show", as: :dashboard_order
   patch "dashboard/orders/:id", to: "dashboard/orders#update", as: :update_dashboard_order
+  get "dashboard/order/:id/laposte_expedition_template", to: "dashboard/orders#laposte_expedition_template", as: :dashboard_order_laposte_expedition_template
+
 
   get "dashboard/products", to: "dashboard/products#index", as: :dashboard_products
   post "dashboard/products", to: "dashboard/products#create"
@@ -72,6 +73,7 @@ Rails.application.routes.draw do
 
   get "dashboard/settings", to: "dashboard/settings#edit", as: :edit_dashboard_settings
   patch "dashboard/settings", to: "dashboard/settings#update", as: :update_dashboard_settings
+
 
   # =========================================================================
   # Utilities
