@@ -384,7 +384,7 @@ function StickyBuyButton({isInStock, onClick, loading, price, currentVariant}: S
 					<Button
 						onClick={onClick}
 						loading={loading}
-						className="w-full py-4 bg-amber-400 hover:bg-amber-300 focus:bg-amber-500 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
+						className="w-full pb-4 pt-2 bg-amber-400 hover:bg-amber-300 focus:bg-amber-500 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
 					>
 						Acheter — {price} €
 					</Button>
