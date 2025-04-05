@@ -65,22 +65,6 @@ jobs:
             PUBLIC_ENV__FRONT_URL=https://assmac.com
             PUBLIC_ENV__SRV_URL=https://srv.assmac.com
 
-      - name: Make images public
-        run: |
-          echo "Making images public..."
-          # Correctly formatted package API calls
-          curl -X PUT \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/server-rails/visibility" \
-            -d '{"visibility":"public"}'
-          
-          curl -X PUT \
-            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
-            -H "Accept: application/vnd.github.v3+json" \
-            "https://api.github.com/orgs/${{ github.repository_owner }}/packages/container/client/visibility" \
-            -d '{"visibility":"public"}'
-
       - name: Output image information
         run: |
           echo "::set-output name=server_image::${{ env.SERVER_IMAGE }}:latest"
