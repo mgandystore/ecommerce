@@ -22,6 +22,7 @@ app.onError((err, c) => {
 		pino().error(logErr, 'error while logging error');
 	}
 
+
 	return c.json({
 		code: 500,
 		message: 'Internal Server Error',
