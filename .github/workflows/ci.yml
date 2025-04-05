@@ -5,6 +5,10 @@ on:
     branches:
       - main
 
+env:
+  SERVER_IMAGE: ghcr.io/${{ github.repository }}/server-rails
+  CLIENT_IMAGE: ghcr.io/${{ github.repository }}/client
+
 jobs:
   build-and-push:
     runs-on: ubuntu-latest
@@ -28,7 +32,7 @@ jobs:
         id: meta-server
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}/server-rails
+          images: ${{ env.SERVER_IMAGE }}
           tags: |
             type=sha,format=short
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
@@ -45,7 +49,7 @@ jobs:
         id: meta-client
         uses: docker/metadata-action@v4
         with:
-          images: ghcr.io/${{ github.repository }}/client
+          images: ${{ env.CLIENT_IMAGE }}
           tags: |
             type=sha,format=short
             type=raw,value=latest,enable=${{ github.ref == 'refs/heads/main' }}
@@ -60,3 +64,32 @@ jobs:
           build-args: |
             PUBLIC_ENV__FRONT_URL=https://assmac.com
             PUBLIC_ENV__SRV_URL=https://srv.assmac.com
+
+      - name: Make images public
+        run: |
+          echo "Making images public..."
+          curl -X PUT \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/user/packages/container/${{ github.repository_owner }}%2F${{ github.event.repository.name }}%2Fserver-rails/visibility \
+            -d '{"visibility":"public"}'
+          curl -X PUT \
+            -H "Authorization: Bearer ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Accept: application/vnd.github.v3+json" \
+            https://api.github.com/user/packages/container/${{ github.repository_owner }}%2F${{ github.event.repository.name }}%2Fclient/visibility \
+            -d '{"visibility":"public"}'
+
+      - name: Output image information
+        run: |
+          echo "::set-output name=server_image::${{ env.SERVER_IMAGE }}:latest"
+          echo "::set-output name=client_image::${{ env.CLIENT_IMAGE }}:latest"
+          
+          echo "================================================================"
+          echo "Build completed successfully!"
+          echo "================================================================"
+          echo "Pull the server-rails image with:"
+          echo "docker pull ${{ env.SERVER_IMAGE }}:latest"
+          echo ""
+          echo "Pull the client image with:"
+          echo "docker pull ${{ env.CLIENT_IMAGE }}:latest"
+          echo "================================================================"
