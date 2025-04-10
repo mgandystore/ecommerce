@@ -33,9 +33,9 @@ export type ActionOrderState =
 
 export const defaultOrderState: OrderState = {
 	customer: {
-		email: "alexis.viscogliosi@Outlook.fr",
-		full_name: "Alexis Viscogliosi",
-		phone: "0689550945"
+		email: "",
+		full_name: "",
+		phone: ""
 	},
 	shipping: {
 		address_line1: '',
