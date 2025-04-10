@@ -26,10 +26,10 @@ class OrderController < ApplicationController
     price = compute_pricing(false, order.order_items)
 
     payment_method_types = %w[card klarna]
-    if Rails.env.production?
-      payment_method_types << "apple_pay"
-      payment_method_types << "google_pay"
-    end
+    # if Rails.env.production?
+    #   payment_method_types << "apple_pay"
+    #   payment_method_types << "google_pay"
+    # end
 
     stripe_intent = Stripe::PaymentIntent.create(
       amount: price[:total],
