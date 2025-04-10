@@ -125,6 +125,8 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 					autoComplete="off"
 					type="text"
 					id="address_line_1"
+					aria-autocomplete={"list"}
+					aria-expanded={showSuggestions && suggestions.length > 0}
 					value={state.shipping.address_line1}
 					onChange={(e) => {
 						dispatcher({ type: 'update_shipping', data: { address_line1: e.target.value } });
