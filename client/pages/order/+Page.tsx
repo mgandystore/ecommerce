@@ -235,16 +235,6 @@ export default function Page() {
 							))
 							}
 						</div>
-						<div className="flex mb-6">
-							<input
-								type="text"
-								placeholder="Discount code"
-								className="flex-1 p-3 border rounded-l-md focus:outline-none focus:ring-1 focus:ring-indigo-600"
-							/>
-							<button className="bg-gray-200 text-gray-800 px-4 rounded-r-md font-medium">
-								Apply
-							</button>
-						</div>
 
 						<div className="space-y-3 border-t pt-4">
 							<div className="flex justify-between">
