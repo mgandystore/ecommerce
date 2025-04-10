@@ -13,7 +13,10 @@ import ProductVariantGallery from "@/components/ProductVariantGallery";
 import ReviewsSection from "@/pages/index/ReviewSection";
 import FAQSection from "@/pages/index/FAQSection";
 import {FooterReassurance, ProductReassurance} from "@/pages/index/Reassurance";
-import {CheckoutResponse, ProductVariant, Specification} from "@/pages/types";
+import {AssmacResponse, CheckoutResponse, ProductVariant, Specification} from "@/pages/types";
+import {AssmacAPI} from "@/lib/assmac_client";
+import {Button} from "@/components/Button";
+import {validateOrderState} from "@/pages/order/validation";
 
 const variantColorToImage: Record<string, string> = {
 	bleu: bleuCropped,
@@ -24,7 +27,7 @@ const variantColorToImage: Record<string, string> = {
 };
 
 export default function Page() {
-	const home = useData<Data>();
+	const home = useData<Data>() as AssmacResponse;
 	const countRating = home.reviews.length;
 	const averageRating = +(
 		home.reviews.reduce((acc, review) => acc + parseFloat(review.stars), 0) / countRating || 0
@@ -46,46 +49,38 @@ export default function Page() {
 
 	const goToCheckout = async () => {
 		setLoadingCheckoutButton(true);
-		try {
-			const apiUrl = import.meta.env.PUBLIC_ENV__SRV_URL;
-			const response = await fetch(`${apiUrl}/api/checkout/${currentProductVariant?.id}`);
-			const checkoutResponse = await response.json();
 
-			if (checkoutResponse.checkout_session_url) {
-				window.location.href = checkoutResponse.checkout_session_url;
-			} else {
-				console.error("Invalid response:", checkoutResponse);
-			}
-		} catch (e) {
-			throw e;
-		} finally {
+		const response = await new AssmacAPI().createOrder(currentProductVariant?.id ?? "");
+		if (!response) {
+			console.error("Error creating order");
 			setLoadingCheckoutButton(false);
+			return;
 		}
+
+		if (response.id) {
+			// go to /checkout/:orderid
+			window.location.href = `/order/${response.id}`;
+		}
+
+		setLoadingCheckoutButton(false);
+
 	};
 
 	const notifyWhenInStock = async () => {
 		if (isNotified) return;
 		setLoadingNotifyButton(true);
 
-		try {
-			const apiUrl = import.meta.env.PUBLIC_ENV__SRV_URL;
-			const url = new URL(`${apiUrl}/api/stock_notifications`);
-			url.searchParams.append("email", notifyEmail ?? "");
-			url.searchParams.append("product_variant_id", currentProductVariant?.id ?? "");
-
-			const response = await fetch(url.toString(), {method: "POST"});
-
-			if (response.status === 201) {
-				setNotified({[currentProductVariant?.id ?? ""]: true, ...notified});
-			} else {
-				console.error("Error while notifying:", response.statusText);
-			}
-		} catch (e) {
-			throw e;
-		} finally {
+		const res = await new AssmacAPI().addToStockNotification(notifyEmail ?? "",  currentProductVariant?.id ?? "")
+		if (!res) {
 			setLoadingNotifyButton(false);
+			return;
 		}
+
+		setNotified({[currentProductVariant?.id ?? ""]: true, ...notified});
+		setLoadingNotifyButton(false);
 	};
+
+
 
 	return (
 		<main>
@@ -208,13 +203,13 @@ export default function Page() {
 				</Container>
 			</section>
 
-				<FooterReassurance/>
+			<FooterReassurance/>
 
-				<StickyBuyButton isInStock={isInStock}
-												 onClick={goToCheckout}
-												 loading={loadingCheckoutButton}
-												 currentVariant={currentProductVariant}
-												 price={currentPrice}/>
+			<StickyBuyButton isInStock={isInStock}
+											 onClick={goToCheckout}
+											 loading={loadingCheckoutButton}
+											 currentVariant={currentProductVariant}
+											 price={currentPrice}/>
 
 
 		</main>
@@ -233,40 +228,6 @@ const Container: React.FC<ContainerProps> = ({className, children}) => (
 		{children}
 	</div>
 );
-
-// Button component for consistent styling
-interface ButtonProps {
-	onClick: () => void;
-	loading?: boolean;
-	className?: string;
-	children: React.ReactNode;
-	loadingText?: string;
-	disabled?: boolean;
-}
-
-function Button({onClick, loading, className, children, loadingText = "Chargement...", disabled}: ButtonProps) {
-	return (
-		<button
-			onClick={onClick}
-			disabled={loading || disabled}
-			className={cn(
-				"cursor-pointer flex justify-center items-center gap-2.5",
-				"w-full py-4 rounded-lg",
-				"font-semibold transition duration-200 ease-in-out",
-				loading || disabled ? "opacity-50 pointer-events-none" : "",
-				className
-			)}
-		>
-			{loading ? (
-				<>
-					<LoaderCircle className="w-4 h-4 animate-spin"/> {loadingText}
-				</>
-			) : (
-				children
-			)}
-		</button>
-	)
-}
 
 // Color variant selector component
 interface ColorVariantSelectorProps {
@@ -395,3 +356,5 @@ function StickyBuyButton({isInStock, onClick, loading, price, currentVariant}: S
 		</div>
 	)
 }
+
+

@@ -22,11 +22,10 @@ class WebhooksController < ApplicationController
       return
     end
 
-    puts "Event type: #{event.type}, #{event.id}"
     # Handle the event
     case event.type
-    when "checkout.session.completed"
-      Order::CreateOrderFromStripeCheckoutSessionCompleted.perform_later(event.data.object.id)
+    when "payment_intent.succeeded"
+      OrderPaidJob.perform_later(event.data.object.id)
     else
       # other
     end

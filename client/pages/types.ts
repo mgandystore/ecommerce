@@ -51,7 +51,7 @@ export type Images = Record<string, ProductImage[]>
 export interface ProductImage {
 	url: string
 	url_medium: string
-	url_thumb: string
+	url_thumbnail: string
 	url_large: string
 	url_blur: string
 	alt: string
@@ -61,13 +61,11 @@ export interface ProductVariant {
 	id: string
 	product_id: string
 	variants: Variants
-	stripe_product_price_id: string
 	variants_slug: string
 	stock: number
 	additional_price: number
 	created_at: string
 	updated_at: string
-	stripe_product_id: string
 }
 
 export interface Variants {
@@ -134,4 +132,68 @@ export interface SalesTermsResponse extends BaseData {
 
 export interface LegalNoticesResponse extends BaseData {
 	value: string
+}
+
+/*
+order_id: order.id,
+      order_total_amount: order.total_amount,
+      order_items: order.order_items.map do |item|
+        {
+          product_variant_id: item.product_variant_id,
+          product_id: item.product_id,
+          quantity: item.quantity,
+          total_amount: item.total_amount,
+        }
+      end
+ */
+
+export interface Customer {
+	email: string;
+	full_name: string;
+	phone: string;
+}
+
+// Address type based on AddressForm
+export interface Address {
+	address_line1: string;
+	address_line2?: string;
+	city: string;
+	postal_code: string;
+	country: string;
+	pickup_point: boolean;
+	pickup_point_id?: string;
+	pickup_point_shop_name?: string;
+	pickup_point_name?: string;
+}
+
+export interface CreateOrderResponse extends Order {
+}
+
+export interface OrderResponse extends BaseData {
+	order: Order
+}
+
+export interface OrderItem {
+	product_variant_id: string
+	product_id: string
+	variant_human_format: string
+	product_name: string
+	short_description: string
+	quantity: number
+	total_amount: number
+	images: Partial<ProductImage>[]
+}
+
+export interface Order {
+	id: string
+	total_amount: number
+	stripe_payment_intent_id: string
+	stripe_payment_intent_client_secret: string
+	items: OrderItem[]
+}
+
+export interface PriceOrderResponse {
+	total: number
+	shipping: number
+	items: number
 }

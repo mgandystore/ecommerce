@@ -5,7 +5,7 @@ import { VariantSlugSelectedEvent } from './product_controller'
 
 type Image = {
   url: string
-  url_thumb: string
+  url_thumbnail: string
   url_medium: string
   url_large: string
   url_blur: string
@@ -175,7 +175,7 @@ export default class extends Controller {
 
       if (button && img) {
         button.dataset.productGalleryIndexParam = index.toString()
-        img.src = image.url_thumb
+        img.src = image.url_thumbnail
         img.alt = image.alt
         this.thumbnailsContainerTarget.appendChild(clone)
       }

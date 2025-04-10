@@ -3,7 +3,8 @@ module Dashboard::OrdersHelper
     {
       "paid" => "Payée",
       "refunded" => "Remboursée",
-      "shipped" => "Expédiée"
+      "shipped" => "Expédiée",
+      "pending" => "En attente"
     }
   end
 
@@ -11,7 +12,8 @@ module Dashboard::OrdersHelper
     {
       "paid" => "icons/bank_note.svg",
       "refunded" => "icons/undo_2.svg",
-      "shipped" => "icons/truck.svg"
+      "shipped" => "icons/truck.svg",
+      "pending" => "icons/hourglass.svg"
     }
   end
 
@@ -19,7 +21,8 @@ module Dashboard::OrdersHelper
     {
       "paid" => "blue",
       "refunded" => "orange",
-      "shipped" => "green"
+      "shipped" => "green",
+      "pending" => "gray"
     }
   end
 
@@ -27,6 +30,11 @@ module Dashboard::OrdersHelper
     events = [
       {
         date: order.created_at,
+        text: "Commande en attente",
+        status: "pending"
+      },
+      {
+        date: order.paid_at,
         text: "Commande payée",
         status: "paid"
       },

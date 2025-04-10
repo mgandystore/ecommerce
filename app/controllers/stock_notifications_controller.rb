@@ -1,7 +1,5 @@
 class StockNotificationsController < ApplicationController
   skip_before_action :verify_authenticity_token
-  before_action :set_cors_headers
-
   def create
     @product_variant = ProductVariant.find(params[:product_variant_id])
     @email = params[:email]

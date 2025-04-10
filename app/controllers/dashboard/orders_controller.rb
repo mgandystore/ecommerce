@@ -128,7 +128,12 @@ module Dashboard
           '', # recipient_additional_information
           @order.customer.phone, # recipient_phone
           @order.customer.email, # recipient_email
-          '', # recipient_proximity_point
+          if @order.shipping_address.pickup_point?
+            # CHRP-FR-1165Y
+            "CHRP-#{@order.shipping_address.country.upcase}-#{@order.shipping_address.pickup_point_id}"
+          else
+             ''
+          end,
           order_items_description, # content_detailed_description
           '50350', # content_category_code
           '0.1', # package_1_weight
@@ -164,8 +169,6 @@ module Dashboard
     end
 
     def orders_scope
-      puts "params: #{params.inspect}"
-
       scope = Order
 
       if params[:query].present?

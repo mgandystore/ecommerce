@@ -33,6 +33,7 @@ gem "ksuid"
 gem "stripe"
 gem "aws-sdk-s3"
 gem 'trix-rails'
+gem 'rack-cors'
 
 # Reduces boot times through caching; required in config/boot.rb
 gem "bootsnap", require: false

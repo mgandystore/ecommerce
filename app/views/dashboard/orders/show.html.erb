@@ -59,7 +59,7 @@
                 <div>
                   <%= f.label :carrier_name, "Transporteur", class: "block text-sm font-medium text-gray-700" %>
                   <%= f.select :carrier_name,
-                               ["Mondial Relay", "La Poste/Colissimo", "Chronopost" , "DHL", "DPD"],
+                               ["mondial relay", "colissimo", "chronopost", "dhl", "dpd"],
                                { prompt: "Sélectionner un transporteur" },
                                value: @order.carrier_name || "Mondial Relay",
                                data: { dashboard_shipping_modal_target: "carrierName" },
@@ -215,30 +215,22 @@
           <div class="px-4 py-5 sm:p-6">
             <table class="min-w-full">
               <tbody class="divide-y divide-gray-200">
-              <tr>
-                <td class="py-2 text-sm font-medium text-gray-900">Nom complet</td>
-                <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.full_name %></td>
-              </tr>
-              <tr>
-                <td class="py-2 text-sm font-medium text-gray-900">Email</td>
-                <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.email %></td>
-              </tr>
-              <% if @order.customer.phone.present? %>
                 <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">N. Tel</td>
-                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.phone %></td>
+                  <td class="py-2 text-sm font-medium text-gray-900">Nom complet</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.full_name %></td>
                 </tr>
-              <% end %>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Email</td>
+                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.email %></td>
+                </tr>
+                <% if @order.customer.phone.present? %>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">N. Tel</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.phone %></td>
+                  </tr>
+                <% end %>
               </tbody>
             </table>
-            <div class="pt-2">
-              <p class="text-xs text-gray-400">
-                Stripe dashboard : <%= link_to @order.customer.stripe_customer_id,
-                                               "#{Rails.configuration.stripe["url"]}/customers/#{@order.customer.stripe_customer_id}",
-                                               target: "_blank",
-                                               class: "dash-stripe-link" %>
-              </p>
-            </div>
           </div>
         </div>
 
@@ -251,160 +243,178 @@
             <div class="px-4 py-5 sm:p-6">
               <table class="min-w-full">
                 <tbody class="divide-y divide-gray-200">
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison</td>
-                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line1 %></td>
-                </tr>
-                <% if @order.shipping_address.address_line2.present? %>
                   <tr>
-                    <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison (2)</td>
-                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line2 %></td>
+                    <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line1 %></td>
                   </tr>
-                <% end %>
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Ville</td>
-                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.city %></td>
-                </tr>
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Code postal</td>
-                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.postal_code %></td>
-                </tr>
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Code pays</td>
-                  <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.country %></td>
-                </tr>
-                </tbody>
-              </table>
+                  <% if @order.shipping_address.address_line2.present? %>
+                    <tr>
+                      <td class="py-2 text-sm font-medium text-gray-900">Addresse de livraison (2)</td>
+                      <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.address_line2 %></td>
+                    </tr>
+                  <% end %>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Ville</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.city %></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Code postal</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.postal_code %></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Code pays</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.country %></td>
+                  </tr>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Transporteur</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.carrier_name %></td>
+                  </tr>
+                  <% if @order.shipping_address.pickup_point %>
+                    <tr>
+                      <td class="py-2 text-sm font-medium text-gray-900">Point relais</td>
+                      <td class="py-2 text-sm font-medium text-gray-500 text-right">Oui</td>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-sm font-medium text-gray-900">ID Point Relais</td>
+                      <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.pickup_point_id %>
+                    </tr>
+                    <tr>
+                      <td class="py-2 text-sm font-medium text-gray-900">Nom Point Relais</td>
+                      <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.shipping_address.pickup_point_shop_name %>
+                    </tr>
+                    <% end %>
 
-              <div class="mt-4 pt-2">
-                <%= link_to dashboard_order_laposte_expedition_template_path(id: @order.id),
-                            class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
+                    </tbody>
+                    </table>
+
+                    <div class="mt-4 pt-2">
+                      <%= link_to dashboard_order_laposte_expedition_template_path(id: @order.id),
+                                  class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm
                             text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2
                             focus:ring-offset-2 focus:ring-indigo-500" do %>
-                  <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-                  </svg>
-                  Télécharger le modèle La Poste Expedition
-                <% end %>
-              </div>
-            </div>
-
-
-
-          </div>
-
-
-        <% end %>
-
-        <% if @order.shipped? %>
-          <div class="bg-white rounded-lg border border-gray-200">
-            <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-              <h3 class="text-lg leading-6 font-medium text-gray-900">Informations de livraison</h3>
-            </div>
-            <div class="px-4 py-5 sm:p-6">
-              <table class="min-w-full">
-                <tbody class="divide-y divide-gray-200">
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Transporteur</td>
-                  <td class="py-2 text-sm text-gray-500 text-right">
-                    <%= @order.carrier_name %>
-                  </td>
-                </tr>
-                <tr>
-                  <td class="py-2 text-sm font-medium text-gray-900">Numéro de suivi</td>
-                  <td class="py-2 text-sm text-gray-500 text-right">
-                    <%= @order.carrier_tracking_number %>
-                  </td>
-                </tr>
-                <% if @order.carrier_tracking_link.present? %>
-                  <tr>
-                    <td class="py-2 text-sm font-medium text-gray-900">Suivi</td>
-                    <td class="py-2 text-sm text-gray-500 text-right">
-                      <%= render(Dashboard::ButtonComponent.new(
-                        text: "Lien de tracking",
-                        link: @order.carrier_tracking_link,
-                        html_options: { class: "w-fit" },
-                        variant: Dashboard::ButtonComponent.variant_minimal)) %>
-                    </td>
-                  </tr>
-                <% end %>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Payment Info -->
-        <div class="bg-white rounded-lg border border-gray-200">
-          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <table class="min-w-full">
-              <tbody class="divide-y divide-gray-200">
-              <tr>
-                <td class="py-2 text-sm text-gray-500">Sous-total</td>
-                <td class="py-2 text-sm font-medium text-gray-900 text-right">
-                  <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                </td>
-              </tr>
-              <tr>
-                <td class="py-2 text-sm font-medium text-gray-900">Total</td>
-                <td class="py-2 text-sm font-medium text-gray-900 text-right">
-                  <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                </td>
-              </tr>
-              </tbody>
-            </table>
-            <div class="pt-2">
-              <p class="text-xs text-gray-400">
-                Stripe dashboard : <%= link_to @order.stripe_payment_id,
-                                               "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_id}",
-                                               target: "_blank",
-                                               class: "dash-stripe-link" %>
-              </p>
-            </div>
-          </div>
-        </div>
-
-        <!-- Timeline (keeping original structure as it's not a key-value layout) -->
-        <div class="bg-white rounded-lg border border-gray-200">
-          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-            <h3 class="text-lg leading-6 font-medium text-gray-900">Historique</h3>
-          </div>
-          <div class="px-4 py-5 sm:p-6">
-            <div class="flow-root">
-              <ul role="list" class="-mb-8">
-                <% events = order_events(@order) %>
-                <% events.each_with_index do |event, index| %>
-                  <li>
-                    <div class="relative pb-8">
-                      <% if index < events.length - 1 %>
-                        <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/>
+                        </svg>
+                        Télécharger le modèle La Poste Expedition
                       <% end %>
-                      <div class="relative flex space-x-3">
-                        <div>
+                    </div>
+                    </div>
+
+
+                    </div>
+
+
+                  <% end %>
+
+                  <% if @order.shipped? %>
+                    <div class="bg-white rounded-lg border border-gray-200">
+                      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Informations de livraison</h3>
+                      </div>
+                      <div class="px-4 py-5 sm:p-6">
+                        <table class="min-w-full">
+                          <tbody class="divide-y divide-gray-200">
+                            <tr>
+                              <td class="py-2 text-sm font-medium text-gray-900">Transporteur</td>
+                              <td class="py-2 text-sm text-gray-500 text-right">
+                                <%= @order.carrier_name %>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td class="py-2 text-sm font-medium text-gray-900">Numéro de suivi</td>
+                              <td class="py-2 text-sm text-gray-500 text-right">
+                                <%= @order.carrier_tracking_number %>
+                              </td>
+                            </tr>
+                            <% if @order.carrier_tracking_link.present? %>
+                              <tr>
+                                <td class="py-2 text-sm font-medium text-gray-900">Suivi</td>
+                                <td class="py-2 text-sm text-gray-500 text-right">
+                                  <%= render(Dashboard::ButtonComponent.new(
+                                    text: "Lien de tracking",
+                                    link: @order.carrier_tracking_link,
+                                    html_options: { class: "w-fit" },
+                                    variant: Dashboard::ButtonComponent.variant_minimal)) %>
+                                </td>
+                              </tr>
+                            <% end %>
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                  <% end %>
+
+                  <!-- Payment Info -->
+                  <div class="bg-white rounded-lg border border-gray-200">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                      <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                      <table class="min-w-full">
+                        <tbody class="divide-y divide-gray-200">
+                          <tr>
+                            <td class="py-2 text-sm text-gray-500">Sous-total</td>
+                            <td class="py-2 text-sm font-medium text-gray-900 text-right">
+                              <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td class="py-2 text-sm font-medium text-gray-900">Total</td>
+                            <td class="py-2 text-sm font-medium text-gray-900 text-right">
+                              <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
+                            </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                      <div class="pt-2">
+                        <p class="text-xs text-gray-400">
+                          Stripe dashboard : <%= link_to @order.stripe_payment_intent_id,
+                                                         "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_intent_id}",
+                                                         target: "_blank",
+                                                         class: "dash-stripe-link" %>
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Timeline (keeping original structure as it's not a key-value layout) -->
+                  <div class="bg-white rounded-lg border border-gray-200">
+                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                      <h3 class="text-lg leading-6 font-medium text-gray-900">Historique</h3>
+                    </div>
+                    <div class="px-4 py-5 sm:p-6">
+                      <div class="flow-root">
+                        <ul role="list" class="-mb-8">
+                          <% events = order_events(@order) %>
+                          <% events.each_with_index do |event, index| %>
+                            <li>
+                              <div class="relative pb-8">
+                                <% if index < events.length - 1 %>
+                                  <span class="absolute left-4 top-4 -ml-px h-full w-0.5 bg-gray-200" aria-hidden="true"></span>
+                                <% end %>
+                                <div class="relative flex space-x-3">
+                                  <div>
                     <span class="h-8 w-8 rounded-full bg-<%= statuses_color[event[:status]] %>-100 flex items-center justify-center ring-8 ring-white">
                       <%= inline_svg_tag statuses_icon[event[:status]], class: "h-5 w-5 text-#{statuses_color[event[:status]]}-800" %>
                     </span>
-                        </div>
-                        <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
-                          <div>
-                            <p class="text-sm text-gray-500"><%= event[:text] %></p>
-                          </div>
-                          <div class="whitespace-nowrap text-right text-sm text-gray-500">
-                            <%= event[:date].strftime("%d/%m/%Y à %H:%M") %>
-                          </div>
-                        </div>
+                                  </div>
+                                  <div class="flex min-w-0 flex-1 justify-between space-x-4 pt-1.5">
+                                    <div>
+                                      <p class="text-sm text-gray-500"><%= event[:text] %></p>
+                                    </div>
+                                    <div class="whitespace-nowrap text-right text-sm text-gray-500">
+                                      <%= event[:date].strftime("%d/%m/%Y à %H:%M") %>
+                                    </div>
+                                  </div>
+                                </div>
+                              </div>
+                            </li>
+                          <% end %>
+                        </ul>
                       </div>
                     </div>
-                  </li>
-                <% end %>
-              </ul>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>
+                  </div>

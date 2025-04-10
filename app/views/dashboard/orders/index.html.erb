@@ -107,18 +107,14 @@
               <%= order.id %>
             </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <%= link_to truncate_long_id(order.stripe_payment_id),
-                          "#{Rails.configuration.stripe["url"]}/payments/#{order.stripe_payment_id}",
+              <%= link_to truncate_long_id(order.stripe_payment_intent_id),
+                          "#{Rails.configuration.stripe["url"]}/payments/#{order.stripe_payment_intent_id}",
                           target: "_blank",
                           class: "dash-stripe-link text-xs" %>
             </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
               <div><%= order.customer.full_name %></div>
               <div class="text-xs text-gray-400"><%= order.customer.email %></div>
-              <%= link_to truncate_long_id(order.customer.stripe_customer_id),
-                          "#{Rails.configuration.stripe["url"]}/customers/#{order.customer.stripe_customer_id}",
-                          target: "_blank",
-                          class: "dash-stripe-link text-xs" %>
             </td>
             <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
               <%= render(Dashboard::OrderStatusBadgeComponent.new(status: order.status)) %>

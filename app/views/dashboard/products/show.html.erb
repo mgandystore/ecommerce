@@ -122,12 +122,6 @@
                     <p class="text-sm font-medium text-gray-900">
                       <%= variant.variants_slug %>
                     </p>
-                    <p class="text-xs text-gray-500 mt-1">
-                      Stripe <%= link_to truncate_long_id(variant.stripe_product_price_id),
-                                         "#{Rails.configuration.stripe["url"]}/prices/#{variant.stripe_product_price_id}",
-                                         target: "_blank",
-                                         class: "dash-stripe-link text-xs" %>
-                    </p>
                   </div>
                   <div class="flex items-center gap-4">
                     <p class="text-sm font-medium text-gray-900">

@@ -23,7 +23,6 @@ module Dashboard
     end
 
     def update
-      puts "lolilol je suis un fdp"
       @review = Review.find(params[:id])
       if @review.update(review_params)
         flash[:success] = "Avis mis à jour avec succès"

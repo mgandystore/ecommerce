@@ -27,7 +27,6 @@ Rails.application.routes.draw do
     root to: redirect("/dashboard"), as: :dashboard_root
   end
 
-
   # =========================================================================
   # API
   # =========================================================================
@@ -36,9 +35,15 @@ Rails.application.routes.draw do
   get "/api/settings", to: "home#api_settings", as: :api_settings
   get "/api/legal-notices", to: "home#api_legal_notices", as: :api_legal_notices
   get "/api/sales-terms", to: "home#api_sales_terms", as: :api_sales_terms
-  get "/api/checkout/:product_variant_id", to: "checkout#create"
   post "/api/stock_notifications", to: "stock_notifications#create"
 
+  get "/api/chronoshop/search_city", to: "chronoshop#search_city"
+  get "/api/chronoshop/pickup_points", to: "chronoshop#pickup_points"
+
+  post "/api/orders/:product_variant_id", to: "order#create"
+  patch "/api/orders/:id/pay", to: "order#pay"
+  get "/api/orders/:id/price_calculator", to: "order#price_calculator"
+  get "/api/orders/:id", to: "order#show"
 
   # =========================================================================
   # Dashboard
@@ -49,7 +54,6 @@ Rails.application.routes.draw do
   get "dashboard/orders/:id", to: "dashboard/orders#show", as: :dashboard_order
   patch "dashboard/orders/:id", to: "dashboard/orders#update", as: :update_dashboard_order
   get "dashboard/order/:id/laposte_expedition_template", to: "dashboard/orders#laposte_expedition_template", as: :dashboard_order_laposte_expedition_template
-
 
   get "dashboard/products", to: "dashboard/products#index", as: :dashboard_products
   post "dashboard/products", to: "dashboard/products#create"
@@ -73,7 +77,6 @@ Rails.application.routes.draw do
 
   get "dashboard/settings", to: "dashboard/settings#edit", as: :edit_dashboard_settings
   patch "dashboard/settings", to: "dashboard/settings#update", as: :update_dashboard_settings
-
 
   # =========================================================================
   # Utilities

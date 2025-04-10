@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
+ActiveRecord::Schema[8.0].define(version: 2025_04_10_123434) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -60,17 +60,19 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
     t.string "country"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "pickup_point", default: false
+    t.string "pickup_point_shop_name"
+    t.string "pickup_point_id"
+    t.string "pickup_point_name"
   end
 
   create_table "customers", id: :string, force: :cascade do |t|
-    t.string "stripe_customer_id"
     t.string "email"
     t.string "full_name"
     t.string "phone"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["email"], name: "index_customers_on_email"
-    t.index ["stripe_customer_id"], name: "index_customers_on_stripe_customer_id"
   end
 
   create_table "good_job_batches", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
@@ -166,7 +168,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
     t.string "order_id", null: false
     t.string "product_id", null: false
     t.string "product_variant_id", null: false
-    t.string "stripe_product_price_id"
     t.integer "quantity", default: 1, null: false
     t.integer "total_amount", null: false
     t.datetime "created_at", null: false
@@ -174,7 +175,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
     t.index ["order_id"], name: "index_order_items_on_order_id"
     t.index ["product_id"], name: "index_order_items_on_product_id"
     t.index ["product_variant_id"], name: "index_order_items_on_product_variant_id"
-    t.index ["stripe_product_price_id"], name: "index_order_items_on_stripe_product_price_id"
   end
 
   create_table "order_notes", id: :string, force: :cascade do |t|
@@ -186,8 +186,6 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
   end
 
   create_table "orders", id: :string, force: :cascade do |t|
-    t.string "stripe_payment_id"
-    t.string "stripe_session_id"
     t.string "status"
     t.datetime "paid_at", precision: nil
     t.datetime "shipped_at", precision: nil
@@ -199,25 +197,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_03_22_081933) do
     t.string "carrier_name"
     t.string "carrier_tracking_link"
     t.string "carrier_tracking_number"
+    t.string "stripe_payment_intent_id"
+    t.string "stripe_payment_intent_client_secret"
     t.index ["customer_id"], name: "index_orders_on_customer_id"
     t.index ["shipping_address_id"], name: "index_orders_on_shipping_address_id"
     t.index ["status"], name: "index_orders_on_status"
-    t.index ["stripe_payment_id"], name: "index_orders_on_stripe_payment_id"
-    t.index ["stripe_session_id"], name: "index_orders_on_stripe_session_id"
   end
 
   create_table "product_variants", id: :string, force: :cascade do |t|
     t.string "product_id", null: false
     t.jsonb "variants", default: {}, null: false
-    t.string "stripe_product_price_id"
     t.string "variants_slug", null: false
     t.integer "stock", default: 0
     t.integer "additional_price", default: 0
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
-    t.string "stripe_product_id"
     t.index ["product_id"], name: "index_product_variants_on_product_id"
-    t.index ["stripe_product_price_id"], name: "index_product_variants_on_stripe_product_price_id"
     t.index ["variants_slug"], name: "index_product_variants_on_variants_slug"
   end
 
