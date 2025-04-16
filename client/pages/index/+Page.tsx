@@ -70,7 +70,7 @@ export default function Page() {
 		if (isNotified) return;
 		setLoadingNotifyButton(true);
 
-		const res = await new AssmacAPI().addToStockNotification(notifyEmail ?? "",  currentProductVariant?.id ?? "")
+		const res = await new AssmacAPI().addToStockNotification(notifyEmail ?? "", currentProductVariant?.id ?? "")
 		if (!res) {
 			setLoadingNotifyButton(false);
 			return;
@@ -79,7 +79,6 @@ export default function Page() {
 		setNotified({[currentProductVariant?.id ?? ""]: true, ...notified});
 		setLoadingNotifyButton(false);
 	};
-
 
 
 	return (
@@ -237,6 +236,13 @@ interface ColorVariantSelectorProps {
 }
 
 function ColorVariantSelector({variants, currentVariant, onChange}: ColorVariantSelectorProps) {
+	let colorOrder = ["bleu", "rose", "vert", "orange", "violet"];
+	variants = variants.sort((a, b) => {
+		const aIndex = colorOrder.indexOf(a.variants.couleur);
+		const bIndex = colorOrder.indexOf(b.variants.couleur);
+		return aIndex - bIndex;
+	});
+
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex items-center gap-2">
