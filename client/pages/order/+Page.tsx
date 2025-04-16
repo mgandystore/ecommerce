@@ -1,5 +1,5 @@
 import React, {useEffect, useReducer, useState} from 'react';
-import {ChevronRight, Lock, ShoppingCart} from 'lucide-react';
+import {ChevronRight, Lock, Package, ShieldCheck, ShoppingCart, Truck} from 'lucide-react';
 import {loadStripe} from "@stripe/stripe-js";
 import HomeDeliveryShippingForm from "./HomeDeliveryShippingForm";
 import ContactForm from "./ContactForm";
@@ -210,40 +210,36 @@ export default function Page() {
 							{data.order.items.map((item, idx) => (
 								<div className="flex" key={item.product_variant_id}>
 									<div className="relative">
-										{/*{JSON.stringify(item.images)}*/}
-										{ item.images.length == 0 ? (
-											<div className="w-16 h-16 rounded bg-gray-200 flex items-center justify-center">
-												<ShoppingCart size={24} className="text-gray-500"/>
+										{item.images.length == 0 ? (
+											<div className="w-24 h-24 rounded-md bg-gray-200 flex items-center justify-center">
+												<ShoppingCart size={28} className="text-gray-500"/>
 											</div>
-											) : (
-											<div className="w-16 h-16 rounded bg-gray-200 flex items-center justify-center">
-												<img src={item.images[0].url_thumbnail} alt={item.product_name} className="w-full h-full object-cover"/>
+										) : (
+											<div className="w-24 h-24 rounded-md bg-gray-200 flex items-center justify-center">
+												<img src={item.images[0].url_thumbnail} alt={item.product_name} className="w-full h-full object-cover rounded-md"/>
 											</div>
 										)}
-
-										<div
-											className="absolute -top-2 -right-2 w-5 h-5 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs">
+										<div className="absolute -top-2 -right-2 w-6 h-6 bg-gray-600 rounded-full flex items-center justify-center text-white text-xs">
 											{item.quantity}
 										</div>
 									</div>
 									<div className="ml-4 flex-1">
-										<p className="font-medium">{item.variant_human_format}</p>
+										<p className="font-medium">{item.product_name} {item.variant_human_format}</p>
 										<p className="text-sm text-gray-500">{item.short_description}</p>
 									</div>
 									<div className="font-medium">{item.total_amount / 100} €</div>
 								</div>
-							))
-							}
+							))}
 						</div>
 
 						<div className="space-y-3 border-t pt-4">
 							<div className="flex justify-between">
 								<span className="text-gray-600">Articles</span>
-								<span className="font-medium"> {price.items / 100} €</span>
+								<span className="font-medium">{price.items / 100} €</span>
 							</div>
 							<div className="flex justify-between">
 								<span className="text-gray-600">Livraison</span>
-								<span className="font-medium"> {price.shipping > 0 ? price.shipping / 100 : 0} €</span>
+								<span className="font-medium">{price.shipping > 0 ? price.shipping / 100 : 0} €</span>
 							</div>
 						</div>
 						<div className="flex justify-between mt-4 pt-4 border-t">
@@ -251,9 +247,15 @@ export default function Page() {
 							<span className="font-bold text-xl">{price.total / 100} €</span>
 						</div>
 					</div>
-					<div className="flex items-center justify-center text-sm text-gray-500">
-						<Lock size={14} className="mr-1"/>
-						<span>Paiement sécurisé par stripe</span>
+					<div className="flex flex-col space-y-2 text-sm text-gray-500">
+						<div className="flex items-center">
+							<Lock size={14} className="mr-1"/>
+							<span>Paiement sécurisé par Stripe</span>
+						</div>
+						<div className="flex items-center">
+							<Truck size={14} className="mr-1"/>
+							<span>Expédition sous 2 jours</span>
+						</div>
 					</div>
 				</div>
 			</div>

@@ -86,7 +86,12 @@ export function StripePayment({data, state, dispatch}: {
 
 	return <>
 		<div className="border rounded-md p-6 mb-6">
-			<h2 className="text-lg font-medium mb-4">Paiement</h2>
+			<div className="flex flex-col">
+				<h2 className="text-lg font-medium mb-2">Paiement</h2>
+				<p className="text-sm text-gray-500 mb-4">
+					Toutes les transactions sont sécurisées et cryptées.
+				</p>
+			</div>
 			<PaymentElement options={{
 				layout: "tabs",
 			}}/>
