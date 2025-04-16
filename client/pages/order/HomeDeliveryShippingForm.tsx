@@ -122,9 +122,9 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 					Addresse Ligne 1
 				</label>
 				<Input
-					autoComplete="off"
 					type="text"
 					id="address_line_1"
+					autoComplete="off"
 					aria-autocomplete={"list"}
 					aria-expanded={showSuggestions && suggestions.length > 0}
 					value={state.shipping.address_line1}

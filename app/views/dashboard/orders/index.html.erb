@@ -76,7 +76,7 @@
 
         <div class="flex flex-col gap-4 sm:flex-row place-content-end mt-auto h-full w-full sm:w-fit">
           <%= link_to "Réinitialiser", dashboard_orders_path,
-                         class: "dash-btn-secondary" %>
+                      class: "dash-btn-secondary" %>
 
           <%= submit_tag "Rechercher",
                          class: "dash-btn-primary" %>
@@ -87,56 +87,60 @@
     <div class="overflow-x-auto rounded-lg border border-gray-200">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
-        <tr>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">ID</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Stripe</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Client</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">État</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Variante</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Total</th>
-          <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Créé le</th>
-          <th scope="col" class="relative px-6 py-3">
-            <span class="sr-only">Actions</span>
-          </th>
-        </tr>
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">ID</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Stripe</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Client</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">État</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Variante</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Total</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Créé le</th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
-        <% @orders.each do |order| %>
-          <tr>
-            <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
-              <%= order.id %>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <%= link_to truncate_long_id(order.stripe_payment_intent_id),
-                          "#{Rails.configuration.stripe["url"]}/payments/#{order.stripe_payment_intent_id}",
-                          target: "_blank",
-                          class: "dash-stripe-link text-xs" %>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <div><%= order.customer.full_name %></div>
-              <div class="text-xs text-gray-400"><%= order.customer.email %></div>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <%= render(Dashboard::OrderStatusBadgeComponent.new(status: order.status)) %>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 text-left">
-              <pre class="text-xs text-gray-400"><%= order.order_items.first&.product_variant&.variants_slug %></pre>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <%= number_to_currency(order.order_items.sum(&:total_amount) / 100.0, precision: 2, unit: '€') %>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-              <%= order.created_at.strftime("%b %d, %Y %H:%M") %>
-            </td>
-            <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-              <%= render(Dashboard::ButtonComponent.new(
-                text: "Voir",
-                variant: Dashboard::ButtonComponent.variant_minimal,
-                link: dashboard_order_path(order)
-              )) %>
-            </td>
-          </tr>
-        <% end %>
+          <% @orders.each do |order| %>
+            <tr>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                <%= order.id %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= link_to truncate_long_id(order.stripe_payment_intent_id),
+                            "#{Rails.configuration.stripe["url"]}/payments/#{order.stripe_payment_intent_id}",
+                            target: "_blank",
+                            class: "dash-stripe-link text-xs" %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if order.customer %>
+                  <div><%= order.customer.full_name %></div>
+                  <div class="text-xs text-gray-400"><%= order.customer.email %></div>
+                <% else %>
+                  <div class="text-xs text-gray-400">Inconnu</div>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= render(Dashboard::OrderStatusBadgeComponent.new(status: order.status)) %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 text-left">
+                <pre class="text-xs text-gray-400"><%= order.order_items.first&.product_variant&.variants_slug %></pre>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= number_to_currency(order.order_items.sum(&:total_amount) / 100.0, precision: 2, unit: '€') %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= order.created_at.strftime("%b %d, %Y %H:%M") %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                <%= render(Dashboard::ButtonComponent.new(
+                  text: "Voir",
+                  variant: Dashboard::ButtonComponent.variant_minimal,
+                  link: dashboard_order_path(order)
+                )) %>
+              </td>
+            </tr>
+          <% end %>
         </tbody>
       </table>
     </div>
