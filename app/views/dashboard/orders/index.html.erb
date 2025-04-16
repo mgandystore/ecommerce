@@ -133,11 +133,13 @@
                 <%= order.created_at.strftime("%b %d, %Y %H:%M") %>
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                <%= render(Dashboard::ButtonComponent.new(
-                  text: "Voir",
-                  variant: Dashboard::ButtonComponent.variant_minimal,
-                  link: dashboard_order_path(order)
-                )) %>
+                <% unless order.pending? %>
+                  <%= render(Dashboard::ButtonComponent.new(
+                    text: "Voir",
+                    variant: Dashboard::ButtonComponent.variant_minimal,
+                    link: dashboard_order_path(order)
+                  )) %>
+                <% end %>
               </td>
             </tr>
           <% end %>
