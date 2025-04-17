@@ -23,14 +23,17 @@ FROM base AS build
 
 
 # Wget GeoLite2-City.mmdb to perform geolocation
+# https://www.maxmind.com/en/accounts/1156416/geoip/downloads
+# on scaleway https://city.s3.fr-par.scw.cloud/
 ARG GEOLITE_CITY_NAME=GeoLite2-City_20250415
 ENV GEOLITE_CITY_NAME=${GEOLITE_CITY_NAME}
 
 RUN wget https://city.s3.fr-par.scw.cloud/${GEOLITE_CITY_NAME}.tar.gz && \
     tar -xzf ${GEOLITE_CITY_NAME}.tar.gz && \
     rm ${GEOLITE_CITY_NAME}.tar.gz && \
-    mkdir -p /usr/local/share/GeoIP && \
-    mv ${GEOLITE_CITY_NAME}/GeoLite2-City.mmdb /usr/local/share/GeoIP/GeoLite2-City.mmdb
+    mkdir -p /tmp && \
+    mv ${GEOLITE_CITY_NAME}/GeoLite2-City.mmdb /tmp/GeoLite2-City.mmdb && \
+    rm -rf ${GEOLITE_CITY_NAME}
 
 
 # Install packages needed to build gems and node modules
@@ -60,6 +63,10 @@ RUN yarn install --frozen-lockfile
 # Copy application code
 COPY . .
 
+# Make sure the directory exists before moving the file
+RUN mkdir -p db && \
+    mv /tmp/GeoLite2-City.mmdb db/GeoLite2-City.mmdb
+
 # Precompile bootsnap code for faster boot times
 RUN bundle exec bootsnap precompile app/ lib/
 
@@ -74,7 +81,6 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
-COPY --from=build /usr/local/share/GeoIP/GeoLite2-City.mmdb /rails/db/GeoLite2-City.mmdb
 
 RUN mkdir -p /rails/log /rails/tmp
 
