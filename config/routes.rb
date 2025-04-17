@@ -43,6 +43,8 @@ Rails.application.routes.draw do
   post "/api/orders/:product_variant_id", to: "order#create"
   patch "/api/orders/:id/pay", to: "order#pay"
   get "/api/orders/:id/price_calculator", to: "order#price_calculator"
+  patch "/api/orders/:id/promo_code/:promo_code_id", to: "order#apply_promo_code"
+  delete "/api/orders/:id/promo_code", to: "order#remove_promo_code"
   get "/api/orders/:id", to: "order#show"
 
   # =========================================================================
@@ -77,6 +79,13 @@ Rails.application.routes.draw do
 
   get "dashboard/settings", to: "dashboard/settings#edit", as: :edit_dashboard_settings
   patch "dashboard/settings", to: "dashboard/settings#update", as: :update_dashboard_settings
+
+  get "dashboard/promo_codes", to: "dashboard/promo_codes#index", as: :dashboard_promo_codes
+  get "dashboard/promo_codes/new", to: "dashboard/promo_codes#new", as: :new_dashboard_promo_code
+  post "dashboard/promo_codes", to: "dashboard/promo_codes#create"
+  get "dashboard/promo_codes/:id/edit", to: "dashboard/promo_codes#edit", as: :edit_dashboard_promo_code
+  patch "dashboard/promo_codes/:id", to: "dashboard/promo_codes#update", as: :update_dashboard_promo_code
+  delete "dashboard/promo_codes/:id", to: "dashboard/promo_codes#destroy", as: :delete_dashboard_promo_code
 
   # =========================================================================
   # Utilities

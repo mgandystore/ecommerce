@@ -171,6 +171,7 @@ export interface CreateOrderResponse extends Order {
 
 export interface OrderResponse extends BaseData {
 	order: Order
+	price: PriceOrderResponse
 }
 
 export interface OrderItem {
@@ -195,5 +196,17 @@ export interface Order {
 export interface PriceOrderResponse {
 	total: number
 	shipping: number
+	discount: number | undefined
+	promo_code: {
+		code: string
+		description: string
+		discount_type: 'percentage' | 'fixed_amount'
+		discount_value: number
+	} | undefined
 	items: number
+}
+
+export interface OrderPromoCodeAndPricingResponse {
+	order: Order
+	price: PriceOrderResponse
 }

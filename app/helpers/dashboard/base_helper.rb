@@ -31,6 +31,11 @@ module Dashboard::BaseHelper
         icon: inline_svg_tag("icons/star.svg", class: "w-5 h-5 text-gray-400")
       },
       {
+        label: "Code promos",
+        path: Rails.application.routes.url_helpers.dashboard_promo_codes_path,
+        icon: inline_svg_tag("icons/pct.svg", class: "w-5 h-5 text-gray-400")
+      },
+      {
         label: "Stock notifications",
         path: Rails.application.routes.url_helpers.dashboard_stock_notifications_path,
         icon: inline_svg_tag("icons/bell.svg", class: "w-5 h-5 text-gray-400")

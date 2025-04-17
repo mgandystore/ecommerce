@@ -23,13 +23,9 @@ class OrderController < ApplicationController
       total_amount: variant.total_price
     )
 
-    price = compute_pricing(false, order.order_items)
+    price = order.compute_pricing
 
     payment_method_types = %w[card klarna]
-    # if Rails.env.production?
-    #   payment_method_types << "apple_pay"
-    #   payment_method_types << "google_pay"
-    # end
 
     stripe_intent = Stripe::PaymentIntent.create(
       amount: price[:total],
@@ -53,8 +49,11 @@ class OrderController < ApplicationController
 
     setting = Setting.first
 
+    price = order.compute_pricing
+
     render json: {
       order: order.as_json,
+      price: price,
       setting: setting
     }, status: :ok
   end
@@ -65,15 +64,99 @@ class OrderController < ApplicationController
       return render json: { error: "order not found" }, status: :not_found
     end
 
-    price = compute_pricing(params[:pickup_point], order.order_items)
+    price = order.compute_pricing(params[:pickup_point] == "true")
 
     render json: price, status: :ok
+  end
+
+  def apply_promo_code
+    order = Order.find_by(id: params[:id])
+    if order.nil?
+      return render json: { error: "order_not_found" }, status: :not_found
+    end
+
+    unless order.status == "pending"
+      return render json: { error: "order_not_found" }, status: :not_found
+    end
+
+    promo_code_value = params[:promo_code_id]
+    if promo_code_value.blank?
+      return render json: { error: "promo_code_required" }, status: :bad_request
+    end
+
+    promo_code = PromoCode.find_by(code: promo_code_value, active: true)
+    if promo_code.nil?
+      return render json: { error: "promo_code_invalid" }, status: :not_found
+    end
+
+    if promo_code.expires_at.present? && promo_code.expires_at < Time.current
+      return render json: { error: "promo_code_invalid" }, status: :unprocessable_entity
+    end
+
+    if promo_code.starts_at.present? && promo_code.starts_at > Time.current
+      return render json: { error: "promo_code_invalid" }, status: :unprocessable_entity
+    end
+
+    if promo_code.usage_limit.present? && promo_code.usage_count >= promo_code.usage_limit
+      return render json: { error: "promo_code_invalid" }, status: :unprocessable_entity
+    end
+
+    # Calculate the current price
+    current_price = order.compute_pricing
+
+    # Check minimum order amount if specified
+    if promo_code.minimum_order_amount.present? && current_price[:items] < promo_code.minimum_order_amount
+      return render json: { error: "promo_code_invalid" }, status: :unprocessable_entity
+    end
+
+    # Apply the promo code to the order
+    # First, remove any existing promo code usage for this order
+    # only one promo code can be applied to an order
+    PromoCodeUsage.where(order_id: order.id).destroy_all
+
+    # Create new promo code usage record
+    discount_amount = calculate_discount(promo_code, current_price[:total])
+    PromoCodeUsage.create!(
+      promo_code_id: promo_code.id,
+      order_id: order.id,
+      discount_amount: discount_amount
+    )
+
+    # Calculate new pricing with promo code
+    price = order.compute_pricing
+
+    render json: {
+      order: order.as_json,
+      price: price,
+    }, status: :ok
+  end
+
+  def remove_promo_code
+    order = Order.find_by(id: params[:id])
+    if order.nil?
+      return render json: { error: "order_not_found" }, status: :not_found
+    end
+
+    unless order.status == "pending"
+      return render json: { error: "order_not_found" }, status: :not_found
+    end
+
+    # Remove any existing promo code usage for this order
+    PromoCodeUsage.where(order_id: order.id).destroy_all
+
+    # Calculate new pricing without promo code
+    price = order.compute_pricing
+
+    render json: {
+      order: order.as_json,
+      price: price
+    }, status: :ok
   end
 
   def pay
     order = Order.find_by(id: params[:id])
     if order.nil?
-      return render json: { error: "order not found" }, status: :not_found
+      return render json: { error: "order_not_found" }, status: :not_found
     end
 
     update_attributes = {}
@@ -138,7 +221,7 @@ class OrderController < ApplicationController
 
       order.update!(update_attributes)
       order.update!(carrier_name: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo")
-      price = compute_pricing(order.shipping_address.pickup_point?, order.order_items)
+      price = order.compute_pricing
 
       update_payment_intent = {
         amount: price[:total],
@@ -164,6 +247,11 @@ class OrderController < ApplicationController
         }
       }
 
+      if price[:discount].present?
+        update_payment_intent[:metadata][:promo_code] = price[:promo_code][:code]
+        update_payment_intent[:metadata][:discount_amount] = price[:discount]
+      end
+
       Stripe::PaymentIntent.update(
         order.stripe_payment_intent_id,
         update_payment_intent
@@ -177,21 +265,16 @@ class OrderController < ApplicationController
 
   private
 
-  def compute_pricing(pickup_point, order_items)
-    # Convert the string parameter to a boolean properly
-    pickup_point = pickup_point.to_s.downcase == "true"
 
-    shipping_cost = pickup_point ? 0 : 200
 
-    # Calculate items cost
-    items_cost = order_items.sum(&:total_amount)
-
-    # Return pricing details
-    {
-      shipping: shipping_cost,
-      items: items_cost,
-      total: shipping_cost + items_cost
-    }
+  def calculate_discount(promo_code, amount)
+    if promo_code.percentage?
+      (amount * promo_code.discount_value / 100.0).to_i
+    elsif promo_code.fixed_amount?
+      promo_code.discount_value
+    else
+      0
+    end
   end
 
   def find_or_create_pickup_point(address_params)

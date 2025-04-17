@@ -1,5 +1,5 @@
 import {
-	Address,
+	Address, OrderPromoCodeAndPricingResponse,
 	AssmacResponse,
 	BaseData,
 	CreateOrderResponse,
@@ -176,6 +176,52 @@ export class AssmacAPI {
 		} catch (error) {
 			pino().error(error, "Error adding to stock notification")
 			return undefined
+		}
+	}
+
+	public async applyPromoCodeToOrder(orderId: string, promoCode: string): Promise<OrderPromoCodeAndPricingResponse | { error: string }> {
+		try {
+			const response = await fetch(`${this.baseUrl}/api/orders/${orderId}/promo_code/${promoCode}`, {
+				method: 'PATCH',
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json'
+				},
+				body: JSON.stringify({
+					promo_code: promoCode,
+				})
+			})
+			if (!response.ok) {
+				return await response.json() as { error: string }
+			}
+
+			return await response.json() as OrderPromoCodeAndPricingResponse
+		} catch (error) {
+			pino().error(error, "Error applying promo code to order")
+			return {error: (error as Error).message}
+		}
+	}
+
+	public async removePromoCodeFromOrder(orderId: string): Promise<OrderPromoCodeAndPricingResponse | { error: string }> {
+		try {
+			const response = await fetch(`${this.baseUrl}/api/orders/${orderId}/promo_code`, {
+				method: 'DELETE',
+				headers: {
+					'Content-Type': 'application/json',
+					'Accept': 'application/json'
+				},
+				body: JSON.stringify({
+					promo_code: null,
+				})
+			})
+			if (!response.ok) {
+				return await response.json() as { error: string }
+			}
+
+			return await response.json() as OrderPromoCodeAndPricingResponse
+		} catch (error) {
+			pino().error(error, "Error removing promo code from order")
+			return {error: (error as Error).message}
 		}
 	}
 }

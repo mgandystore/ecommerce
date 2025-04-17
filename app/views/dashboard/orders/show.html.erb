@@ -234,6 +234,60 @@
           </div>
         </div>
 
+        <!-- Payment Info -->
+        <div class="bg-white rounded-lg border border-gray-200">
+          <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+            <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
+          </div>
+          <div class="px-4 py-5 sm:p-6">
+            <table class="min-w-full">
+              <tbody class="divide-y divide-gray-200">
+                <tr>
+                  <td class="py-2 text-sm text-gray-500">Sous-total</td>
+                  <td class="py-2 text-sm font-medium text-gray-900 text-right">
+                    <%= number_to_currency(@price[:items] / 100.0, unit: "€") %>
+                  </td>
+                </tr>
+                <tr>
+                  <td class="py-2 text-sm text-gray-500">Frais de livraison</td>
+                  <td class="py-2 text-sm font-medium text-gray-900 text-right">
+                    <%= number_to_currency(@price[:shipping] / 100.0, unit: "€") %>
+                  </td>
+                </tr>
+                <% if @price[:discount].present? && @price[:discount] > 0 %>
+                  <tr>
+                    <td class="py-2 text-sm text-gray-500">
+                      Remise
+                      <% if @price[:promo_code].present? %>
+                <span class="text-xs text-gray-400">
+                  (<%= @price[:promo_code][:code] %>)
+                </span>
+                      <% end %>
+                    </td>
+                    <td class="py-2 text-sm font-medium text-red-600 text-right">
+                      -<%= number_to_currency(@price[:discount] / 100.0, unit: "€") %>
+                    </td>
+                  </tr>
+                <% end %>
+                <tr>
+                  <td class="py-2 text-sm font-medium text-gray-900">Total</td>
+                  <td class="py-2 text-sm font-medium text-gray-900 text-right">
+                    <%= number_to_currency(@price[:total] / 100.0, unit: "€") %>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="pt-2">
+              <p class="text-xs text-gray-400">
+                Stripe dashboard : <%= link_to @order.stripe_payment_intent_id,
+                                               "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_intent_id}",
+                                               target: "_blank",
+                                               class: "dash-stripe-link" %>
+              </p>
+            </div>
+          </div>
+        </div>
+
         <!-- Shipping Address -->
         <% if @order.shipping_address.present? %>
           <div class="bg-white rounded-lg border border-gray-200">
@@ -343,39 +397,6 @@
                       </div>
                     </div>
                   <% end %>
-
-                  <!-- Payment Info -->
-                  <div class="bg-white rounded-lg border border-gray-200">
-                    <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
-                      <h3 class="text-lg leading-6 font-medium text-gray-900">Paiement</h3>
-                    </div>
-                    <div class="px-4 py-5 sm:p-6">
-                      <table class="min-w-full">
-                        <tbody class="divide-y divide-gray-200">
-                          <tr>
-                            <td class="py-2 text-sm text-gray-500">Sous-total</td>
-                            <td class="py-2 text-sm font-medium text-gray-900 text-right">
-                              <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td class="py-2 text-sm font-medium text-gray-900">Total</td>
-                            <td class="py-2 text-sm font-medium text-gray-900 text-right">
-                              <%= number_to_currency(@order.order_items.sum(&:total_amount) / 100.0, unit: "€") %>
-                            </td>
-                          </tr>
-                        </tbody>
-                      </table>
-                      <div class="pt-2">
-                        <p class="text-xs text-gray-400">
-                          Stripe dashboard : <%= link_to @order.stripe_payment_intent_id,
-                                                         "#{Rails.configuration.stripe["url"]}/payments/#{@order.stripe_payment_intent_id}",
-                                                         target: "_blank",
-                                                         class: "dash-stripe-link" %>
-                        </p>
-                      </div>
-                    </div>
-                  </div>
 
                   <!-- Timeline (keeping original structure as it's not a key-value layout) -->
                   <div class="bg-white rounded-lg border border-gray-200">

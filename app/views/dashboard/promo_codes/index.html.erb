@@ -1,0 +1,190 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+
+    <div class="flex flex-col gap-2 py-4">
+      <h1 class="text-xl leading-6 font-medium text-gray-900">Codes Promo</h1>
+      <p class="mt-1 text-sm text-gray-500">
+        Gérer tous les codes promotionnels pour votre boutique.
+      </p>
+    </div>
+
+    <div class="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4 mt-4">
+      <!-- Total Promo Codes -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Total codes promo</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <%= @total_promo_codes %>
+        </div>
+      </div>
+
+      <!-- Active Promo Codes -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Codes actifs</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <%= @active_promo_codes %>
+        </div>
+      </div>
+
+      <!-- Most Used Code -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Code le plus utilisé</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <% if @most_used_code %>
+            <div class="text-lg font-medium"><%= @most_used_code[:code] %></div>
+            <div class="text-sm text-gray-500"><%= pluralize(@most_used_code[:usage_count], 'utilisation') %></div>
+          <% else %>
+            -
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Total Discounts -->
+      <div class="overflow-hidden rounded-lg bg-white px-4 py-5 shadow sm:p-6">
+        <div class="truncate text-sm font-medium text-gray-500">Total remises</div>
+        <div class="mt-1 text-3xl font-semibold tracking-tight text-gray-900">
+          <%= number_to_currency(@total_discounts / 100.0, precision: 2, unit: '€') %>
+        </div>
+      </div>
+    </div>
+
+    <%= form_tag dashboard_promo_codes_path, method: :get, class: "space-y-4" do %>
+      <div class="flex flex-col sm:flex-row gap-4 w-full items-baseline align">
+        <div class="flex flex-col sm:flex-row gap-4 sm:flex-1 w-full">
+          <div class="w-64 max-sm:w-full max-lg:w-fit">
+            <label for="query" class="block text-sm font-medium text-gray-700">Rechercher</label>
+            <div class="mt-1">
+              <%= text_field_tag :query,
+                                 params[:query],
+                                 class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full text-sm border-gray-300 rounded-md",
+                                 placeholder: "Code ou description" %>
+            </div>
+          </div>
+
+          <div class="w-full sm:w-fit min-sm:w-64">
+            <label for="status" class="block text-sm w-fit font-medium text-gray-700">État</label>
+            <div class="mt-1">
+              <%= select_tag :status,
+                             options_for_select([["Tous", ""], ["Actifs", "active"], ["Inactifs", "inactive"], ["Expirés", "expired"]], params[:status]),
+                             class: "dash-btn-select" %>
+            </div>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-4 sm:flex-row place-content-end mt-auto h-full w-full sm:w-fit">
+          <%= link_to "Réinitialiser", dashboard_promo_codes_path,
+                      class: "dash-btn-secondary" %>
+          <%= submit_tag "Rechercher", class: "dash-btn-primary" %>
+
+          <%= link_to "Nouveau code", new_dashboard_promo_code_path,
+                      class: "dash-btn-primary" %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="overflow-x-auto rounded-lg border border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Code</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Description</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Type</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Valeur</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Min. commande</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Utilisations</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Validité</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">Expiration</th>
+            <th scope="col" class="px-6 py-3 text-left text-sm font-semibold text-gray-900">État</th>
+            <th scope="col" class="relative px-6 py-3">
+              <span class="sr-only">Actions</span>
+            </th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200 bg-white">
+          <% @promo_codes.each do |promo_code| %>
+            <tr>
+              <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
+                <%= promo_code.code %>
+              </td>
+              <td class="px-6 py-4 text-sm text-gray-500">
+                <%= promo_code.description %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <%= promo_code.percentage? ? "Pourcentage" : "Montant fixe" %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.percentage? %>
+                  <%= number_to_percentage(promo_code.discount_value, precision: 0) %>
+                <% else %>
+                  <%= number_to_currency(promo_code.discount_value / 100.0, precision: 2, unit: '€') %>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.minimum_order_amount %>
+                  <%= promo_code.minimum_order_amount > 0 ? number_to_currency(promo_code.minimum_order_amount / 100.0, precision: 2, unit: '€') : "-" %>
+                <% else %>
+                  <span class="text-xs text-gray-400">Pas de minimum</span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.usage_limit %>
+                  <%= "#{promo_code.usage_count} / #{promo_code.usage_limit}" %>
+                <% else %>
+                  <%= promo_code.usage_count %> <span class="text-xs text-gray-400">(illimité)</span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.starts_at %>
+                  <%= promo_code.starts_at.strftime("%d/%m/%Y") %>
+                <% else %>
+                  <span class="text-xs text-gray-400">Pas d'expiration</span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.expires_at %>
+                  <%= promo_code.expires_at.strftime("%d/%m/%Y") %>
+                <% else %>
+                  <span class="text-xs text-gray-400">Pas d'expiration</span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
+                <% if promo_code.active? %>
+                  <% if promo_code.expires_at && promo_code.expires_at < Time.current %>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                      Expiré
+                    </span>
+                  <% elsif promo_code.usage_limit && promo_code.usage_count >= promo_code.usage_limit %>
+                    <span class="inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 text-xs font-medium text-yellow-800">
+                      Épuisé
+                    </span>
+                  <% else %>
+                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+                      Actif
+                    </span>
+                  <% end %>
+                <% else %>
+                  <span class="inline-flex items-center rounded-full bg-red-100 px-2.5 py-0.5 text-xs font-medium text-red-800">
+                    Inactif
+                  </span>
+                <% end %>
+              </td>
+              <td class="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
+                <div class="flex space-x-2 justify-end">
+                  <%= link_to edit_dashboard_promo_code_path(promo_code.id), class: "text-indigo-600 hover:text-indigo-900" do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                    </svg>
+                  <% end %>
+                  <%= button_to delete_dashboard_promo_code_path(promo_code.id), method: :delete, class: "text-red-600 hover:text-red-900", data: { confirm: "Êtes-vous sûr de vouloir supprimer ce code promo ?" } do %>
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                    </svg>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

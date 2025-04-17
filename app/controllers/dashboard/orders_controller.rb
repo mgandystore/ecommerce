@@ -32,12 +32,10 @@ module Dashboard
 
     def show
       @order = Order
-                 .includes(:customer, :order_notes, :shipping_address, order_items: [:product_variant, :product])
+                 .includes(:customer, :order_notes, :shipping_address, :promo_code_usages, order_items: [:product_variant, :product])
                  .find_by!(id: params[:id])
 
-      # create 3 statistic on orders
-      # total amount of order
-      # avg delay between status paid and shipped
+      @price = @order.compute_pricing
     end
 
     def update
@@ -65,6 +63,7 @@ module Dashboard
         @order.order_notes.create(content: order_params[:notes])
         flash[:success] = "La note d'informations a été ajoutée avec succès"
       end
+
 
       redirect_to dashboard_order_path(@order)
     end

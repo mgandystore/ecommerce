@@ -1,4 +1,4 @@
-import {OrderResponse} from "@/pages/types";
+import {OrderResponse, PriceOrderResponse} from "@/pages/types";
 import {ActionOrderState, OrderState} from "@/pages/order/reducer";
 import {PaymentElement, useElements, useStripe} from "@stripe/react-stripe-js";
 import React, {useState} from "react";
@@ -7,9 +7,10 @@ import {AssmacAPI} from "@/lib/assmac_client";
 import {Button} from "@/components/Button";
 import {ChevronRight} from "lucide-react";
 
-export function StripePayment({data, state, dispatch}: {
+export function StripePayment({data, price, state, dispatch}: {
 	data: OrderResponse,
 	state: OrderState,
+	price: PriceOrderResponse,
 	dispatch: (action: (ActionOrderState)) => void
 }) {
 	const stripe = useStripe();
@@ -110,8 +111,10 @@ export function StripePayment({data, state, dispatch}: {
 				loading={loading}
 				className="w-full py-4 bg-amber-400 hover:bg-amber-300 focus:bg-amber-500 text-base font-bold text-stone-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500"
 			>
-				Payer
-				<ChevronRight className="ml-1" size={16}/>
+				{ price.total > 0 ?
+					<>Payer {price.total/100} €</> :
+					<>Si c'est gratuit c'est toi le produit :)</>
+				}
 			</Button>
 		</div>
 	</>;

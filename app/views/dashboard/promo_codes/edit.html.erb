@@ -1,0 +1,193 @@
+<div class="px-4 mx-auto py-4 sm:px-6 lg:px-8">
+  <div class="flex flex-col gap-4 px-4 py-4 sm:px-8 sm:py-8 bg-white shadow-md sm:rounded-lg sm:border">
+
+    <div class="flex flex-col gap-2 py-4">
+      <div class="flex justify-between items-center">
+        <h1 class="text-xl leading-6 font-medium text-gray-900">
+          Modifier le code promo
+        </h1>
+        <div>
+          <%= link_to "Retour", dashboard_promo_codes_path(@promo_code), class: "dash-btn-secondary" %>
+        </div>
+      </div>
+      <p class="mt-1 text-sm text-gray-500">
+        Modifier les détails du code promo existant.
+      </p>
+    </div>
+
+    <%= form_with(model: [:dashboard, @promo_code],
+                  url: update_dashboard_promo_code_path(@promo_code),
+                  class: "space-y-6", data: { turbo: false }) do |form| %>
+      <div class="grid grid-cols-1 gap-y-6 gap-x-4 sm:grid-cols-6">
+        <div class="sm:col-span-3">
+          <%= form.label :code, "Code", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.text_field :code,
+                                disabled: true,
+                                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm #{@promo_code.errors[:code].any? ? 'border-red-300' : 'border-gray-300'} rounded-md",
+                                placeholder: "WELCOME10" %>
+            <% if @promo_code.errors[:code].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:code].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Le code que les clients utiliseront durant le checkout</p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :active, "État", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.select :active, [["Actif", true], ["Inactif", false]], {},
+                            class: "dash-btn-select #{@promo_code.errors[:active].any? ? 'border-red-300' : ''}" %>
+          </div>
+          <% if @promo_code.errors[:active].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:active].join(', ') %></p>
+          <% end %>
+        </div>
+
+        <div class="sm:col-span-6">
+          <%= form.label :description, "Description", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.text_field :description,
+                                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm #{@promo_code.errors[:description].any? ? 'border-red-300' : 'border-gray-300'} rounded-md",
+                                placeholder: "10% de remise sur votre première commande" %>
+            <% if @promo_code.errors[:description].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:description].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Une description claire du code promo pour la gestion interne</p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :discount_type, "Type de remise", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.select :discount_type, [["Pourcentage", "percentage"], ["Montant fixe", "fixed_amount"]], {},
+                            class: "dash-btn-select #{@promo_code.errors[:discount_type].any? ? 'border-red-300' : ''}" %>
+            <% if @promo_code.errors[:discount_type].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:discount_type].join(', ') %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :discount_value, "Valeur de la remise", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm" id="discount-symbol">
+                <%= @promo_code.percentage? ? "%" : "€" %>
+              </span>
+            </div>
+            <%= form.number_field :discount_value,
+                                  class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm #{@promo_code.errors[:discount_value].any? ? 'border-red-300' : 'border-gray-300'} rounded-md",
+                                  min: 0,
+                                  value: @promo_code.percentage? ? @promo_code.discount_value : (@promo_code.discount_value / 100.0).to_i %>
+          </div>
+          <% if @promo_code.errors[:discount_value].any? %>
+            <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:discount_value].join(', ') %></p>
+          <% end %>
+          <p class="mt-2 text-sm text-gray-500">
+            <span id="discount-help-text">
+              <%= @promo_code.percentage? ? "Pourcentage de remise (ex: 10 pour 10%)" : "Montant en euros (ex: 10 pour 10,00€)" %>
+            </span>
+          </p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :minimum_order_amount, "Montant minimum de commande", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1 relative rounded-md shadow-sm">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span class="text-gray-500 sm:text-sm">€</span>
+            </div>
+            <%= form.number_field :minimum_order_amount,
+                                  class: "focus:ring-indigo-500 focus:border-indigo-500 block w-full pl-7 sm:text-sm #{@promo_code.errors[:minimum_order_amount].any? ? 'border-red-300' : 'border-gray-300'} rounded-md",
+                                  min: 0,
+                                  value: @promo_code.minimum_order_amount ? (@promo_code.minimum_order_amount / 100.0).to_i : 0 %>
+            <% if @promo_code.errors[:minimum_order_amount].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:minimum_order_amount].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Montant en euros (ex: 25 pour 25,00€), 0 pour aucun minimum</p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :usage_limit, "Limite d'utilisation", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.number_field :usage_limit,
+                                  class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm #{@promo_code.errors[:usage_limit].any? ? 'border-red-300' : 'border-gray-300'} rounded-md",
+                                  min: 0 %>
+            <% if @promo_code.errors[:usage_limit].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:usage_limit].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Nombre maximum d'utilisations, laisser vide pour illimité</p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :starts_at, "Date de début", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.date_field :starts_at,
+                                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm #{@promo_code.errors[:starts_at].any? ? 'border-red-300' : 'border-gray-300'} rounded-md" %>
+            <% if @promo_code.errors[:starts_at].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:starts_at].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Laisser vide pour une validité immédiate</p>
+        </div>
+
+        <div class="sm:col-span-3">
+          <%= form.label :expires_at, "Date d'expiration", class: "block text-sm font-medium text-gray-700" %>
+          <div class="mt-1">
+            <%= form.date_field :expires_at,
+                                class: "shadow-sm focus:ring-indigo-500 focus:border-indigo-500 block w-full sm:text-sm #{@promo_code.errors[:expires_at].any? ? 'border-red-300' : 'border-gray-300'} rounded-md" %>
+            <% if @promo_code.errors[:expires_at].any? %>
+              <p class="mt-2 text-sm text-red-600"><%= @promo_code.errors[:expires_at].join(', ') %></p>
+            <% end %>
+          </div>
+          <p class="mt-2 text-sm text-gray-500">Laisser vide pour une validité sans limite de temps</p>
+        </div>
+      </div>
+
+      <div class="flex justify-end space-x-3">
+        <%= link_to "Annuler", dashboard_promo_codes_path, class: "dash-btn-secondary" %>
+        <%= form.submit "Mettre à jour", class: "dash-btn-primary" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<script>
+	function updateDiscountElements() {
+		const discountTypeSelect = document.getElementById('promo_code_discount_type');
+		const discountSymbol = document.getElementById('discount-symbol');
+		const discountHelpText = document.getElementById('discount-help-text');
+		const discountValueField = document.getElementById('promo_code_discount_value');
+
+		if (!discountTypeSelect || !discountSymbol || !discountHelpText || !discountValueField) return;
+
+		if (discountTypeSelect.value === 'percentage') {
+			discountSymbol.textContent = '%';
+			discountHelpText.textContent = 'Pourcentage de remise (ex: 10 pour 10%)';
+		} else {
+			discountSymbol.textContent = '€';
+			discountHelpText.textContent = 'Montant en euros (ex: 10 pour 10,00€)';
+		}
+	}
+
+	function initializePromoCodeForm() {
+		const discountTypeSelect = document.getElementById('promo_code_discount_type');
+		if (discountTypeSelect) {
+			discountTypeSelect.addEventListener('change', updateDiscountElements);
+			updateDiscountElements();
+		}
+	}
+
+	// Listen for both DOMContentLoaded (initial page load) and turbo:load (Turbo navigation)
+	document.addEventListener('DOMContentLoaded', initializePromoCodeForm);
+	document.addEventListener('turbo:load', initializePromoCodeForm);
+
+	document.addEventListener('turbo:before-render', function() {
+		const discountTypeSelect = document.getElementById('promo_code_discount_type');
+		if (discountTypeSelect) {
+			discountTypeSelect.removeEventListener('change', updateDiscountElements);
+		}
+	});
+</script>
