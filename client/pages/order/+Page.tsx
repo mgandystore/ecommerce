@@ -215,7 +215,7 @@ export default function Page() {
 										placeholder="Code promo"
 										value={promoCode}
 										onChange={(e) => setPromoCode(e.target.value)}
-										className="bg-white"
+										className="bg-white h-12"
 									/>
 									{promoError && <p className="text-red-500 text-sm py-1">{promoError}</p>}
 								</div>
