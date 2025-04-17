@@ -256,16 +256,19 @@ class OrderController < ApplicationController
         order.stripe_payment_intent_id,
         update_payment_intent
       )
+
     rescue StandardError => e
       return render json: { error: "failed_updating_attributes" }, status: :unprocessable_entity
+    end
+
+    order.promo_code_usages.each do |promo_code_usage|
+      promo_code_usage.promo_code.increment_usage!
     end
 
     render json: order.as_json, status: :ok
   end
 
   private
-
-
 
   def calculate_discount(promo_code, amount)
     if promo_code.percentage?

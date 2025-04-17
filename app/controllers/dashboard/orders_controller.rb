@@ -7,27 +7,37 @@ module Dashboard
                   .order(Arel.sql("paid_at DESC NULLS LAST"))
                   .order(id: :desc)
 
-      @total_orders = Order.count
+      # Only count paid orders for total statistics
+      @total_orders = Order.paid.count
 
-      @orders_this_month = Order.where('created_at >= ?', Time.current.beginning_of_month).count
+      @orders_this_month = Order.paid.where("created_at >= ?", Time.current.beginning_of_month).count
 
-      # Average shipping duration for shipped orders
-      @avg_shipping_duration = Order.where.not(paid_at: nil)
+      # Average shipping duration for paid and shipped orders
+      @avg_shipping_duration = Order.paid
                                     .where.not(shipped_at: nil)
                                     .average("EXTRACT(EPOCH FROM shipped_at - paid_at)").to_i
 
+      # Best variant calculation - only considering paid orders and factoring in quantity
       best_variant = OrderItem
+                       .joins(:order)
+                       .where(orders: { status: "paid" }) # Assuming 'paid' is the status for paid orders
+                       .select("product_variant_id, SUM(quantity) as total_quantity")
                        .group(:product_variant_id)
-                       .order(Arel.sql('COUNT(*) DESC'))
+                       .order("total_quantity DESC")
                        .limit(1)
-                       .count
                        .first
 
       @best_variant = best_variant ? {
-        name: ProductVariant.find(best_variant[0]).human_format,
-        sales_count: best_variant[1]
+        name: ProductVariant.find(best_variant.product_variant_id).human_format,
+        sales_count: best_variant.total_quantity
       } : nil
 
+      # Add additional useful statistics
+      @revenue_this_month = OrderItem
+                              .joins(:order)
+                              .where(orders: { status: "paid" })
+                              .where("orders.created_at >= ?", Time.current.beginning_of_month)
+                              .sum(:total_amount)
     end
 
     def show
@@ -69,13 +79,13 @@ module Dashboard
     end
 
     def laposte_expedition_template
-      require 'csv'
+      require "csv"
 
       @order = Order.includes(:customer, :shipping_address).find_by!(id: params[:id])
 
-      name_parts = @order.customer.full_name.split(' ', 2)
-      first_name = name_parts[0] || ''
-      last_name = name_parts[1] || ''
+      name_parts = @order.customer.full_name.split(" ", 2)
+      first_name = name_parts[0] || ""
+      last_name = name_parts[1] || ""
 
       filename = generate_filename(first_name, last_name, @order.id)
 
@@ -83,26 +93,26 @@ module Dashboard
       csv_data = CSV.generate(headers: true) do |csv|
         # Add headers based on the template
         csv << [
-          'recipient_first_name',
-          'recipient_last_name',
-          'recipient_company',
-          'recipient_address_line_1',
-          'recipient_address_line_2',
-          'recipient_postal_code',
-          'recipient_city',
-          'recipient_country_iso_code',
-          'recipient_additional_information',
-          'recipient_phone',
-          'recipient_email',
-          'recipient_proximity_point',
-          'content_detailed_description',
-          'content_category_code',
-          'package_1_weight',
-          'package_1_length',
-          'package_1_width',
-          'package_1_height',
-          'package_1_value',
-          'external_reference'
+          "recipient_first_name",
+          "recipient_last_name",
+          "recipient_company",
+          "recipient_address_line_1",
+          "recipient_address_line_2",
+          "recipient_postal_code",
+          "recipient_city",
+          "recipient_country_iso_code",
+          "recipient_additional_information",
+          "recipient_phone",
+          "recipient_email",
+          "recipient_proximity_point",
+          "content_detailed_description",
+          "content_category_code",
+          "package_1_weight",
+          "package_1_length",
+          "package_1_width",
+          "package_1_height",
+          "package_1_value",
+          "external_reference"
         ]
 
         # Split customer full name into first and last name
@@ -112,7 +122,7 @@ module Dashboard
         # Get order items description
         order_items_description = @order.order_items.map do |item|
           "#{item.product.name} - #{item.product_variant.human_format} (x#{item.quantity})"
-        end.join(', ')
+        end.join(", ")
 
         # Calculate total order value in euros (cents / 100)
         order_value = (@order.order_items.sum(&:total_amount) / 100.0).round(2).to_s
@@ -120,47 +130,47 @@ module Dashboard
         csv << [
           first_name, # recipient_first_name
           last_name, # recipient_last_name
-          '', # recipient_company
+          "", # recipient_company
           @order.shipping_address.address_line1, # recipient_address_line_1
           @order.shipping_address.address_line2, # recipient_address_line_2
           @order.shipping_address.postal_code, # recipient_postal_code
           @order.shipping_address.city, # recipient_city
           @order.shipping_address.country, # recipient_country_iso_code
-          '', # recipient_additional_information
+          "", # recipient_additional_information
           @order.customer.phone, # recipient_phone
           @order.customer.email, # recipient_email
           if @order.shipping_address.pickup_point?
             # CHRP-FR-1165Y
             "CHRP-#{@order.shipping_address.country.upcase}-#{@order.shipping_address.pickup_point_id}"
           else
-             ''
+             ""
           end,
           order_items_description, # content_detailed_description
-          '50350', # content_category_code
-          '0.1', # package_1_weight
-          '15.2', # package_1_length
-          '22.8', # package_1_width
-          '5', # package_1_height
+          "50350", # content_category_code
+          "0.1", # package_1_weight
+          "15.2", # package_1_length
+          "22.8", # package_1_width
+          "5", # package_1_height
           order_value, # package_1_value
           @order.id # external_reference
         ]
       end
 
       send_data csv_data,
-                type: 'text/csv; charset=utf-8; header=present',
+                type: "text/csv; charset=utf-8; header=present",
                 disposition: "attachment; filename=#{filename}"
     end
 
     private
 
     def slugify(text)
-      text.downcase.strip.gsub(/\s+/, '-').gsub(/[^\w-]/, '')
+      text.downcase.strip.gsub(/\s+/, "-").gsub(/[^\w-]/, "")
     end
 
     def generate_filename(first_name, last_name, order_id)
       slugged_first_name = slugify(first_name)
       slugged_last_name = slugify(last_name)
-      date = Date.today.strftime('%Y%m%d')
+      date = Date.today.strftime("%Y%m%d")
 
       "#{slugged_first_name}_#{slugged_last_name}_#{date}_#{order_id}.csv"
     end
