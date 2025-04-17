@@ -22,35 +22,65 @@ interface AddressData {
 	country?: string;
 }
 
+let userCoordinates: [number, number] | undefined = undefined;
+let attemptGeoloc = 0;
+const MAX_GEOLOC_ATTEMPT = 5;
+
+async function getUserCoordinates(): Promise<[number, number] | undefined> {
+	if (userCoordinates) {
+		return userCoordinates;
+	}
+
+
+	if (attemptGeoloc >= MAX_GEOLOC_ATTEMPT) {
+		return undefined;
+	}
+
+	const resLongLat = await fetch((import.meta.env.PUBLIC_ENV__SRV_URL) + '/api/geoloc')
+		.then(response => response.json())
+		.then(data => {
+			if (data.latitude && data.longitude) {
+				return [data.longitude, data.latitude] as [number, number];
+			}
+			return undefined;
+		})
+		.catch(() => undefined);
+
+	if (resLongLat) {
+		userCoordinates = resLongLat;
+		return resLongLat;
+	}
+}
+
 class MapboxClient {
 	private apiKey: string;
-	private sessionToken: string;
 
 	constructor(apiKey: string) {
 		this.apiKey = apiKey;
-		this.sessionToken = this.generateRandomString(32);
 	}
 
-	private generateRandomString(length: number): string {
-		const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-		let result = '';
-		for (let i = 0; i < length; i++) {
-			result += chars.charAt(Math.floor(Math.random() * chars.length));
-		}
-		return result;
-	}
 
 	async getSuggestions(query: string): Promise<MapboxFeature[]> {
 		if (!query || query.length < 3) {
 			return [];
 		}
 
+		const url = new URL(`https://api.mapbox.com/search/geocode/v6/forward`);
+
+		url.searchParams.append('access_token', this.apiKey);
+		url.searchParams.append('q', query);
+		url.searchParams.append('autocomplete', 'true');
+		url.searchParams.append('country', 'FR');
+		url.searchParams.append('language', 'fr');
+		url.searchParams.append('format', 'v5');
+
+		const longLat = await getUserCoordinates();
+		if (longLat) {
+			url.searchParams.append('proximity', `${longLat[0]},${longLat[1]}`);
+		}
+
 		try {
-			const response = await fetch(
-				`https://api.mapbox.com/geocoding/v5/mapbox.places/${encodeURIComponent(
-					query
-				)}.json?access_token=${this.apiKey}&country=fr&language=fr&types=address&autocomplete=true&session_token=${this.sessionToken}`
-			);
+			const response = await fetch(url.toString());
 			const data = await response.json() as MapboxResponse;
 			return data.features || [];
 		} catch (error) {

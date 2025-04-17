@@ -1,5 +1,5 @@
-import React, { useState, useRef, useEffect } from 'react';
-import { Input } from "@/components/ui/input";
+import React, {useState, useRef, useEffect} from 'react';
+import {Input} from "@/components/ui/input";
 import {
 	Command,
 	CommandEmpty,
@@ -7,7 +7,7 @@ import {
 	CommandItem,
 	CommandList
 } from "@/components/ui/command";
-import MapboxClient, { MapboxFeature } from "@/lib/mapbox";
+import MapboxClient, {MapboxFeature} from "@/lib/mapbox";
 import {ActionOrderState, OrderState} from "@/pages/order/reducer";
 import {cn} from "@/lib/utils";
 
@@ -115,6 +115,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 		}
 	};
 
+	const hasSuggestions = showSuggestions && suggestions.length > 0;
 	return (
 		<div className="space-y-4" ref={containerRef}>
 			<div className="relative">
@@ -124,12 +125,17 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 				<Input
 					type="text"
 					id="address_line_1"
-					autoComplete="off"
-					aria-autocomplete={"list"}
-					aria-expanded={showSuggestions && suggestions.length > 0}
+					autoCorrect="off"
+					aria-haspopup="listbox"
+					data-1p-ignore={true}
+					data-lpignore={true}
+					data-bwignore={true}
+					data-form-type={'address'}
+					autoCapitalize='off'
+					autoComplete={'address-line1'}
 					value={state.shipping.address_line1}
 					onChange={(e) => {
-						dispatcher({ type: 'update_shipping', data: { address_line1: e.target.value } });
+						dispatcher({type: 'update_shipping', data: {address_line1: e.target.value}});
 						setAddressSelected(false);
 					}}
 					placeholder="123 Rue de la Paix"
@@ -147,35 +153,29 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 					</p>
 				)}
 
-				{showSuggestions && (
+				{showSuggestions && suggestions.length > 0 && (
 					<div className="absolute w-full z-10 mt-1">
 						<Command className="border rounded-md shadow-md" onKeyDown={handleKeyDown}>
 							<CommandList>
-								{isLoading ? (
-									<CommandEmpty>Chargement des suggestions...</CommandEmpty>
-								) : suggestions.length === 0 ? (
-									<CommandEmpty>Aucune adresse trouvée</CommandEmpty>
-								) : (
-									<CommandGroup>
-										{suggestions.map((suggestion, index) => (
-											<CommandItem
-												key={suggestion.id}
-												value={suggestion.id}
-												onSelect={(value) => {
-													const selected = suggestions.find((s) => s.id === value);
-													if (selected) {
-														handleAddressSelect(selected);
-													}
-												}}
-												className={`cursor-pointer hover:bg-gray-100 ${
-													index === selectedIndex ? 'bg-gray-200' : ''
-												}`}
-											>
-												{suggestion.place_name}
-											</CommandItem>
-										))}
-									</CommandGroup>
-								)}
+								<CommandGroup>
+									{suggestions.map((suggestion, index) => (
+										<CommandItem
+											key={suggestion.id}
+											value={suggestion.id}
+											onSelect={(value) => {
+												const selected = suggestions.find((s) => s.id === value);
+												if (selected) {
+													handleAddressSelect(selected);
+												}
+											}}
+											className={`cursor-pointer hover:bg-gray-100 ${
+												index === selectedIndex ? 'bg-gray-200' : ''
+											}`}
+										>
+											{suggestion.place_name}
+										</CommandItem>
+									))}
+								</CommandGroup>
 							</CommandList>
 						</Command>
 					</div>
@@ -190,7 +190,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 					type="text"
 					id="address_line_2"
 					value={state.shipping.address_line2}
-					onChange={(e) => dispatcher({ type: 'update_shipping', data: { address_line2: e.target.value } })}
+					onChange={(e) => dispatcher({type: 'update_shipping', data: {address_line2: e.target.value}})}
 					placeholder="Apt 4B"
 					className={cn(state.errors.shipping?.address_line2 ? 'border-red-500 border-2' : '')}
 				/>
@@ -210,7 +210,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 						type="text"
 						id="postal_code"
 						value={state.shipping.postal_code}
-						onChange={(e) => dispatcher({ type: 'update_shipping', data: { postal_code: e.target.value } })}
+						onChange={(e) => dispatcher({type: 'update_shipping', data: {postal_code: e.target.value}})}
 						placeholder="75001"
 						className={cn(state.errors.shipping?.postal_code ? 'border-red-500 border-2' : '')}
 					/>
@@ -229,7 +229,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 						type="text"
 						id="city"
 						value={state.shipping.city}
-						onChange={(e) => dispatcher({ type: 'update_shipping', data: { city: e.target.value } })}
+						onChange={(e) => dispatcher({type: 'update_shipping', data: {city: e.target.value}})}
 						placeholder="Paris"
 						className={cn(state.errors.shipping?.city ? 'border-red-500 border-2' : '')}
 					/>

@@ -160,7 +160,7 @@ export default function PickupPointShippingForm({state, dispatcher}: PickupPoint
 	return (
 		<div className="space-y-6" ref={containerRef}>
 
-			{ state?.errors.shipping.pickup_point && (
+			{state?.errors.shipping.pickup_point && (
 				<p className="text-red-500 border-2 border-red-500 text-sm p-4 bg-red-50 rounded-md">
 					Veuillez sélectionner un point de retrait
 				</p>
@@ -174,10 +174,17 @@ export default function PickupPointShippingForm({state, dispatcher}: PickupPoint
 					</Label>
 				</div>
 				<Input
-					autoComplete="off"
 					type="text"
 					id="city"
 					value={city}
+					autoCorrect="off"
+					aria-haspopup="listbox"
+					data-1p-ignore={true}
+					data-lpignore={true}
+					data-bwignore={true}
+					data-form-type={'address'}
+					autoCapitalize='off'
+					autoComplete={'address-line1'}
 					onChange={(e) => {
 						setCity(e.target.value);
 						setAddressSelected(false);
@@ -193,46 +200,35 @@ export default function PickupPointShippingForm({state, dispatcher}: PickupPoint
 					className="w-full"
 				/>
 
-				{showSuggestions && (
+				{showSuggestions && suggestions.length > 0 && (
 					<div className="absolute w-full z-10 mt-1">
 						<Command className="border rounded-md shadow-md" onKeyDown={handleKeyDown}>
 							<CommandList>
-								{isLoading ? (
-									<CommandEmpty>
-										<div className="flex items-center justify-center py-2">
-											<LoaderCircle className="animate-spin h-5 w-5 text-emerald-500 mr-2"/>
-											<span>Chargement des suggestions...</span>
-										</div>
-									</CommandEmpty>
-								) : suggestions.length === 0 ? (
-									<CommandEmpty>Aucune ville trouvée</CommandEmpty>
-								) : (
-									<CommandGroup className="max-h-64 overflow-y-auto">
-										{suggestions.map((suggestion, index) => (
-											<CommandItem
-												key={`${suggestion.city}-${suggestion.zipCode}`}
-												value={`${suggestion.city}-${suggestion.zipCode}`}
-												onSelect={(value) => {
-													const selected = suggestions.find((s) => {
-														const [city, zipCode] = value.split('-');
-														return (
-															s.city === city &&
-															s.zipCode === zipCode
-														);
-													});
-													if (selected) {
-														handleAddressSelect(selected);
-													}
-												}}
-												className={`cursor-pointer hover:bg-gray-50 ${
-													index === selectedIndex ? 'bg-gray-100' : ''
-												}`}
-											>
-												{`${suggestion.city} (${suggestion.zipCode})`}
-											</CommandItem>
-										))}
-									</CommandGroup>
-								)}
+								<CommandGroup className="max-h-64 overflow-y-auto">
+									{suggestions.map((suggestion, index) => (
+										<CommandItem
+											key={`${suggestion.city}-${suggestion.zipCode}`}
+											value={`${suggestion.city}-${suggestion.zipCode}`}
+											onSelect={(value) => {
+												const selected = suggestions.find((s) => {
+													const [city, zipCode] = value.split('-');
+													return (
+														s.city === city &&
+														s.zipCode === zipCode
+													);
+												});
+												if (selected) {
+													handleAddressSelect(selected);
+												}
+											}}
+											className={`cursor-pointer hover:bg-gray-50 ${
+												index === selectedIndex ? 'bg-gray-100' : ''
+											}`}
+										>
+											{`${suggestion.city} (${suggestion.zipCode})`}
+										</CommandItem>
+									))}
+								</CommandGroup>
 							</CommandList>
 						</Command>
 					</div>

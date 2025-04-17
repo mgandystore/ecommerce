@@ -21,6 +21,18 @@ ENV RAILS_ENV="production" \
 # Throw-away build stage to reduce size of final image
 FROM base AS build
 
+
+# Wget GeoLite2-City.mmdb to perform geolocation
+ARG GEOLITE_CITY_NAME=GeoLite2-City_20250415
+ENV GEOLITE_CITY_NAME=${GEOLITE_CITY_NAME}
+
+RUN wget https://city.s3.fr-par.scw.cloud/${GEOLITE_CITY_NAME}.tar.gz && \
+    tar -xzf ${GEOLITE_CITY_NAME}.tar.gz && \
+    rm ${GEOLITE_CITY_NAME}.tar.gz && \
+    mkdir -p /usr/local/share/GeoIP && \
+    mv ${GEOLITE_CITY_NAME}/GeoLite2-City.mmdb /usr/local/share/GeoIP/GeoLite2-City.mmdb
+
+
 # Install packages needed to build gems and node modules
 RUN apt-get update -qq && \
     apt-get install --no-install-recommends -y build-essential git libpq-dev node-gyp pkg-config python-is-python3 && \
@@ -62,6 +74,7 @@ FROM base
 # Copy built artifacts: gems, application
 COPY --from=build "${BUNDLE_PATH}" "${BUNDLE_PATH}"
 COPY --from=build /rails /rails
+COPY --from=build /usr/local/share/GeoIP/GeoLite2-City.mmdb /rails/db/GeoLite2-City.mmdb
 
 RUN mkdir -p /rails/log /rails/tmp
 

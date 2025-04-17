@@ -47,6 +47,8 @@ Rails.application.routes.draw do
   delete "/api/orders/:id/promo_code", to: "order#remove_promo_code"
   get "/api/orders/:id", to: "order#show"
 
+  get "/api/geoloc", to: "geolocation#lookup"
+
   # =========================================================================
   # Dashboard
   # =========================================================================
