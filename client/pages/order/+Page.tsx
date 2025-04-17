@@ -215,7 +215,7 @@ export default function Page() {
 										placeholder="Code promo"
 										value={promoCode}
 										onChange={(e) => setPromoCode(e.target.value)}
-										className="bg-white h-12"
+										className="bg-white h-10 py-4"
 									/>
 									{promoError && <p className="text-red-500 text-sm py-1">{promoError}</p>}
 								</div>
@@ -224,7 +224,8 @@ export default function Page() {
 									onClick={applyPromo}
 									variant={'outline'}
 									loading={applyingPromo}
-									className="w-24 h-12 font-medium"
+									loadingText={''}
+									className="w-24 h-10 py-4 font-medium"
 								>
 									Appliquer
 								</Button>

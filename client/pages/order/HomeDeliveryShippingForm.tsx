@@ -120,7 +120,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 		<div className="space-y-4" ref={containerRef}>
 			<div className="relative">
 				<label htmlFor="address_line_1" className="block text-sm font-medium text-gray-700 mb-1">
-					Addresse Ligne 1
+					Adresse Ligne 1
 				</label>
 				<Input
 					type="text"
@@ -184,7 +184,7 @@ export default function HomeDeliveryShippingForm({state, dispatcher}: HomeDelive
 
 			<div>
 				<label htmlFor="address_line_2" className="block text-sm font-medium text-gray-700 mb-1">
-					Addresse Ligne 2
+					Adresse Ligne 2
 				</label>
 				<Input
 					type="text"
