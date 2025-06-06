@@ -60,7 +60,6 @@ module Dashboard
 
       if @product.changed? || product_params[:images].present? || params[:product][:images_to_delete].present?
         @product.save
-        Product::UpdateStripeProductJob.perform_later({ product_id: @product.id })
         flash[:success] = "Les informations du produit ont été mises à jour avec succès"
       end
 
@@ -103,7 +102,6 @@ module Dashboard
 
       if @product_variant.changed? || product_variant_params[:images].present? || params[:product_variant][:images_to_delete].present?
         @product_variant.save
-        Product::UpdateStripeProductJob.perform_later({ product_id: @product.id, variant_id: @product_variant.id })
         flash[:success] = "Les informations de la variante ont été mises à jour avec succès"
       end
 
