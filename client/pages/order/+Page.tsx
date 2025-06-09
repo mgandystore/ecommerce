@@ -274,7 +274,7 @@ export default function Page() {
 						</div>
 						<div className="flex items-center">
 							<Truck size={14} className="mr-1"/>
-							<span>Expédition sous 2 jours</span>
+                                                        <span>Expédition sous 2 jours ouvrés</span>
 						</div>
 					</div>
 				</div>
