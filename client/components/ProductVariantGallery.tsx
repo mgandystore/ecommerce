@@ -41,8 +41,9 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 	const [loadedImages, setLoadedImages] = useState<Set<number>>(new Set());
 
 	// Reference to Swiper instance
-	const mainSwiperRef = useRef<SwiperType | null>(null);
-	const fullscreenSwiperRef = useRef<SwiperType | null>(null);
+        const mainSwiperRef = useRef<SwiperType | null>(null);
+        const fullscreenSwiperRef = useRef<SwiperType | null>(null);
+        const containerRef = useRef<HTMLDivElement | null>(null);
 
 	// Helper function to get gallery images
 	const getGalleryImages = () => {
@@ -59,10 +60,10 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 	const [galleryImages, setGalleryImages] = useState<Image[]>(getGalleryImages());
 
 	// Check if device is mobile or tablet on mount and when window resizes
-	useEffect(() => {
-		const checkIfMobile = () => {
-			setIsMobile(window.innerWidth < 1024); // Using 1024px as the lg breakpoint
-		};
+        useEffect(() => {
+                const checkIfMobile = () => {
+                        setIsMobile(window.innerWidth < 1024); // Using 1024px as the lg breakpoint
+                };
 
 		// Initial check
 		checkIfMobile();
@@ -71,10 +72,24 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 		window.addEventListener('resize', checkIfMobile);
 
 		// Cleanup
-		return () => {
-			window.removeEventListener('resize', checkIfMobile);
-		};
-	}, []);
+                return () => {
+                        window.removeEventListener('resize', checkIfMobile);
+                };
+        }, []);
+
+        // Round container width to avoid sub-pixel transforms causing 1px artifacts
+        useEffect(() => {
+                const updateWidth = () => {
+                        if (containerRef.current) {
+                                containerRef.current.style.width = `${Math.round(containerRef.current.offsetWidth)}px`;
+                        }
+                };
+                updateWidth();
+                window.addEventListener('resize', updateWidth);
+                return () => {
+                        window.removeEventListener('resize', updateWidth);
+                };
+        }, []);
 
 	// Update gallery images when variant or images change
 	useEffect(() => {
@@ -259,7 +274,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 
 			{/* Main image container */}
                         <div className="flex-grow w-full">
-                                <div className="relative w-full aspect-square lg:aspect-auto lg:h-[80vh] bg-gray-100 overflow-hidden lg:rounded-md">
+                                <div ref={containerRef} className="relative w-full aspect-square lg:aspect-auto lg:max-h-[825px] bg-gray-100 overflow-hidden lg:rounded-md">
 					{/* Navigation buttons - only show if more than one image */}
 					{showNavigation && (
 						<>
@@ -321,28 +336,27 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 						))}
                                         </Swiper>
 
-                                        {showNavigation && (
-                                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
-                                                        {galleryImages.map((_, i) => (
-                                                                <span
-                                                                        key={`progress-${i}`}
-                                                                        className={`block w-4 h-0.5 rounded-full ${i === activeIndex ? 'bg-black' : 'bg-black/30'}`}
-                                                                />
-                                                        ))}
-                                                </div>
-                                        )}
-
                                         {/* Fullscreen button */}
-					<button
-						onClick={toggleFullscreen}
-						className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
-						aria-label="View fullscreen"
-					>
-						<Maximize2 className="w-5 h-5" />
-					</button>
-				</div>
-			</div>
-		</div>
+                                        <button
+                                                onClick={toggleFullscreen}
+                                                className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
+                                                aria-label="View fullscreen"
+                                        >
+                                                <Maximize2 className="w-5 h-5" />
+                                        </button>
+                                </div>
+                                {showNavigation && (
+                                        <div className="flex justify-center space-x-1 mt-2">
+                                                {galleryImages.map((_, i) => (
+                                                        <span
+                                                                key={`progress-${i}`}
+                                                                className={`block w-4 h-0.5 rounded-full ${i === activeIndex ? 'bg-black' : 'bg-black/30'}`}
+                                                        />
+                                                ))}
+                                        </div>
+                                )}
+                        </div>
+                </div>
 	);
 
 	// Fullscreen render
