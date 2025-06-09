@@ -230,7 +230,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
                                                 watchSlidesProgress={true}
                                                 modules={[FreeMode]}
                                                 roundLengths={true}
-                                                className="h-96 !w-full"
+                                               className="h-96 !w-full overflow-hidden"
                                         >
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
@@ -289,7 +289,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
                                                 roundLengths={true}
                                                onSlideChange={handleSlideChange}
                                                initialSlide={activeIndex}
-                                               className="!w-full !h-full"
+                                               className="!w-full !h-full overflow-hidden"
 					>
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`main-${index}`} className="!w-full !h-full !overflow-hidden">
@@ -384,7 +384,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
                                                 initialSlide={activeIndex}
                                                 roundLengths={true}
                                                 onSlideChange={handleSlideChange}
-                                                className="w-full h-full"
+                                               className="w-full h-full overflow-hidden"
                                         >
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`fs-slide-${index}`} className="!w-full !h-full flex items-center justify-center">
