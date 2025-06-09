@@ -220,17 +220,18 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 			{/* Thumbnails - vertical on desktop (lg and above), hidden on smaller screens */}
 			{showNavigation && (
 				<div className="hidden lg:block relative flex-shrink-0 w-20">
-					<Swiper
-						onSwiper={setThumbsSwiper}
-						direction="vertical"
-						spaceBetween={8}
-						slidesPerView={5}
-						freeMode={true}
-						loop={true}
-						watchSlidesProgress={true}
-						modules={[FreeMode]}
-						className="h-96 !w-full"
-					>
+                                        <Swiper
+                                                onSwiper={setThumbsSwiper}
+                                                direction="vertical"
+                                                spaceBetween={8}
+                                                slidesPerView={5}
+                                                freeMode={true}
+                                                loop={true}
+                                                watchSlidesProgress={true}
+                                                modules={[FreeMode]}
+                                                roundLengths={true}
+                                                className="h-96 !w-full"
+                                        >
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
 								<div
@@ -284,10 +285,11 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 							mainSwiperRef.current = swiper;
 						}}
 						thumbs={{ swiper: showNavigation && !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-						modules={[Thumbs]}
-						onSlideChange={handleSlideChange}
-						initialSlide={activeIndex}
-						className="!w-full !h-full"
+                                               modules={[Thumbs]}
+                                                roundLengths={true}
+                                               onSlideChange={handleSlideChange}
+                                               initialSlide={activeIndex}
+                                               className="!w-full !h-full"
 					>
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`main-${index}`} className="!w-full !h-full !overflow-hidden">
@@ -375,14 +377,15 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 
 				<div className="w-full h-full flex items-center justify-center">
 					{/* Add a separate Swiper for fullscreen view */}
-					<Swiper
-						onSwiper={(swiper) => {
-							fullscreenSwiperRef.current = swiper;
-						}}
-						initialSlide={activeIndex}
-						onSlideChange={handleSlideChange}
-						className="w-full h-full"
-					>
+                                        <Swiper
+                                                onSwiper={(swiper) => {
+                                                        fullscreenSwiperRef.current = swiper;
+                                                }}
+                                                initialSlide={activeIndex}
+                                                roundLengths={true}
+                                                onSlideChange={handleSlideChange}
+                                                className="w-full h-full"
+                                        >
 						{galleryImages.map((image, index) => (
 							<SwiperSlide key={`fs-slide-${index}`} className="!w-full !h-full flex items-center justify-center">
 								<div className="relative max-h-full max-w-full flex items-center justify-center">
