@@ -10,8 +10,8 @@ const iconMap : Record<string, React.FC<React.SVGProps<SVGSVGElement>>> = {
 };
 
 export function ProductReassurance() {
-	const features = [
-		{ icon: 'truck', text: "Expédition sous 24h" },
+        const features = [
+                { icon: 'truck', text: "Expédition sous 2 jours ouvrés" },
 		{ icon: 'shield', text: "Garantie 2 ans" },
 		{ icon: 'rotate-ccw', text: "Retour 30 jours" },
 		{ icon: 'lock', text: "Paiement sécurisé" }
@@ -37,7 +37,7 @@ export function FooterReassurance() {
 		{
 			icon: 'truck',
 			title: 'Livraison rapide',
-			text: 'Expédition sous 24h pour toutes les commandes'
+                        text: 'Expédition sous 2 jours ouvrés pour toutes les commandes'
 		},
 		{
 			icon: 'shield',
