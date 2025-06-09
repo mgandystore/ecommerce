@@ -2,13 +2,13 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Maximize2, X, ChevronLeft, ChevronRight } from 'lucide-react';
 // Import Swiper and required modules
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { Thumbs, Pagination, FreeMode } from 'swiper/modules';
+import { Thumbs, FreeMode, Zoom } from 'swiper/modules';
 import { Swiper as SwiperType } from 'swiper';
 // Import Swiper styles
 import 'swiper/css';
-import 'swiper/css/pagination';
 import 'swiper/css/thumbs';
 import 'swiper/css/free-mode';
+import 'swiper/css/zoom';
 
 // Define types for image structure
 type Image = {
@@ -227,8 +227,9 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 						slidesPerView={5}
 						freeMode={true}
 						loop={true}
-						watchSlidesProgress={true}
-						modules={[FreeMode]}
+                                                watchSlidesProgress={true}
+                                                roundLengths={true}
+                                                modules={[FreeMode]}
 						className="h-96 !w-full"
 					>
 						{galleryImages.map((image, index) => (
@@ -243,16 +244,17 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 										}
 									}}
 								>
-									<img
-										src={image.url_thumb || image.url}
-										alt={`Thumbnail ${index + 1}`}
-										className="w-full h-full object-cover"
-									/>
+                                                                       <img
+                                                                               src={image.url_thumb || image.url}
+                                                                               alt={`Thumbnail ${index + 1}`}
+                                                                               className="w-full h-full object-cover block"
+                                                                       />
 								</div>
 							</SwiperSlide>
 						))}
-					</Swiper>
-				</div>
+                                        </Swiper>
+
+                                </div>
 			)}
 
 			{/* Main image container */}
@@ -279,51 +281,57 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 						</>
 					)}
 
-					<Swiper
-						onSwiper={(swiper) => {
-							mainSwiperRef.current = swiper;
-						}}
-						thumbs={{ swiper: showNavigation && !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
-						modules={[Thumbs]}
-						onSlideChange={handleSlideChange}
-						initialSlide={activeIndex}
-						className="!w-full !h-full"
-					>
+                                        <Swiper
+                                                onSwiper={(swiper) => {
+                                                        mainSwiperRef.current = swiper;
+                                                }}
+                                                thumbs={{ swiper: showNavigation && !isMobile && thumbsSwiper && !thumbsSwiper.destroyed ? thumbsSwiper : null }}
+                                                modules={[Thumbs, Zoom]}
+                                                zoom={{ maxRatio: 3 }}
+                                                roundLengths={true}
+                                                onSlideChange={handleSlideChange}
+                                                initialSlide={activeIndex}
+                                                className="!w-full !h-full"
+                                        >
 						{galleryImages.map((image, index) => (
-							<SwiperSlide key={`main-${index}`} className="!w-full !h-full !overflow-hidden">
-								<div className="relative w-full h-full">
-									{/* Blur image shown only during loading */}
-									{isLoading && activeIndex === index && image.url_blur && (
-										<div className="absolute inset-0">
-											<img
-												src={image.url_blur}
-												alt={image.alt || `Product image ${index + 1}`}
-												className="w-full h-full object-cover lg:rounded-md"
-											/>
-										</div>
-									)}
+                                                       <SwiperSlide key={`main-${index}`} className="!w-full !h-full !overflow-hidden bg-white">
+                                                               <div className="swiper-zoom-container relative w-full h-full overflow-hidden">
+                                                                        {/* Blur image shown only during loading */}
+                                                                        {isLoading && activeIndex === index && image.url_blur && (
+                                                                       <div className="absolute inset-0">
+                                                                       <img
+                                                                               src={image.url_blur}
+                                                                               alt={image.alt || `Product image ${index + 1}`}
+                                                                               className="w-full h-full object-cover lg:rounded-md block"
+                                                                       />
+                                                                       </div>
+                                                                        )}
 
 									{/* Large image */}
-									<img
-										src={image.url_large || image.url}
-										alt={image.alt || `Product image ${index + 1}`}
-										className={`w-full h-full object-cover lg:rounded-md transition-opacity duration-300 ${
-											isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
-										}`}
-									/>
-								</div>
-							</SwiperSlide>
+                                                                       <img
+                                                                               src={image.url_large || image.url}
+                                                                               alt={image.alt || `Product image ${index + 1}`}
+                                                                               className={`swiper-zoom-target w-full h-full object-cover lg:rounded-md transition-opacity duration-300 block ${
+                                                                               isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
+                                                                               }`}
+                                                                       />
+                                                                </div>
+                                                        </SwiperSlide>
 						))}
-					</Swiper>
+                                        </Swiper>
 
-					{/* Image counter - only show if more than one image */}
-					{showNavigation && (
-						<div className="absolute bottom-2 left-2 bg-black/60 text-white px-2 py-1 rounded text-sm z-10">
-							{activeIndex + 1} / {galleryImages.length}
-						</div>
-					)}
+                                        {showNavigation && (
+                                                <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
+                                                        {galleryImages.map((_, i) => (
+                                                                <span
+                                                                        key={`progress-${i}`}
+                                                                        className={`block w-4 h-0.5 rounded-full ${i === activeIndex ? 'bg-black' : 'bg-black/30'}`}
+                                                                />
+                                                        ))}
+                                                </div>
+                                        )}
 
-					{/* Fullscreen button */}
+                                        {/* Fullscreen button */}
 					<button
 						onClick={toggleFullscreen}
 						className="cursor-pointer absolute top-2 right-2 bg-white/80 p-2 rounded-full shadow hover:bg-white transition-colors z-10"
@@ -375,49 +383,57 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 
 				<div className="w-full h-full flex items-center justify-center">
 					{/* Add a separate Swiper for fullscreen view */}
-					<Swiper
-						onSwiper={(swiper) => {
-							fullscreenSwiperRef.current = swiper;
-						}}
-						initialSlide={activeIndex}
-						onSlideChange={handleSlideChange}
-						className="w-full h-full"
-					>
+                                        <Swiper
+                                                onSwiper={(swiper) => {
+                                                        fullscreenSwiperRef.current = swiper;
+                                                }}
+                                                initialSlide={activeIndex}
+                                                onSlideChange={handleSlideChange}
+                                                modules={[Zoom]}
+                                                zoom={{ maxRatio: 3 }}
+                                                roundLengths={true}
+                                                className="w-full h-full"
+                                        >
 						{galleryImages.map((image, index) => (
-							<SwiperSlide key={`fs-slide-${index}`} className="!w-full !h-full flex items-center justify-center">
-								<div className="relative max-h-full max-w-full flex items-center justify-center">
+                                                       <SwiperSlide key={`fs-slide-${index}`} className="!w-full !h-full flex items-center justify-center bg-black">
+                                                               <div className="swiper-zoom-container relative max-h-full max-w-full flex items-center justify-center overflow-hidden">
 									{/* Blur image in fullscreen (shown only during loading) */}
 									{isLoading && activeIndex === index && image.url_blur && (
 										<div className="absolute inset-0 flex items-center justify-center">
-											<img
-												src={image.url_blur}
-												alt={image.alt || `Product image ${index + 1}`}
-												className="max-h-full max-w-full object-contain mx-auto"
-												style={{ filter: 'blur(8px)' }}
-											/>
+                                                                               <img
+                                                                               src={image.url_blur}
+                                                                               alt={image.alt || `Product image ${index + 1}`}
+                                                                               className="max-h-full max-w-full object-contain mx-auto block"
+                                                                               style={{ filter: 'blur(8px)' }}
+                                                                               />
 										</div>
 									)}
 
 									{/* Large image in fullscreen */}
-									<img
-										src={image.url_large || image.url}
-										alt={image.alt || `Product image ${index + 1}`}
-										className={`max-h-full max-w-full object-contain mx-auto transition-opacity duration-300 ${
-											isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
-										}`}
-									/>
+                                                                        <img
+                                                                               src={image.url_large || image.url}
+                                                                               alt={image.alt || `Product image ${index + 1}`}
+                                                                               className={`swiper-zoom-target max-h-full max-w-full object-contain mx-auto transition-opacity duration-300 block ${
+                                                                               isLoading && activeIndex === index ? 'opacity-0' : 'opacity-100'
+                                                                               }`}
+                                                                        />
 								</div>
 							</SwiperSlide>
 						))}
-					</Swiper>
-				</div>
+                                        </Swiper>
 
-				{/* Image counter in fullscreen - only show if more than one image */}
-				{showNavigation && (
-					<div className="absolute bottom-4 left-4 bg-black/60 text-white px-3 py-2 rounded text-sm z-10">
-						{activeIndex + 1} / {galleryImages.length}
-					</div>
-				)}
+                                        {showNavigation && (
+                                                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex space-x-1 z-10">
+                                                        {galleryImages.map((_, i) => (
+                                                                <span
+                                                                        key={`fs-progress-${i}`}
+                                                                        className={`block w-6 h-0.5 rounded-full ${i === activeIndex ? 'bg-white' : 'bg-white/40'}`}
+                                                                />
+                                                        ))}
+                                                </div>
+                                        )}
+                                </div>
+
 			</div>
 
 			{/* Fullscreen thumbnails - only show if more than one image */}
@@ -436,11 +452,11 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 									index === activeIndex ? 'border-white' : 'border-transparent'
 								}`}
 							>
-								<img
-									src={image.url_thumb || image.url}
-									alt={`Thumbnail ${index + 1}`}
-									className="w-full h-full object-cover"
-								/>
+                                                                <img
+                                                                        src={image.url_thumb || image.url}
+                                                                        alt={`Thumbnail ${index + 1}`}
+                                                                        className="w-full h-full object-cover block"
+                                                                />
 							</button>
 						))}
 					</div>
