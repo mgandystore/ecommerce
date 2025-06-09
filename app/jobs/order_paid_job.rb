@@ -13,10 +13,19 @@ class OrderPaidJob < ApplicationJob
       pi = Stripe::PaymentIntent.retrieve(stripe_payment_intent_id)
 
       if pi.status == "succeeded"
-        order.update!(
-          status: "paid",
-          paid_at: Time.current
-        )
+        ActiveRecord::Base.transaction do
+          order.update!(
+            status: "paid",
+            paid_at: Time.current
+          )
+
+          order.order_items.includes(:product_variant).each do |item|
+            variant = item.product_variant
+            variant.lock!
+            variant.update!(stock: variant.stock - item.quantity)
+          end
+        end
+
         OrderMailer.order_created(order.id).deliver_later
       end
     rescue Stripe::StripeError => e
