@@ -7,20 +7,20 @@ module Dashboard
                   .order(Arel.sql("paid_at DESC NULLS LAST"))
                   .order(id: :desc)
 
-      # Only count paid orders for total statistics
-      @total_orders = Order.paid.count
+      # Count order paid at not null
+      @total_orders = Order.where.not(paid_at: nil).count
 
-      @orders_this_month = Order.paid.where("created_at >= ?", Time.current.beginning_of_month).count
+      @orders_this_month = Order.where.not(paid_at: nil).where("created_at >= ?", Time.current.beginning_of_month).count
 
       # Average shipping duration for paid and shipped orders
-      @avg_shipping_duration = Order.paid
+      @avg_shipping_duration = Order.where.not(paid_at: nil)
                                     .where.not(shipped_at: nil)
                                     .average("EXTRACT(EPOCH FROM shipped_at - paid_at)").to_i
 
       # Best variant calculation - only considering paid orders and factoring in quantity
       best_variant = OrderItem
                        .joins(:order)
-                       .where(orders: { status: "paid" }) # Assuming 'paid' is the status for paid orders
+                       .where.not(orders: { paid_at: nil })
                        .select("product_variant_id, SUM(quantity) as total_quantity")
                        .group(:product_variant_id)
                        .order("total_quantity DESC")
