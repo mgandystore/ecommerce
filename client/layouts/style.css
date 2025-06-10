@@ -1,0 +1,5 @@
+.swiper-zoom-container > img,
+.swiper-zoom-container > svg,
+.swiper-zoom-container > canvas {
+  object-fit: cover !important;
+}
