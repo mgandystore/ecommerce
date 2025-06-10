@@ -9,7 +9,7 @@ import orangeCropped from "@/assets/variant_colors/orange_cropped.webp";
 import roseCropped from "@/assets/variant_colors/rose_cropped.webp";
 import vertCropped from "@/assets/variant_colors/vert_cropped.webp";
 import violetCropped from "@/assets/variant_colors/violet_cropped.webp";
-import ProductVariantGallery from "@/components/ProductVariantGallery";
+import ProductGallery from "@/components/ProductGallery";
 import ReviewsSection from "@/pages/index/ReviewSection";
 import FAQSection from "@/pages/index/FAQSection";
 import {FooterReassurance, ProductReassurance} from "@/pages/index/Reassurance";
@@ -87,21 +87,19 @@ export default function Page() {
 			<section className="bg-gray-50 py-24 px-6 max-lg:pb-8 max-lg:pt-0 max-lg:px-0">
 				{/* Full-width gallery for mobile and tablet */}
 				<div className="lg:hidden w-full">
-					<ProductVariantGallery
-						images={home.images}
-						variant={currentProductVariant?.variants_slug ?? ''}
-					/>
+                                        <ProductGallery
+                                                images={{ product_images: home.images.product_images }}
+                                        />
 				</div>
 
 				<Container className="max-lg:mt-8 max-lg:px-6">
 					<div className="grid grid-cols-5 gap-12 max-lg:grid-cols-1 max-sm:gap-4">
 						{/* Product gallery (hidden on mobile and tablet) */}
-						<div className="col-span-3 max-lg:hidden">
-							<ProductVariantGallery
-								images={home.images}
-								variant={currentProductVariant?.variants_slug ?? ''}
-							/>
-						</div>
+                                                <div className="col-span-3 max-lg:hidden">
+                                                        <ProductGallery
+                                                                images={{ product_images: home.images.product_images }}
+                                                        />
+                                                </div>
 
 						{/* Product info */}
 						<article className="col-span-2 max-lg:col-span-1">
