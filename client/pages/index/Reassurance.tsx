@@ -37,7 +37,7 @@ export function FooterReassurance() {
 		{
 			icon: 'truck',
 			title: 'Livraison rapide',
-                        text: 'Expédition sous 2 jours ouvrés pour toutes les commandes'
+                        text: 'Expédition sous 2 jours ouvrés'
 		},
 		{
 			icon: 'shield',
