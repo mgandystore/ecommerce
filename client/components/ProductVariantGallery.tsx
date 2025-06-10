@@ -1,4 +1,4 @@
-import React, { useMemo, useRef, useState } from "react";
+import React, { useMemo, useRef, useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Swiper as SwiperType } from "swiper";
@@ -39,6 +39,11 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
     const defaultImages = images.product_images || [];
     return [...variantImages, ...defaultImages];
   }, [images, variant]);
+
+  useEffect(() => {
+    setActiveIndex(0);
+    mainSwiperRef.current?.slideToLoop(0);
+  }, [galleryImages]);
 
   if (!galleryImages.length) {
     return (
