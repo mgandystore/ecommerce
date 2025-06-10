@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useEffect, useState } from "react";
 
 const loadedImages = new Map<string, boolean>();
 
@@ -9,11 +9,20 @@ interface LazyImageProps {
   className?: string;
 }
 
-const LazyImage: React.FC<LazyImageProps> = ({ src, blurSrc, alt, className }) => {
+const LazyImage: React.FC<LazyImageProps> = ({
+  src,
+  blurSrc,
+  alt,
+  className,
+}) => {
   const [loaded, setLoaded] = useState(() => loadedImages.get(src) ?? false);
 
-  const loadFullImage = useCallback(() => {
-    if (loadedImages.get(src)) return;
+  useEffect(() => {
+    if (loadedImages.get(src)) {
+      setLoaded(true);
+      return;
+    }
+
     const img = new Image();
     img.src = src;
     img.onload = () => {
@@ -22,27 +31,12 @@ const LazyImage: React.FC<LazyImageProps> = ({ src, blurSrc, alt, className }) =
     };
   }, [src]);
 
-  useEffect(() => {
-    if (!blurSrc && !loadedImages.get(src)) {
-      loadFullImage();
-    } else if (loadedImages.get(src)) {
-      setLoaded(true);
-    }
-  }, [src, blurSrc, loadFullImage]);
-
-  const handleBlurLoad = () => {
-    if (!loadedImages.get(src)) {
-      loadFullImage();
-    }
-  };
-
   return (
     <img
-      src={loaded ? src : blurSrc ?? src}
+      src={loaded ? src : (blurSrc ?? src)}
       alt={alt}
       loading="lazy"
-      className={className}
-      onLoad={!loaded && blurSrc ? handleBlurLoad : undefined}
+      className={className ? `object-cover ${className}` : "object-cover"}
     />
   );
 };

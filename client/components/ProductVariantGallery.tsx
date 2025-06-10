@@ -1,54 +1,54 @@
-import React, { useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight } from 'lucide-react'
-import { Swiper, SwiperSlide } from 'swiper/react'
-import { Swiper as SwiperType } from 'swiper'
-import { Thumbs, FreeMode, Zoom, Scrollbar } from 'swiper/modules'
-import 'swiper/css'
-import 'swiper/css/free-mode'
-import 'swiper/css/thumbs'
-import 'swiper/css/zoom'
-import 'swiper/css/scrollbar'
-import LazyImage from './LazyImage'
+import React, { useMemo, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Swiper as SwiperType } from "swiper";
+import { Thumbs, FreeMode, Zoom, Scrollbar } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/free-mode";
+import "swiper/css/thumbs";
+import "swiper/css/zoom";
+import "swiper/css/scrollbar";
+import LazyImage from "./LazyImage";
 
 type Image = {
-  url: string
-  url_thumb: string
-  url_medium: string
-  url_large: string
-  url_blur: string
-  alt: string
-}
+  url: string;
+  url_thumb: string;
+  url_medium: string;
+  url_large: string;
+  url_blur: string;
+  alt: string;
+};
 
-type Images = Record<string, Image[]>
+type Images = Record<string, Image[]>;
 
 interface ProductVariantGalleryProps {
-  images: Images
-  variant?: string
+  images: Images;
+  variant?: string;
 }
 
 const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
   images,
-  variant = 'product_images',
+  variant = "product_images",
 }) => {
-  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null)
-  const mainSwiperRef = useRef<SwiperType | null>(null)
-  const [activeIndex, setActiveIndex] = useState(0)
+  const [thumbsSwiper, setThumbsSwiper] = useState<SwiperType | null>(null);
+  const mainSwiperRef = useRef<SwiperType | null>(null);
+  const [activeIndex, setActiveIndex] = useState(0);
 
   const galleryImages = useMemo(() => {
-    const variantImages = variant && images[variant] ? images[variant] : []
-    const defaultImages = images.product_images || []
-    return [...variantImages, ...defaultImages]
-  }, [images, variant])
+    const variantImages = variant && images[variant] ? images[variant] : [];
+    const defaultImages = images.product_images || [];
+    return [...variantImages, ...defaultImages];
+  }, [images, variant]);
 
   if (!galleryImages.length) {
     return (
       <div className="w-full h-64 bg-gray-100 flex items-center justify-center">
         <p className="text-gray-500">No images available</p>
       </div>
-    )
+    );
   }
 
-  const showNavigation = galleryImages.length > 1
+  const showNavigation = galleryImages.length > 1;
 
   return (
     <div className="w-full flex flex-col lg:flex-row gap-4">
@@ -65,10 +65,15 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
             className="h-96 !w-full"
           >
             {galleryImages.map((image, index) => (
-              <SwiperSlide key={`thumb-${index}`} className="cursor-pointer !w-full !h-auto">
+              <SwiperSlide
+                key={`thumb-${index}`}
+                className="cursor-pointer !w-full !h-auto"
+              >
                 <div
                   className={`w-16 h-16 rounded-md overflow-hidden border-2 ${
-                    index === activeIndex ? 'border-black' : 'border-transparent'
+                    index === activeIndex
+                      ? "border-black"
+                      : "border-transparent"
                   }`}
                   onClick={() => mainSwiperRef.current?.slideToLoop(index)}
                 >
@@ -107,10 +112,11 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
 
           <Swiper
             onSwiper={(swiper) => {
-              mainSwiperRef.current = swiper
+              mainSwiperRef.current = swiper;
             }}
             thumbs={{ swiper: thumbsSwiper }}
             modules={[Thumbs, Zoom, Scrollbar]}
+            spaceBetween={10}
             onSlideChange={(swiper) => setActiveIndex(swiper.realIndex)}
             loop
             zoom
@@ -118,7 +124,10 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
             className="!w-full !h-full"
           >
             {galleryImages.map((image, index) => (
-              <SwiperSlide key={`slide-${index}`} className="!w-full !h-full !overflow-hidden">
+              <SwiperSlide
+                key={`slide-${index}`}
+                className="!w-full !h-full !overflow-hidden"
+              >
                 <div className="relative w-full h-full swiper-zoom-container">
                   <LazyImage
                     src={image.url_large || image.url}
@@ -133,7 +142,7 @@ const ProductVariantGallery: React.FC<ProductVariantGalleryProps> = ({
         </div>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ProductVariantGallery
+export default ProductVariantGallery;
