@@ -194,7 +194,7 @@ class OrderController < ApplicationController
 
     # Process customer if provided
     if params[:customer].present?
-      customer_params = params.require(:customer).permit(:email, :full_name, :phone)
+      customer_params = params.require(:customer).permit(:email, :full_name, :phone, :referral_source)
       customer_validator = CustomerForm.new(customer_params)
 
       unless customer_validator.valid?
@@ -223,41 +223,51 @@ class OrderController < ApplicationController
       order.update!(carrier_name: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo")
       price = order.compute_pricing
 
-      update_payment_intent = {
-        amount: price[:total],
-        currency: "eur",
-        metadata: {
-          order_id: order.id,
-          order_items: order.order_items.map { |item| item.product_variant_id }.join(","),
-          shipping_address_id: order.shipping_address_id,
-          customer_id: order.customer_id,
-          is_pickup_point: order.shipping_address.pickup_point?,
-        },
-        shipping: {
-          address: {
-            line1: order.shipping_address.address_line1,
-            line2: order.shipping_address.address_line2,
-            city: order.shipping_address.city,
-            postal_code: order.shipping_address.postal_code,
-            country: order.shipping_address.country,
-          },
-          name: order.customer.full_name,
-          phone: order.customer.phone,
-          carrier: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo"
-        }
-      }
+      # Check if PaymentIntent is already succeeded
+      payment_intent = Stripe::PaymentIntent.retrieve(order.stripe_payment_intent_id)
 
-      if price[:discount].present?
-        update_payment_intent[:metadata][:promo_code] = price[:promo_code][:code]
-        update_payment_intent[:metadata][:discount_amount] = price[:discount]
+      if payment_intent.status != "succeeded"
+        # Only update PaymentIntent if it hasn't been paid yet
+        update_payment_intent = {
+          amount: price[:total],
+          currency: "eur",
+          metadata: {
+            order_id: order.id,
+            order_items: order.order_items.map { |item| item.product_variant_id }.join(","),
+            shipping_address_id: order.shipping_address_id,
+            customer_id: order.customer_id,
+            is_pickup_point: order.shipping_address.pickup_point?,
+          },
+          shipping: {
+            address: {
+              line1: order.shipping_address.address_line1,
+              line2: order.shipping_address.address_line2,
+              city: order.shipping_address.city,
+              postal_code: order.shipping_address.postal_code,
+              country: order.shipping_address.country,
+            },
+            name: order.customer.full_name,
+            phone: order.customer.phone,
+            carrier: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo"
+          }
+        }
+
+        if price[:discount].present?
+          update_payment_intent[:metadata][:promo_code] = price[:promo_code][:code]
+          update_payment_intent[:metadata][:discount_amount] = price[:discount]
+        end
+
+        Stripe::PaymentIntent.update(
+          order.stripe_payment_intent_id,
+          update_payment_intent
+        )
+      else
+        # Payment already succeeded, update order status
+        order.update!(status: :paid)
       end
 
-      Stripe::PaymentIntent.update(
-        order.stripe_payment_intent_id,
-        update_payment_intent
-      )
-
     rescue StandardError => e
+      Rails.logger.error("Failed to update payment intent: #{e.message}")
       return render json: { error: "failed_updating_attributes" }, status: :unprocessable_entity
     end
 
@@ -337,6 +347,7 @@ class OrderController < ApplicationController
         email: customer.email,
         full_name: customer.full_name,
         phone: customer.phone,
+        referral_source: customer.referral_source,
       )
     rescue StandardError => e
       Rails.logger.error("Failed to create customer: #{e.message}")
@@ -380,6 +391,7 @@ class CustomerForm
   attribute :email, :string
   attribute :full_name, :string
   attribute :phone, :string
+  attribute :referral_source, :string
 
   validates :email, :full_name, :phone, presence: true
   validates :email, format: { with: URI::MailTo::EMAIL_REGEXP }

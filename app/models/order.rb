@@ -5,6 +5,7 @@ class Order < ApplicationRecord
   belongs_to :customer, optional: true
   belongs_to :shipping_address, class_name: "Address", optional: true
   before_save :update_status_timestamp, if: :status_changed?
+  after_save :send_order_paid_email, if: :saved_change_to_status_to_paid?
   enum :status, {
     paid: "paid",
     shipped: "shipped",
@@ -14,6 +15,14 @@ class Order < ApplicationRecord
 
   def update_status_timestamp
     self[:"#{status}_at"] = Time.current if self.respond_to?(:"#{status}_at")
+  end
+
+  def saved_change_to_status_to_paid?
+    saved_change_to_status? && status == "paid"
+  end
+
+  def send_order_paid_email
+    OrderMailer.order_paid(self.id).deliver_later
   end
 
   def human_address

@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvelle commande payée</title>
+
+    <style>
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          background-color: #f6f9fc;
+          color: #32325d;
+      }
+      .container {
+          max-width: 680px;
+          margin: 40px auto;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+      }
+      .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 32px;
+          text-align: center;
+      }
+      .header h1 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 500;
+      }
+      .header .order-id {
+          margin-top: 8px;
+          font-size: 14px;
+          opacity: 0.9;
+      }
+      .content {
+          padding: 32px;
+      }
+      .alert-box {
+          background-color: #fff8e1;
+          border-left: 4px solid #ffc107;
+          padding: 16px;
+          margin-bottom: 32px;
+          border-radius: 4px;
+          font-weight: 500;
+      }
+      .section {
+          margin-bottom: 32px;
+          padding-bottom: 24px;
+          border-bottom: 1px solid #e6ebf1;
+      }
+      .section:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+          margin-bottom: 0;
+      }
+      .section-title {
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #8898aa;
+          margin-bottom: 16px;
+      }
+      .info-grid {
+          display: table;
+          width: 100%;
+      }
+      .info-row {
+          display: table-row;
+      }
+      .info-label,
+      .info-value {
+          display: table-cell;
+          padding: 8px 0;
+          font-size: 15px;
+      }
+      .info-label {
+          color: #8898aa;
+          width: 40%;
+      }
+      .info-value {
+          color: #32325d;
+          font-weight: 500;
+      }
+      .payment-section .info-row:last-child {
+          border-top: 2px solid #32325d;
+          font-weight: 600;
+          font-size: 16px;
+      }
+      .payment-section .info-row:last-child .info-label,
+      .payment-section .info-row:last-child .info-value {
+          padding-top: 16px;
+          color: #32325d;
+      }
+      .stripe-link {
+          color: #635bff;
+          text-decoration: none;
+          word-break: break-all;
+      }
+      .stripe-link:hover {
+          text-decoration: underline;
+      }
+      .footer {
+          background-color: #f6f9fc;
+          padding: 24px 32px;
+          text-align: center;
+          font-size: 13px;
+          color: #8898aa;
+      }
+  </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Nouvelle commande payée</h1>
+        <div class="order-id">Commande #<%= @order_number %></div>
+      </div>
+
+      <div class="content">
+        <div class="alert-box">
+          Cette commande est prête à être expédiée
+        </div>
+
+        <div class="section">
+          <div class="section-title">Produit</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Variante</div>
+              <div class="info-value"><%= @variant_human %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Client</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Nom complet</div>
+              <div class="info-value"><%= @client_name %></div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Email</div>
+              <div class="info-value"><%= @client_email %></div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Téléphone</div>
+              <div class="info-value"><%= @client_phone %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section payment-section">
+          <div class="section-title">Paiement</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Sous-total</div>
+
+              <div class="info-value">
+                <%= sprintf("%.2f €", @pricing[:items] / 100.0) %>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Frais de livraison</div>
+
+              <div class="info-value">
+                <%= sprintf("%.2f €", @pricing[:shipping] / 100.0) %>
+              </div>
+            </div>
+
+            <% if @pricing[:discount] && @pricing[:discount] > 0 %>
+              <div class="info-row">
+                <div class="info-label">Réduction</div>
+
+                <div class="info-value">
+                  -<%= sprintf("%.2f €", @pricing[:discount] / 100.0) %>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="info-row">
+              <div class="info-label">Total</div>
+
+              <div class="info-value">
+                <%= sprintf("%.2f €", @pricing[:total] / 100.0) %>
+              </div>
+            </div>
+          </div>
+
+          <div style="margin-top: 16px;">
+            <div class="info-label" style="display: block; margin-bottom: 8px;">
+              Stripe dashboard
+            </div>
+
+            <a
+              href="https://dashboard.stripe.com/payments/<%= @stripe_payment_intent_id %>"
+              class="stripe-link"
+            >
+              <%= @stripe_payment_intent_id %>
+            </a>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Adresse de livraison</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Adresse de livraison</div>
+
+              <div class="info-value">
+                <%= @shipping_address.address_line1 %>
+                <%= @shipping_address.address_line2.present? ? ", #{@shipping_address.address_line2}" : "" %>
+              </div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Ville</div>
+              <div class="info-value"><%= @shipping_address.city %></div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Code postal</div>
+              <div class="info-value"><%= @shipping_address.postal_code %></div>
+            </div>
+
+            <div class="info-row">
+              <div class="info-label">Code pays</div>
+              <div class="info-value"><%= @shipping_address.country %></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="footer">
+        Notification automatique pour la commande #<%= @order_number %>
+      </div>
+    </div>
+  </body>
+</html>

@@ -23,4 +23,19 @@ class OrderMailer < ApplicationMailer
 
     mail(to: order.customer.email, subject: "#{order.customer.full_name}, votre commande est en route")
   end
+
+  def order_paid(order_id)
+    order = Order.find(order_id)
+    @order_number = order.id
+    @client_name = order.customer.full_name
+    @client_email = order.customer.email
+    @client_phone = order.customer.phone
+    @variant_human = order.order_items.first.product_variant.human_format
+    @pricing = order.compute_pricing
+    @shipping_address = order.shipping_address
+    @stripe_payment_intent_id = order.stripe_payment_intent_id
+
+    admin_email = ENV.fetch("MARTIN_ASSMAC_EMAIL", "martin@assmac.com")
+    mail(to: admin_email, subject: "Nouvelle commande payée ##{order.id} - Prête à expédier")
+  end
 end

@@ -11,7 +11,8 @@ services:
       TZ: UTC
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    command: ["postgres", "-c", "log_statement=all", "-c", "max_connections=250"]
+    command:
+      ["postgres", "-c", "log_statement=all", "-c", "max_connections=250"]
     ports:
       - "6543:5432"
   mailpit:
@@ -30,4 +31,4 @@ services:
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 
 volumes:
-  postgres_data: { }
+  postgres_data: {}
