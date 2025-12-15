@@ -49,6 +49,9 @@ Rails.application.routes.draw do
 
   get "/api/geoloc", to: "geolocation#lookup"
 
+  get "/api/reviews/:token", to: "review#show"
+  patch "/api/reviews/:token", to: "review#update"
+
   # =========================================================================
   # Dashboard
   # =========================================================================
@@ -57,6 +60,7 @@ Rails.application.routes.draw do
   get "dashboard/orders", to: "dashboard/orders#index", as: :dashboard_orders
   get "dashboard/orders/:id", to: "dashboard/orders#show", as: :dashboard_order
   patch "dashboard/orders/:id", to: "dashboard/orders#update", as: :update_dashboard_order
+  post "dashboard/orders/:id/send_review_request", to: "dashboard/orders#send_review_request", as: :send_review_request_dashboard_order
   get "dashboard/order/:id/laposte_expedition_template", to: "dashboard/orders#laposte_expedition_template", as: :dashboard_order_laposte_expedition_template
 
   get "dashboard/products", to: "dashboard/products#index", as: :dashboard_products
@@ -78,6 +82,7 @@ Rails.application.routes.draw do
   get "dashboard/reviews/:id/edit", to: "dashboard/reviews#edit", as: :edit_dashboard_review
   patch "dashboard/reviews/:id", to: "dashboard/reviews#update", as: :update_dashboard_review
   delete "dashboard/reviews/:id", to: "dashboard/reviews#destroy", as: :delete_dashboard_review
+  post "dashboard/reviews/:id/validate", to: "dashboard/reviews#validate_review", as: :validate_dashboard_review
 
   get "dashboard/settings", to: "dashboard/settings#edit", as: :edit_dashboard_settings
   patch "dashboard/settings", to: "dashboard/settings#update", as: :update_dashboard_settings

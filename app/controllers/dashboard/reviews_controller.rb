@@ -10,6 +10,7 @@ module Dashboard
 
     def create
       @review = Review.new(review_params)
+      @review.validated = true  # Auto-validate reviews created by admin
       if @review.save
         flash[:success] = "Avis créé avec succès"
         redirect_to dashboard_reviews_path
@@ -36,6 +37,13 @@ module Dashboard
       @review = Review.find(params[:id])
       @review.destroy
       flash[:success] = "Avis supprimé avec succès"
+      redirect_to dashboard_reviews_path
+    end
+
+    def validate_review
+      @review = Review.find(params[:id])
+      @review.update(validated: true)
+      flash[:success] = "Avis validé avec succès"
       redirect_to dashboard_reviews_path
     end
 

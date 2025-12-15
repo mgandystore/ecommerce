@@ -26,7 +26,15 @@
           Créée le <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %>
         </p>
       </div>
-      <div class="flex gap-2" data-controller="dashboard-shipping-modal">
+      <div class="flex flex-col lg:flex-row gap-2">
+        <% review_submitted = @order.review&.content.present? %>
+        <%= button_to "Demander un avis",
+                      send_review_request_dashboard_order_path(@order),
+                      method: :post,
+                      disabled: review_submitted,
+                      class: "dash-btn-primary whitespace-nowrap #{review_submitted ? 'opacity-50 cursor-not-allowed' : ''}" %>
+
+        <div class="flex gap-2" data-controller="dashboard-shipping-modal">
         <%= form_with model: @order,
                       url: update_dashboard_order_path(@order),
                       method: :patch,
@@ -100,6 +108,7 @@
             </div>
           </dialog>
         <% end %>
+        </div>
       </div>
     </div>
 
@@ -227,6 +236,12 @@
                   <tr>
                     <td class="py-2 text-sm font-medium text-gray-900">N. Tel</td>
                     <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.phone %></td>
+                  </tr>
+                <% end %>
+                <% if @order.customer.referral_source.present? %>
+                  <tr>
+                    <td class="py-2 text-sm font-medium text-gray-900">Comment nous a connu</td>
+                    <td class="py-2 text-sm font-medium text-gray-500 text-right"><%= @order.customer.referral_source %></td>
                   </tr>
                 <% end %>
               </tbody>
@@ -435,6 +450,30 @@
                       </div>
                     </div>
                   </div>
+
+                  <!-- Review Link -->
+                  <% if @order.review&.content.present? %>
+                    <div class="bg-white rounded-lg border border-gray-200">
+                      <div class="px-4 py-5 sm:px-6 border-b border-gray-200">
+                        <h3 class="text-lg leading-6 font-medium text-gray-900">Avis client</h3>
+                      </div>
+                      <div class="px-4 py-5 sm:p-6">
+                        <div class="flex items-center justify-between">
+                          <div>
+                            <p class="text-sm text-gray-500">
+                              <%= @order.review.validated ? "Avis validé" : "Avis en attente de validation" %>
+                            </p>
+                            <p class="text-sm font-medium text-gray-900 mt-1">
+                              <%= @order.review.stars %> étoiles
+                            </p>
+                          </div>
+                          <%= link_to "Voir l'avis",
+                                      edit_dashboard_review_path(@order.review),
+                                      class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500" %>
+                        </div>
+                      </div>
+                    </div>
+                  <% end %>
                   </div>
                   </div>
                   </div>

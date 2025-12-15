@@ -2,6 +2,7 @@ class Order < ApplicationRecord
   has_many :order_items
   has_many :order_notes
   has_many :promo_code_usages
+  has_one :review
   belongs_to :customer, optional: true
   belongs_to :shipping_address, class_name: "Address", optional: true
   before_save :update_status_timestamp, if: :status_changed?

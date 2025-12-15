@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_12_12_151900) do
+ActiveRecord::Schema[8.0].define(version: 2025_12_12_154713) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -258,6 +258,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_12_12_151900) do
     t.decimal "stars"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "order_id"
+    t.boolean "validated", default: false, null: false
+    t.string "token"
+    t.index ["order_id"], name: "index_reviews_on_order_id"
+    t.index ["token"], name: "index_reviews_on_token", unique: true
   end
 
   create_table "settings", id: :string, force: :cascade do |t|

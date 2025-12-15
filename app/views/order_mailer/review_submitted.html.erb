@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nouvel avis client à valider</title>
+
+    <style>
+      body {
+          font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Helvetica', 'Arial', sans-serif;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          background-color: #f6f9fc;
+          color: #32325d;
+      }
+      .container {
+          max-width: 680px;
+          margin: 40px auto;
+          background-color: white;
+          border-radius: 8px;
+          overflow: hidden;
+      }
+      .header {
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          color: white;
+          padding: 32px;
+          text-align: center;
+      }
+      .header h1 {
+          margin: 0;
+          font-size: 24px;
+          font-weight: 500;
+      }
+      .header .order-id {
+          margin-top: 8px;
+          font-size: 14px;
+          opacity: 0.9;
+      }
+      .content {
+          padding: 32px;
+      }
+      .alert-box {
+          background-color: #fff8e1;
+          border-left: 4px solid #ffc107;
+          padding: 16px;
+          margin-bottom: 32px;
+          border-radius: 4px;
+          font-weight: 500;
+      }
+      .section {
+          margin-bottom: 32px;
+          padding-bottom: 24px;
+          border-bottom: 1px solid #e6ebf1;
+      }
+      .section:last-child {
+          border-bottom: none;
+          padding-bottom: 0;
+          margin-bottom: 0;
+      }
+      .section-title {
+          font-size: 12px;
+          font-weight: 600;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          color: #8898aa;
+          margin-bottom: 16px;
+      }
+      .info-grid {
+          display: table;
+          width: 100%;
+      }
+      .info-row {
+          display: table-row;
+      }
+      .info-label,
+      .info-value {
+          display: table-cell;
+          padding: 8px 0;
+          font-size: 15px;
+      }
+      .info-label {
+          color: #8898aa;
+          width: 40%;
+      }
+      .info-value {
+          color: #32325d;
+          font-weight: 500;
+      }
+      .stars {
+          color: #ffc107;
+          font-size: 20px;
+      }
+      .comment-box {
+          background-color: #f6f9fc;
+          border-radius: 4px;
+          padding: 16px;
+          margin-top: 16px;
+          font-style: italic;
+          color: #525f7f;
+      }
+      .footer {
+          background-color: #f6f9fc;
+          padding: 24px 32px;
+          text-align: center;
+          font-size: 13px;
+          color: #8898aa;
+      }
+  </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Nouvel avis client à valider</h1>
+        <div class="order-id">Commande #<%= @order_number %></div>
+      </div>
+
+      <div class="content">
+        <div class="alert-box">
+          Cet avis doit être validé avant d'être publié
+        </div>
+
+        <div class="section">
+          <div class="section-title">Client</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Nom</div>
+              <div class="info-value"><%= @client_name %></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Avis</div>
+
+          <div class="info-grid">
+            <div class="info-row">
+              <div class="info-label">Note</div>
+
+              <div class="info-value">
+                <span class="stars"><%= "★" * @rating.to_i %><%= "☆" * (5 - @rating.to_i) %></span>
+                (<%= @rating %>/5)
+              </div>
+            </div>
+          </div>
+
+          <div class="comment-box"><%= @comment %></div>
+        </div>
+
+        <div class="section">
+          <div class="section-title">Action requise</div>
+          <p>Rendez-vous sur le dashboard pour valider ou refuser cet avis.</p>
+        </div>
+      </div>
+
+      <div class="footer">
+        Notification automatique pour l'avis de la commande
+        #<%= @order_number %>
+      </div>
+    </div>
+  </body>
+</html>

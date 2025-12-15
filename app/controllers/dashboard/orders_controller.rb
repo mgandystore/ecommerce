@@ -78,6 +78,23 @@ module Dashboard
       redirect_to dashboard_order_path(@order)
     end
 
+    def send_review_request
+      @order = Order.find(params[:id])
+
+      # Create or find existing review for this order
+      review = @order.review || Review.create!(
+        order_id: @order.id,
+        name: @order.customer.full_name,
+        content: nil,
+        stars: nil,
+        validated: false
+      )
+
+      OrderMailer.request_review(@order.id).deliver_later
+      flash[:success] = "L'email de demande d'avis a été envoyé au client"
+      redirect_to dashboard_order_path(@order)
+    end
+
     def laposte_expedition_template
       require "csv"
 

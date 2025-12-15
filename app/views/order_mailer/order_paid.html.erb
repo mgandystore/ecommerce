@@ -157,6 +157,13 @@
               <div class="info-label">Téléphone</div>
               <div class="info-value"><%= @client_phone %></div>
             </div>
+
+            <% if @client_referral_source.present? %>
+              <div class="info-row">
+                <div class="info-label">Comment nous a connu</div>
+                <div class="info-value"><%= @client_referral_source %></div>
+              </div>
+            <% end %>
           </div>
         </div>
 

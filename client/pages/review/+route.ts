@@ -1,0 +1,1 @@
+export default '/review/@token'

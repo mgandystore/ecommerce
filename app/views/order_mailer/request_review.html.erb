@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Donnez-nous votre avis</title>
+
+    <style>
+      body {
+          font-family: Arial, sans-serif;
+          line-height: 1.6;
+          margin: 0;
+          padding: 0;
+          background-color: #f5f5f5;
+      }
+      .container {
+          max-width: 600px;
+          margin: 0 auto;
+          padding: 20px;
+          background-color: white;
+      }
+      .header {
+          background-color: #4CAF50;
+          color: white;
+          padding: 20px;
+          text-align: center;
+          border-radius: 8px 8px 0 0;
+      }
+      .content {
+          padding: 30px;
+          background-color: white;
+          border-radius: 0 0 8px 8px;
+      }
+      .button {
+          background-color: #4CAF50;
+          color: white;
+          padding: 12px 24px;
+          text-decoration: none;
+          border-radius: 4px;
+          display: inline-block;
+          margin: 20px 0;
+      }
+      .footer {
+          text-align: center;
+          padding: 20px;
+          color: #666;
+          font-size: 14px;
+      }
+  </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1>Votre avis compte pour nous !</h1>
+      </div>
+
+      <div class="content">
+        <p>Bonjour <%= @client_name %>,</p>
+
+        <p>
+          Merci d'avoir commandé chez nous! Nous espérons que votre commande
+          <strong>#<%= @order_number %></strong> vous satisfait pleinement.
+        </p>
+
+        <p>
+          Votre avis est très important pour nous et nous aide à améliorer nos
+          produits et services. Pourriez-vous prendre quelques instants pour
+          partager votre expérience ?
+        </p>
+
+        <p style="text-align: center;">
+          <a href="<%= @review_url %>" class="button">Donner mon avis</a>
+        </p>
+
+        <p>
+          Cela ne prendra que quelques minutes et nous permettra de continuer à
+          vous offrir la meilleure expérience possible.
+        </p>
+
+        <p>Merci pour votre confiance !</p>
+
+        <p>
+          Cordialement,
+          <br>
+          L'équipe ASSMAC
+        </p>
+      </div>
+
+      <div class="footer">
+        <p>
+          Cet email a été envoyé à
+          <a href="mailto:<%= @client_email %>"><%= @client_email %></a>
+        </p>
+      </div>
+    </div>
+  </body>
+</html>
