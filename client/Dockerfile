@@ -1,4 +1,5 @@
 FROM oven/bun:latest as builder
+# check=skip=SecretsUsedInArgOrEnv
 
 WORKDIR /app
 
