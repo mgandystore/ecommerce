@@ -8,13 +8,7 @@ class Product < ApplicationRecord
     attachment.variant :blur, blur: 32, resize_to_limit: [16, nil]
   end
 
-  after_create_commit :create_stripe_products
-
   has_many :product_variants
-
-  def create_stripe_products
-    CreateStripeProductJob.perform_later(self.id)
-  end
 
   def in_stock?
     product_variants.any? { |v| v.stock > 0 }

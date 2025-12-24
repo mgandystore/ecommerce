@@ -68,9 +68,11 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :smtp
   config.action_mailer.smtp_settings = {
     address: ENV.fetch("SMTP_HOST", "localhost"),
-    port: ENV.fetch("SMTP_PORT", 1025),
+    port: ENV.fetch("SMTP_PORT", 587),
     user_name: ENV.fetch("SMTP_LOGIN", "user"),
     password: ENV.fetch("SMTP_PASSWORD", "password"),
+    authentication: :plain,
+    enable_starttls_auto: true,
   }
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

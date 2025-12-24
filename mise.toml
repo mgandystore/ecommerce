@@ -1,0 +1,6 @@
+[tools]
+ruby = '3.3.6'
+node = '25'
+
+[env]
+_.file = [{ path = ".env", optional = true }]

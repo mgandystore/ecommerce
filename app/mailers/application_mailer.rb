@@ -1,5 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: "boutique@mail.assmac.com"
+  default from: ENV.fetch("SMTP_FROM_EMAIL", "martin@assmac.com")
   layout "mailer"
 
   before_action :set_common_variables
