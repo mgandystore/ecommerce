@@ -29,7 +29,7 @@ class HomeController < ApplicationController
 
     @product.faq.sort_by { |element| element["position"] }
     @product.specifications.sort_by { |element| element["position"] }
-    @reviews = Review.order(created_at: :desc)
+    @reviews = Review.where(validated: true).order(created_at: :desc)
     @setting = Setting.first
 
     preview_image_path = ActionController::Base.helpers.image_path("preview_image.png")
