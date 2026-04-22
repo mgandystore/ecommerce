@@ -1,7 +1,6 @@
 // https://vike.dev/Head
 
 import React from "react";
-import logoUrl from "../assets/logo.svg";
 import {usePageContext} from "vike-react/usePageContext";
 
 export default function HeadDefault() {
@@ -17,7 +16,7 @@ export default function HeadDefault() {
 
   return (
     <>
-      <link rel="icon" href={logoUrl}/>
+      <link rel="icon" type="image/png" href="/favicon_assmac.png"/>
       <link rel="canonical" href={canonicalUrl}/>
       <link rel="preconnect" href="https://fonts.googleapis.com"/>
       <link rel="preconnect" href="https://fonts.gstatic.com"/>
