@@ -9,8 +9,6 @@ export function Head() {
 	const siteUrl = import.meta.env.PUBLIC_ENV__FRONT_URL as string;
 	return (
 		<>
-			<title>La boutique du assmac</title>
-
 			<meta property="og:type" content={seo?.og?.type || "product"} />
 			<meta property="og:title" content={seo?.og?.title || "Assmac | La boutique du Assmac"} />
 			<meta property="og:description" content={seo?.og?.description || "La révolution minimaliste pour votre confort en suspension !"} />

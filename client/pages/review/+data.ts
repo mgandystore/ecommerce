@@ -10,6 +10,7 @@ export const data = async (pageContext: PageContextServer) => {
   const config = useConfig();
   config({
     title: "Assmac | Donnez votre avis",
+    description: "Deposer un avis apres une commande Assmac.",
   });
 
   const token = pageContext.routeParams.token;

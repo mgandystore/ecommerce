@@ -8,8 +8,8 @@ import Layout from "../layouts/LayoutDefault.js";
 export default {
   Layout,
 
-  title: "My Vike App",
-  description: "Demo showcasing Vike",
+  title: "Assmac",
+  description: "Hamac ultra-leger pour les relais en grande voie et les ascensions verticales.",
 
   extends: vikeReact,
 } satisfies Config;

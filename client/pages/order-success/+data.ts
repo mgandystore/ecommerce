@@ -12,11 +12,11 @@ export const data = async (pageContext: PageContextServer) => {
 
 	const config = useConfig()
 	config({
-		title: "Assmac | ✅ Achat validé",
+		title: "Assmac | Achat valide",
+		description: "Confirmation de commande Assmac.",
 	})
 
 	const response = await new AssmacAPI().settings();
 
 	return response;
 };
-

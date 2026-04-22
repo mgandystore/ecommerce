@@ -5,6 +5,12 @@ import {canonicalLogger, getLogger} from "./server/canonical_logger";
 import pino from "pino";
 
 const app = new Hono();
+const metaEnv = (import.meta as unknown as { env?: Record<string, string | undefined> }).env;
+const siteUrl = (
+	process.env.PUBLIC_ENV__FRONT_URL ||
+	metaEnv?.PUBLIC_ENV__FRONT_URL ||
+	"https://assmac.com"
+).replace(/\/$/, "");
 
 app.onError((err, c) => {
 	// @ts-ignore
@@ -35,6 +41,38 @@ app.use('*', canonicalLogger({
 	level: 'info',
 	excludePaths: ['/health', /^\/static\//],
 }));
+
+app.get("/robots.txt", (c) => {
+	return c.text(`User-agent: *
+Allow: /
+
+Sitemap: ${siteUrl}/sitemap.xml
+`, 200, {
+		"Content-Type": "text/plain; charset=utf-8",
+		"Cache-Control": "public, max-age=3600",
+	});
+});
+
+app.get("/sitemap.xml", (c) => {
+	const urls = [
+		`${siteUrl}/`,
+		`${siteUrl}/cgv`,
+		`${siteUrl}/mention-legales`,
+	];
+
+	const body = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${urls.map((url) => `  <url>
+    <loc>${url}</loc>
+  </url>`).join("\n")}
+</urlset>
+`;
+
+	return c.body(body, 200, {
+		"Content-Type": "application/xml; charset=utf-8",
+		"Cache-Control": "public, max-age=3600",
+	});
+});
 
 
 /**

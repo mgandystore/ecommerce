@@ -11,7 +11,8 @@ export type Data = Awaited<ReturnType<typeof data>>;
 export const data = async (pageContext: PageContextServer) => {
 	const config = useConfig()
 	config({
-		title: "Assmac | Condition genérale de vente",
+		title: "Assmac | Conditions generales de vente",
+		description: "Conditions generales de vente de la boutique Assmac.",
 	})
 
 	const response = await new AssmacAPI().salesTerms();
@@ -21,4 +22,3 @@ export const data = async (pageContext: PageContextServer) => {
 
 	return response as SalesTermsResponse;
 };
-
