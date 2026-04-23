@@ -1,4 +1,4 @@
-import { OrderResponse, PriceOrderResponse } from "@/pages/types";
+import { OrderResponse, PayOrderResponse, PriceOrderResponse } from "@/pages/types";
 import { ActionOrderState, OrderState } from "@/pages/order/reducer";
 import {
   PaymentElement,
@@ -9,7 +9,6 @@ import React, { useState, useEffect } from "react";
 import { validateOrderState } from "@/pages/order/validation";
 import { AssmacAPI } from "@/lib/assmac_client";
 import { Button } from "@/components/Button";
-import { ChevronRight } from "lucide-react";
 
 export function StripePayment({
   data,
@@ -43,11 +42,21 @@ export function StripePayment({
       // Validate the order state
       if (!validateCustomerAndShipping()) return;
 
-      // Check if Stripe is ready
-      if (!isStripeReady()) return;
+      // Stripe is only required when payment is still needed.
+      if (price.total > 0 && !isStripeReady()) return;
 
-      // Process the order with API
-      if (!(await processOrder())) return;
+      const order = await processOrder();
+      if (!order) return;
+
+      if (!order.payment_required) {
+        window.location.assign("/order/success");
+        return;
+      }
+
+      if (!isStripeReady()) {
+        setError("Le formulaire de paiement n'est pas prêt. Veuillez réessayer.");
+        return;
+      }
 
       if (!(await confirmStripePayment())) return;
     } finally {
@@ -80,7 +89,7 @@ export function StripePayment({
     return !(!stripe || !elements);
   };
 
-  const processOrder = async () => {
+  const processOrder = async (): Promise<PayOrderResponse | false> => {
     const mayOrder = await new AssmacAPI().payOrder(
       data.order.id,
       state.shipping,
@@ -92,12 +101,12 @@ export function StripePayment({
       );
       return false;
     }
-    return true;
+    return mayOrder;
   };
 
   const confirmStripePayment = async () => {
     const { error } = await stripe!.confirmPayment({
-      elements,
+      elements: elements!,
       confirmParams: {
         return_url: `${window.location.origin}/order/success`,
       },
@@ -113,19 +122,28 @@ export function StripePayment({
 
   return (
     <>
-      <div className="border rounded-md p-6 mb-6">
-        <div className="flex flex-col">
-          <h2 className="text-lg font-medium mb-2">Paiement</h2>
-          <p className="text-sm text-gray-500 mb-4">
-            Toutes les transactions sont sécurisées et cryptées.
+      {price.total > 0 ? (
+        <div className="border rounded-md p-6 mb-6">
+          <div className="flex flex-col">
+            <h2 className="text-lg font-medium mb-2">Paiement</h2>
+            <p className="text-sm text-gray-500 mb-4">
+              Toutes les transactions sont sécurisées et cryptées.
+            </p>
+          </div>
+          <PaymentElement
+            options={{
+              layout: "tabs",
+            }}
+          />
+        </div>
+      ) : (
+        <div className="border rounded-md p-6 mb-6 bg-emerald-50 border-emerald-200">
+          <h2 className="text-lg font-medium mb-2">Commande gratuite</h2>
+          <p className="text-sm text-emerald-700">
+            Aucun moyen de paiement n&apos;est requis pour cette commande.
           </p>
         </div>
-        <PaymentElement
-          options={{
-            layout: "tabs",
-          }}
-        />
-      </div>
+      )}
 
       {error && (
         <div className="mb-4">
@@ -143,7 +161,7 @@ export function StripePayment({
           {price.total > 0 ? (
             <>Payer {price.total / 100} €</>
           ) : (
-            <>Si c'est gratuit c'est toi le produit :)</>
+            <>Confirmer la commande gratuite</>
           )}
         </Button>
       </div>

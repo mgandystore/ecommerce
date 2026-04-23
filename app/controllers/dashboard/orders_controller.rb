@@ -2,7 +2,7 @@ module Dashboard
   class OrdersController < BaseController
     def index
       @orders = orders_scope
-                  .includes(:customer, :order_notes, :shipping_address, order_items: [:product_variant, :product])
+                  .includes(:customer, :order_notes, :shipping_address, :promo_code_usages, order_items: [:product_variant, :product])
                   .order(Arel.sql("paid_at IS NULL ASC"))
                   .order(Arel.sql("paid_at DESC NULLS LAST"))
                   .order(id: :desc)

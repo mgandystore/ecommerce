@@ -6,8 +6,8 @@ import {
   CreateOrderResponse,
   Customer,
   LegalNoticesResponse,
-  Order,
   OrderResponse,
+  PayOrderResponse,
   PriceOrderResponse,
   SalesTermsResponse,
 } from "@/pages/types";
@@ -100,7 +100,7 @@ export class AssmacAPI {
     orderId: string,
     address: Address,
     customer: Customer,
-  ): Promise<Order | { error: string }> {
+  ): Promise<PayOrderResponse | { error: string }> {
     try {
       const response = await fetch(
         `${this.baseUrl}/api/orders/${orderId}/pay`,
@@ -120,7 +120,7 @@ export class AssmacAPI {
         return (await response.json()) as { error: string };
       }
 
-      return (await response.json()) as Order;
+      return (await response.json()) as PayOrderResponse;
     } catch (error) {
       pino().error(error, "Error paying order");
       return { error: (error as Error).message };

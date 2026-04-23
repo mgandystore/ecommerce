@@ -102,6 +102,7 @@
         </thead>
         <tbody class="divide-y divide-gray-200 bg-white">
           <% @orders.each do |order| %>
+            <% order_price = order.compute_pricing %>
             <tr>
               <td class="whitespace-nowrap px-6 py-4 text-sm font-medium text-gray-900">
                 <%= order.id %>
@@ -121,7 +122,14 @@
                 <% end %>
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500">
-                <%= render(Dashboard::OrderStatusBadgeComponent.new(status: order.status)) %>
+                <div class="flex flex-col gap-1 items-start">
+                  <%= render(Dashboard::OrderStatusBadgeComponent.new(status: order.status)) %>
+                  <% if order_price[:total].zero? %>
+                    <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800 w-fit">
+                      Commande gratuite
+                    </span>
+                  <% end %>
+                </div>
               </td>
               <td class="whitespace-nowrap px-6 py-4 text-sm text-gray-500 text-left">
                 <pre class="text-xs text-gray-400"><%= order.order_items.first&.product_variant&.variants_slug %></pre>

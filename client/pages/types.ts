@@ -168,6 +168,10 @@ export interface Address {
 
 export interface CreateOrderResponse extends Order {}
 
+export interface PayOrderResponse extends Order {
+  payment_required: boolean;
+}
+
 export interface OrderResponse extends BaseData {
   order: Order;
   price: PriceOrderResponse;

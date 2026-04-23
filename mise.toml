@@ -3,4 +3,20 @@ ruby = '3.3.6'
 node = '25'
 
 [env]
-_.file = [{ path = ".env", optional = true }]
+_.file = [".env", "client/.env"]
+
+[tasks.rails]
+description = "Run the Rails development server"
+run = "bin/rails server"
+
+[tasks.vike]
+description = "Run the Vike development server"
+run = "cd client && npm run dev"
+
+[tasks.css]
+description = "Run the Rails Tailwind watcher"
+run = "bin/rails tailwindcss:watch"
+
+[tasks.dev]
+description = "Run Rails, Vike and Tailwind watcher together"
+run = "bash -lc 'mise run rails & mise run vike & mise run css & wait'"

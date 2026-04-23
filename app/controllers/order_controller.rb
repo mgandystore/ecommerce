@@ -211,6 +211,8 @@ class OrderController < ApplicationController
       return render json: { error: "customer_required" }, status: :bad_request
     end
 
+    payment_required = true
+
     begin
       # check if stock is available
       order.order_items.each do |item|
@@ -226,44 +228,26 @@ class OrderController < ApplicationController
       # Check if PaymentIntent is already succeeded
       payment_intent = Stripe::PaymentIntent.retrieve(order.stripe_payment_intent_id)
 
-      if payment_intent.status != "succeeded"
-        # Only update PaymentIntent if it hasn't been paid yet
-        update_payment_intent = {
-          amount: price[:total],
-          currency: "eur",
-          metadata: {
-            order_id: order.id,
-            order_items: order.order_items.map { |item| item.product_variant_id }.join(","),
-            shipping_address_id: order.shipping_address_id,
-            customer_id: order.customer_id,
-            is_pickup_point: order.shipping_address.pickup_point?,
-          },
-          shipping: {
-            address: {
-              line1: order.shipping_address.address_line1,
-              line2: order.shipping_address.address_line2,
-              city: order.shipping_address.city,
-              postal_code: order.shipping_address.postal_code,
-              country: order.shipping_address.country,
-            },
-            name: order.customer.full_name,
-            phone: order.customer.phone,
-            carrier: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo"
-          }
-        }
-
-        if price[:discount].present?
-          update_payment_intent[:metadata][:promo_code] = price[:promo_code][:code]
-          update_payment_intent[:metadata][:discount_amount] = price[:discount]
-        end
-
+      if price[:total].zero?
+        # A 0 EUR checkout must skip card confirmation.
+        # Keep a Stripe trace (metadata) and cancel the intent when possible.
         Stripe::PaymentIntent.update(
           order.stripe_payment_intent_id,
-          update_payment_intent
+          free_order_payment_intent_payload(order, price)
+        )
+        cancel_payment_intent_if_possible(payment_intent)
+        order.mark_paid!
+        payment_required = false
+      elsif payment_intent.status != "succeeded"
+        # Only update PaymentIntent if it hasn't been paid yet
+        Stripe::PaymentIntent.update(
+          order.stripe_payment_intent_id,
+          paid_order_payment_intent_payload(order, price)
         )
       else
         # Payment already succeeded, update order status
-        order.update!(status: :paid)
+        order.mark_paid!
+        payment_required = false
       end
 
     rescue StandardError => e
@@ -275,7 +259,7 @@ class OrderController < ApplicationController
       promo_code_usage.promo_code.increment_usage!
     end
 
-    render json: order.as_json, status: :ok
+    render json: order.as_json.merge(payment_required: payment_required), status: :ok
   end
 
   private
@@ -288,6 +272,60 @@ class OrderController < ApplicationController
     else
       0
     end
+  end
+
+  def base_payment_intent_payload(order, price)
+    payload = {
+      metadata: {
+        order_id: order.id,
+        order_items: order.order_items.map { |item| item.product_variant_id }.join(","),
+        shipping_address_id: order.shipping_address_id,
+        customer_id: order.customer_id,
+        is_pickup_point: order.shipping_address.pickup_point?,
+      },
+      shipping: {
+        address: {
+          line1: order.shipping_address.address_line1,
+          line2: order.shipping_address.address_line2,
+          city: order.shipping_address.city,
+          postal_code: order.shipping_address.postal_code,
+          country: order.shipping_address.country,
+        },
+        name: order.customer.full_name,
+        phone: order.customer.phone,
+        carrier: order.shipping_address.pickup_point? ? order.shipping_address.pickup_point_name : "colissimo"
+      }
+    }
+
+    if price[:discount].present?
+      payload[:metadata][:promo_code] = price[:promo_code][:code]
+      payload[:metadata][:discount_amount] = price[:discount]
+    end
+
+    payload
+  end
+
+  def paid_order_payment_intent_payload(order, price)
+    base_payment_intent_payload(order, price).merge(
+      amount: price[:total],
+      currency: "eur",
+    )
+  end
+
+  def free_order_payment_intent_payload(order, price)
+    payload = base_payment_intent_payload(order, price)
+    payload[:metadata][:no_payment_required] = true
+    payload[:metadata][:free_order_total] = price[:total]
+    payload
+  end
+
+  def cancel_payment_intent_if_possible(payment_intent)
+    cancellable_statuses = %w[requires_payment_method requires_confirmation requires_action requires_capture processing]
+    return unless cancellable_statuses.include?(payment_intent.status)
+
+    Stripe::PaymentIntent.cancel(payment_intent.id)
+  rescue StandardError => e
+    Rails.logger.warn("Unable to cancel PaymentIntent #{payment_intent.id}: #{e.message}")
   end
 
   def find_or_create_pickup_point(address_params)

@@ -25,6 +25,13 @@
         <p class="mt-1 text-sm text-gray-500">
           Créée le <%= @order.created_at.strftime("%d/%m/%Y à %H:%M") %>
         </p>
+        <% if @price[:total].zero? %>
+          <div class="mt-2">
+            <span class="inline-flex items-center rounded-full bg-green-100 px-2.5 py-0.5 text-xs font-medium text-green-800">
+              Commande gratuite
+            </span>
+          </div>
+        <% end %>
       </div>
       <div class="flex flex-col lg:flex-row gap-2">
         <% review_submitted = @order.review&.content.present? %>

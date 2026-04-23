@@ -26,6 +26,25 @@ class Order < ApplicationRecord
     OrderMailer.order_paid(self.id).deliver_later
   end
 
+  # Finalizes a paid order in an idempotent way.
+  # Returns true when the order transitioned to paid, false if it was already paid.
+  def mark_paid!
+    return false if paid?
+
+    ActiveRecord::Base.transaction do
+      update!(status: "paid")
+
+      order_items.includes(:product_variant).each do |item|
+        variant = item.product_variant
+        variant.lock!
+        variant.update!(stock: variant.stock - item.quantity)
+      end
+    end
+
+    OrderMailer.order_created(id).deliver_later
+    true
+  end
+
   def human_address
     [
       shipping_address.address_line1,
