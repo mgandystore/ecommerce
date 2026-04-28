@@ -42,6 +42,19 @@ app.use('*', canonicalLogger({
 	excludePaths: ['/health', /^\/static\//],
 }));
 
+const permanentRedirects: Record<string, string> = {
+	"/pages/index": "/",
+	"/pages/index/": "/",
+	"/pages/sales-terms": "/cgv",
+	"/pages/sales-terms/": "/cgv",
+	"/pages/legal-notices": "/mention-legales",
+	"/pages/legal-notices/": "/mention-legales",
+};
+
+Object.entries(permanentRedirects).forEach(([from, to]) => {
+	app.get(from, (c) => c.redirect(to, 301));
+});
+
 app.get("/robots.txt", (c) => {
 	return c.text(`User-agent: *
 Allow: /
